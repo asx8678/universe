@@ -11,8 +11,9 @@ Each run is `<task>.<setup>.<n>.jsonl` (claude -p stream-json) with a
     total       input+output tokens summed over every model call, subagents
                 included (each message counted once: stream-json repeats a
                 message's usage for every content block)
-    wall_s      result.duration_ms
-    turns       result.num_turns
+    wall_s      real elapsed time from <cell>.wall (run.py), else the sum of
+                result.duration_ms
+    turns       sum of result.num_turns (background subagents add results)
     success     PASS/FAIL from the grader
 """
 
@@ -61,9 +62,12 @@ def parse(path):
                         delegations += sum(1 for d in c.get("input", {}).get("directives") or []
                                            if isinstance(d, dict) and d.get("op") == "call" and "prompt" in d)
             elif t == "result":
-                turns = e.get("num_turns", 0)
-                wall_s = round((e.get("duration_ms") or 0) / 1000, 1)
+                # Background subagents make several results per run: sum them.
+                turns += e.get("num_turns", 0)
+                wall_s += (e.get("duration_ms") or 0) / 1000
 
+    wall_file = path.removesuffix(".jsonl") + ".wall"
+    wall_s = float(open(wall_file).read()) if os.path.exists(wall_file) else round(wall_s, 1)
     helpers = sum(v for k, v in usage_by_msg.items() if k in helper_msgs)
     side = path.removesuffix(".jsonl") + ".helpers.json"
     if os.path.exists(side):

@@ -142,6 +142,9 @@ def run_cell(task, setup, n, go):
                                stdin=subprocess.DEVNULL, timeout=RUN_TIMEOUT_S)
             except subprocess.TimeoutExpired:
                 log(f"timeout {cell} after {RUN_TIMEOUT_S}s")
+        # Real elapsed time: with background subagents a run emits several
+        # result events, and the last one's duration_ms covers only its turn.
+        (OUT / f"{cell}.wall").write_text(f"{time.time() - started:.1f}\n")
         helpers = [json.loads(l) for f in sorted((work / ".universe/agents").glob("*.usage.jsonl"))
                    for l in f.read_text().splitlines() if l.strip()]
         if setup == "agents":
