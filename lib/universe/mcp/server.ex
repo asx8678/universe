@@ -43,6 +43,11 @@ defmodule Universe.MCP.Server do
   call: call a service function. {"op":"call","label":"q","service":"pg", \
   "fn":"query","args":{...},"timeout_s":60}. Small results inline, large ones \
   become a handle.
+  agent: a serve with "agent" instead of code is a helper Claude session \
+  that stays up and takes tasks: {"op":"serve","label":"rev","agent": \
+  {"purpose":"system prompt","model":"haiku","tools":["Read","Grep"], \
+  "pool":"reviewers"}}; give it a task with {"op":"call","label":"r1", \
+  "service":"rev or a pool","prompt":"..."}. It can't run code.
   kill: {"op":"kill","target":"#5 or label"}.
   reply: answer a worker that is asking. {"op":"reply","target":"#9","text":"..."}.
 

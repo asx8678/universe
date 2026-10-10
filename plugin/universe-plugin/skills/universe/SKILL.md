@@ -28,6 +28,15 @@ digest. Bash is off in this project; read and edit files with your own tools.
   the 900 s idle stop.
 - `call`: `{"op":"call","label":"n","service":"pg","fn":"query","args":{"sql":"..."}}`.
   Small results show inline; large ones become a handle.
+- Agents: a `serve` with an `agent` block instead of code is a helper Claude
+  session with a purpose. It stays up, shows `idle`/`busy` in the manifest, and
+  takes tasks as calls with a `prompt`; it remembers earlier tasks.
+  `{"op":"serve","label":"reviewer","agent":{"purpose":"Review Elixir code for bugs","model":"haiku"}}`
+  then `{"op":"call","label":"r1","service":"reviewer","prompt":"Review lib/x.ex"}`.
+  Agent tools default to `Read, Grep, Glob`; `Edit`/`Write` need `leases`. Agents
+  can't run code. Give several agents the same `"pool":"reviewers"` and call
+  the pool: each task goes to a free agent. An agent with a question shows as
+  `asking`; answer with `reply`.
 - `kill`: `{"op":"kill","target":"#5"}`. `reply`: answer a worker that is
   `asking`: `{"op":"reply","target":"#9","text":"..."}`.
 

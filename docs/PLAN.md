@@ -224,6 +224,56 @@ Each milestone lists its tasks (with paths), its automated tests (ExUnit), its m
 
 **Done when:** the table is filled in and the decision is written down.
 
+### M5: agent workers (done Oct 10, 2026)
+
+An agent is a service whose process is a headless Claude session with a
+purpose. It builds on services and `call`, the parts the M4 no-go clause
+keeps, not on tick batching.
+
+**Design**
+- Create: `serve` with an `agent` block (`purpose`, `model`, `tools`, `pool`)
+  instead of `lang`/`code`. The worker runs `priv/sdk/agent_bridge.py`, which
+  holds one `claude -p --input-format stream-json --output-format stream-json`
+  session and serves one function, `task`.
+- Task: `call` with `prompt` (sugar for `fn: "task"`). The session's final
+  message is the result (inline or a handle). Calls to one agent run one at a
+  time, so it is one conversation that remembers earlier tasks.
+- Available: the agent's digest line and the manifest show `idle`/`busy`,
+  tasks done and context size.
+- Pools: agents sharing `pool`; a call naming the pool goes to a free member
+  (lowest ID), or waits until one is free.
+- Questions: a reply starting `QUESTION:` becomes `U.ask`; the model answers
+  with `reply`.
+- Crashes: a dead session is replaced on the next task (context lost); 4
+  deaths in 60 s stop the agent. Idle agents stop after `ttl_idle_s`.
+- Isolation: `claude` needs your login under `$HOME` and the Claude API, so
+  agents are not Seatbelt-wrapped. They run `--restricted`
+  (no code-running tools, file tools confined to the project, user/project
+  settings ignored), `--strict-mcp-config`, `--permission-mode dontAsk`, with
+  `Edit` allow rules only for leased paths and `Read`/`Edit` deny rules for
+  `.universe/`. Rules need absolute `//path` form (verified: relative `/path`
+  rules matched nothing when passed via `--settings`).
+
+**Evidence**
+- Probe: one session stayed alive idle, took a second task with context
+  kept; first-call context ~3.0k tokens with a short purpose and Read/Grep,
+  against ~26k for default Claude Code (M4).
+- Unit/integration: `test/universe/agents_test.exs` against a fake `claude`
+  (`test/support/bin/fake_claude`): validation, one session across tasks,
+  argv/permission rules, ask/reply, pool split, crash recovery.
+- Real run (haiku, release daemon over MCP): a 2-agent pool split 4 tasks
+  2/2 in 7.6 s including startup; a read of `.universe/token` was refused; a
+  follow-up to one agent recalled exactly the files it had summarised.
+- Orchestrated run: headless Claude Code with the plugin, asked to use a
+  pool of 3, found the existing pool in the manifest, added one agent, sent 20
+  tasks in one tick and wrote a correct 20-line `index.md` in 9 turns / 47 s.
+
+**Open**
+- Sessions don't survive a daemon restart (`--session-id`/`--resume` would
+  allow it).
+- A timed-out call leaves the session working on the old task.
+- Not benchmarked against Claude Code's own subagents.
+
 ---
 
 ## 3b. Carry-forward notes (from the M1 review)

@@ -17,7 +17,10 @@ defmodule Universe.Isolation.EscapeTest do
     label = uniq("escape")
     d = Map.merge(%{"op" => "run", "label" => label, "lang" => "bash", "code" => code}, extra)
     result = API.tick(%{"directives" => [d], "wait" => %{"timeout_s" => 30}})
-    [{"#" <> id, %{"status" => status}}] = Map.to_list(result.structured["ids"])
+    # Other tests' workers may still report late events; find ours by label.
+    {"#" <> id, %{"status" => status}} =
+      Enum.find(result.structured["ids"], fn {_, v} -> v["label"] == label end)
+
     {status, String.to_integer(id), result.text}
   end
 

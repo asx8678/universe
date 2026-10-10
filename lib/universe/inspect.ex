@@ -44,6 +44,20 @@ defmodule Universe.Inspect do
 
   ## manifest
 
+  # Agents show whether they can take a task now: idle, busy or asking.
+  defp agent_status(%{spec: %{agent: %{} = agent}, status: status}, busy, name) do
+    state =
+      cond do
+        status != "serving" -> status
+        MapSet.member?(busy, name) -> "busy"
+        true -> "idle"
+      end
+
+    Enum.join(["agent", agent.pool && "pool #{agent.pool}", state] |> Enum.filter(& &1), ", ")
+  end
+
+  defp agent_status(w, _busy, _name), do: w.status
+
   @doc "The manifest as plain text (also served to the SessionStart hook)."
   def manifest do
     workers = Tick.snapshot()
@@ -59,11 +73,19 @@ defmodule Universe.Inspect do
     tools = list_tools()
     handles = Handles.list()
 
+    busy =
+      for w <- others,
+          w.kind == "call",
+          w.status == "running",
+          into: MapSet.new(),
+          do: w.spec.service
+
     service_lines =
       Enum.map(services, fn w ->
         fns = if w.fns == [], do: "", else: " · fns: #{Enum.join(w.fns, ", ")}"
         desc = if w.describe in [nil, ""], do: "", else: " · #{w.describe}"
-        "  #{w.service || w.spec.service} (##{w.id}, #{w.status})#{fns}#{desc}"
+        name = w.service || w.spec.service
+        "  #{name} (##{w.id}, #{agent_status(w, busy, name)})#{fns}#{desc}"
       end)
 
     lines =

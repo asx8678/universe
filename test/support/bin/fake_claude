@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+"""Stands in for `claude -p --input-format stream-json` in agent tests.
+
+Answers each user message with one result. Records its argv in
+$TMPDIR/fake_claude_args.json. Message content steers it:
+  ASK     -> "QUESTION: which file?"; the next message is echoed as the answer
+  SLOW    -> waits 1.5 s first
+  CRASH   -> exits 7
+  anything else -> "done #<n>: <content>" (n counts messages, so one process
+                   shows a growing n)
+"""
+import json, os, sys, time
+
+with open(os.path.join(os.environ.get("TMPDIR", "/tmp"), "fake_claude_args.json"), "w") as f:
+    json.dump(sys.argv[1:], f)
+
+n = 0
+for line in sys.stdin:
+    msg = json.loads(line)
+    text = msg["message"]["content"]
+    n += 1
+    if "CRASH" in text:
+        sys.exit(7)
+    if "SLOW" in text:
+        time.sleep(1.5)
+    if text.startswith("Answer from the orchestrator:"):
+        result = "got " + text.split(":", 1)[1].strip()
+    elif "ASK" in text:
+        result = "QUESTION: which file?"
+    else:
+        result = f"done #{n}: {text}"
+    usage = {"input_tokens": 100 * n, "cache_read_input_tokens": 2900, "output_tokens": 5}
+    for e in ({"type": "system", "subtype": "init", "model": "fake"},
+              {"type": "assistant", "message": {"id": f"m{n}", "usage": usage, "content": []}},
+              {"type": "result", "subtype": "success", "is_error": False, "num_turns": 1,
+               "result": result}):
+        print(json.dumps(e), flush=True)

@@ -105,3 +105,29 @@ reads it with `U.get("h:7/q")`.
 
 Two directives can't lease overlapping paths at once; the second is rejected
 and names the holder.
+
+### 4. A pool of agents for many small reviews
+
+```json
+{"directives": [
+  {"op":"serve","label":"rev-a","agent":{"purpose":"You review one Elixir file for bugs. Answer with at most 3 findings, each file:line and one sentence.","model":"haiku","pool":"reviewers"}},
+  {"op":"serve","label":"rev-b","agent":{"purpose":"You review one Elixir file for bugs. Answer with at most 3 findings, each file:line and one sentence.","model":"haiku","pool":"reviewers"}},
+  {"op":"call","label":"r-tick","service":"reviewers","prompt":"Review lib/universe/tick.ex"},
+  {"op":"call","label":"r-worker","service":"reviewers","prompt":"Review lib/universe/worker.ex"},
+  {"op":"call","label":"r-handles","service":"reviewers","prompt":"Review lib/universe/handles.ex"}
+], "wait": {"until":"all","timeout_s":90}}
+```
+
+Each call goes to whichever agent is free; the rest wait. An agent's answer is
+the call's result (a handle if large). Agents stay up between ticks: send a
+follow-up to `rev-a` by name and it still knows what it read. They stop after
+`ttl_idle_s` (900 s) idle, or on `kill`.
+
+Agent fields: `purpose` (its system prompt, required), `model` (`haiku`,
+`sonnet`, `opus` or a full model name; default: your CLI's default), `tools`
+(from `Read Grep Glob Edit Write NotebookEdit WebSearch WebFetch TodoWrite`;
+default `Read Grep Glob`; writing tools need `leases`), `pool`. Agents run
+`claude --restricted`: no Bash or other code-running tools, file tools confined
+to the project, writes only under their leases, `.universe/` unreadable. They
+run outside the code-worker sandbox, since `claude` needs your login and the
+Claude API. Each task uses your Claude plan.

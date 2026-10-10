@@ -91,7 +91,9 @@ defmodule Universe.ServicesTest do
 
     manifest = API.inspect(%{"target" => "manifest"}).text
     assert manifest =~ "#{name} (#"
-    kill(name)
+
+    # A kill's wait holds until the service is really gone.
+    assert status(kill(name), name) == "killed"
   end
 
   test "large call results become handles; errors are failed lines" do
@@ -197,7 +199,7 @@ defmodule Universe.ServicesTest do
         %{"timeout_s" => 0}
       )
 
-    assert result.text =~ "no live service nope"
+    assert result.text =~ "no live service or agent pool nope"
     assert result.text =~ "service #{name} already runs as #"
     kill(name)
   end

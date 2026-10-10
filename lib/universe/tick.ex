@@ -307,7 +307,11 @@ defmodule Universe.Tick do
   # Pass 1 gives every run, serve and call an ID (and holds leases) so `after`
   # can point at labels later in the batch; pass 2 resolves dependencies.
   defp apply_directives(state, tick, accepted) do
-    batch_services = for %{op: "serve", service: name} <- accepted, into: MapSet.new(), do: name
+    batch_services =
+      for %{op: "serve"} = d <- accepted,
+          name <- [d.service | List.wrap(d[:agent] && d.agent.pool)],
+          into: MapSet.new(),
+          do: name
 
     {state, placed, rejected} =
       Enum.reduce(accepted, {state, [], []}, fn d, {st, placed, rej} ->
@@ -383,11 +387,16 @@ defmodule Universe.Tick do
   defp place(state, tick, %{op: "call"} = d, batch_services) do
     holder = state.services[d.service]
 
-    if MapSet.member?(batch_services, d.service) or (holder && status_of(state, holder) in @live) do
+    live? =
+      MapSet.member?(batch_services, d.service) or
+        (holder != nil and status_of(state, holder) in @live) or
+        pool_members(state, d.service) != []
+
+    if live? do
       id = Ids.next_worker()
       {:placed, add_worker(state, id, tick, "call", d), id}
     else
-      {:error, "no live service #{d.service}; start it with serve"}
+      {:error, "no live service or agent pool #{d.service}; start it with serve"}
     end
   end
 
@@ -497,7 +506,9 @@ defmodule Universe.Tick do
   # Stops a live ID. `reason` (if any) ends up in its exit summary.
   defp stop(state, id, reason) do
     w = state.workers[id]
-    state = put_worker(state, %{w | kill_reason: reason})
+    # Marked so waits hold until it is really gone: a serving service would
+    # otherwise count as settled and the kill would surface a tick later.
+    state = put_worker(state, Map.merge(w, %{kill_reason: reason, stopping: true}))
 
     case w.status do
       "queued" ->
@@ -582,14 +593,20 @@ defmodule Universe.Tick do
       not Enum.all?(dep_states, fn {_, s} -> s in ["done", "serving"] end) ->
         :wait
 
-      w.kind == "call" ->
+      w.kind == "call" and Map.has_key?(state.services, w.spec.service) ->
         sid = state.services[w.spec.service]
 
-        case sid && status_of(state, sid) do
+        case status_of(state, sid) do
           "serving" -> :ready
           s when s in @terminal -> {:fail, "service #{w.spec.service} is #{s}"}
           nil -> {:fail, "no service #{w.spec.service}"}
           _ -> :wait
+        end
+
+      w.kind == "call" ->
+        case pool_members(state, w.spec.service) do
+          [] -> {:fail, "no service or agent pool #{w.spec.service}"}
+          members -> if free_member(state, members), do: :ready, else: :wait
         end
 
       w.kind == "run" ->
@@ -603,13 +620,43 @@ defmodule Universe.Tick do
   defp running_count(state),
     do: Enum.count(state.workers, fn {_, w} -> w.kind == "run" and w.status == "running" end)
 
+  # Live agents of a pool (queued and starting ones too, so a call can wait).
+  defp pool_members(state, pool) do
+    for {_, %{kind: "serve", status: s, spec: %{agent: %{pool: ^pool}}} = w} <- state.workers,
+        s in @live,
+        do: w
+  end
+
+  # A serving pool member with no call running on it, lowest ID first.
+  defp free_member(state, members) do
+    busy =
+      for {_, %{kind: "call", status: "running"} = c} <- state.workers,
+          into: MapSet.new(),
+          do: c.spec.service
+
+    members
+    |> Enum.filter(&(&1.status == "serving" and not MapSet.member?(busy, &1.service)))
+    |> Enum.min_by(& &1.id, fn -> nil end)
+  end
+
   defp start(state, %{kind: "call"} = w) do
+    w =
+      if Map.has_key?(state.services, w.spec.service) do
+        w
+      else
+        # A pool call: hand it to a free member.
+        member = free_member(state, pool_members(state, w.spec.service))
+        %{w | spec: Map.merge(w.spec, %{pool: w.spec.service, service: member.service})}
+      end
+
     %{service: service, fn: fun, args: args, timeout_s: timeout} = w.spec
 
     EventLog.append("call",
       tick: w.tick,
       id: w.id,
-      data: %{"service" => service, "fn" => fun, "args" => clip_json(args, 500)}
+      data:
+        %{"service" => service, "fn" => fun, "args" => clip_json(args, 500)}
+        |> then(&if(w.spec[:pool], do: Map.put(&1, "pool", w.spec.pool), else: &1))
     )
 
     task =
@@ -637,6 +684,7 @@ defmodule Universe.Tick do
       kind: w.kind,
       lang: d.lang,
       code: d.code,
+      agent: Map.get(d, :agent),
       budget: d.budget,
       leases: d.leases,
       network: Map.get(d, :network, []),
@@ -1023,8 +1071,15 @@ defmodule Universe.Tick do
     end)
   end
 
+  defp wait_status(state, id) do
+    case state.workers[id] do
+      %{stopping: true, status: s} when s in @live -> "stopping"
+      _ -> status_of(state, id)
+    end
+  end
+
   defp wake_rule(state, waiter) do
-    statuses = Enum.map(waiter.watch, &status_of(state, &1))
+    statuses = Enum.map(waiter.watch, &wait_status(state, &1))
     t = now()
 
     cond do
@@ -1120,12 +1175,30 @@ defmodule Universe.Tick do
   defp detail(%{status: "queued"} = w, _recent) do
     cond do
       w.deps != [] -> "after " <> Enum.map_join(w.deps, ", ", &"##{&1}")
-      w.kind == "call" -> "waiting for service #{w.spec.service}"
+      w.kind == "call" -> "waiting for #{w.spec.service}"
       true -> "waiting for a slot"
     end
   end
 
   defp detail(%{status: "asking"} = w, _recent), do: "asks: #{w.question}"
+
+  defp detail(%{status: "serving", spec: %{agent: %{} = agent}} = w, recent) do
+    restarted = Enum.any?(recent, &(&1["type"] == "restart"))
+
+    progress =
+      case EventLog.for_id_since(w.id, 0) |> Enum.filter(&(&1["type"] == "progress")) do
+        [] -> "idle"
+        events -> List.last(events)["data"]["text"]
+      end
+
+    join([
+      "agent #{w.service}",
+      agent.pool && "pool #{agent.pool}",
+      agent.model,
+      progress,
+      restarted && "restarted"
+    ])
+  end
 
   defp detail(%{status: "serving"} = w, recent) do
     restarted = Enum.any?(recent, &(&1["type"] == "restart"))

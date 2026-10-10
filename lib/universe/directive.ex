@@ -12,8 +12,16 @@ defmodule Universe.Directive do
       %{op: "serve", label: "pg", service: "pg", lang:, code:, budget:, leases:,
         network: ["db.internal:5432"], ttl_idle_s: 900, after: [], then: [], quiet: false}
 
+      %{op: "serve", label: "reviewer", service: "reviewer", lang: "agent",
+        agent: %{purpose: "...", model: "haiku", tools: ["Read", "Grep"], pool: "reviewers"},
+        code: "<agent config JSON>", ...}
+
       %{op: "call", label: "count", service: "pg", fn: "query", args: %{...},
         timeout_s: 60, after: [], then: [], quiet: false}
+
+  A call with `prompt` instead of `fn`/`args` is a task for an agent:
+  `fn: "task", args: %{"prompt" => prompt}`. A call's `service` may also name
+  an agent pool.
 
       %{op: "kill", label: nil | "stop-pg", target: "#5" | "pg"}
       %{op: "reply", label: nil, target: "#9" | "ui-build", text: "use the new file"}
@@ -33,8 +41,15 @@ defmodule Universe.Directive do
   @id_re ~r/^#(\d+)$/
 
   @run_fields ~w(op label lang code budget leases after then quiet)
-  @serve_fields ~w(op label name lang code budget leases network ttl_idle_s after quiet)
-  @call_fields ~w(op label service fn args timeout_s after quiet)
+  @serve_fields ~w(op label name lang code agent budget leases network ttl_idle_s after quiet)
+  @call_fields ~w(op label service fn args prompt timeout_s after quiet)
+  @agent_fields ~w(purpose model tools pool)
+  # Built-in tools an agent may get. Code-running tools never: an agent runs
+  # code through Universe workers, which are sandboxed.
+  @agent_tools ~w(Read Grep Glob Edit Write NotebookEdit WebSearch WebFetch TodoWrite)
+  @agent_write_tools ~w(Edit Write NotebookEdit)
+  @default_agent_tools ~w(Read Grep Glob)
+  @max_purpose_bytes 16 * 1024
   @kill_fields ~w(op label target)
   @reply_fields ~w(op label target text)
   @budget_fields ~w(wall_s out_kb mem_mb)
@@ -44,7 +59,8 @@ defmodule Universe.Directive do
   @serve_defaults %{wall_s: nil, out_kb: 256, mem_mb: 2048}
   @limits %{wall_s: 86_400, out_kb: 4096, mem_mb: 16_384}
   @default_ttl_s 900
-  @max_call_timeout_s 300
+  # Agent tasks can take a while.
+  @max_call_timeout_s 1800
   @max_code_bytes 256 * 1024
   @max_directives 64
 
@@ -152,8 +168,7 @@ defmodule Universe.Directive do
     with :ok <- known_fields(d, @serve_fields),
          {:ok, label} <- label(d["label"], true),
          {:ok, name} <- service_name(d["name"] || label),
-         {:ok, lang} <- lang(d["lang"]),
-         {:ok, code} <- code(d["code"]),
+         {:ok, lang, code, agent} <- serve_body(d),
          {:ok, budget} <- budget(d["budget"], @serve_defaults),
          {:ok, leases} <- leases(d["leases"]),
          {:ok, network} <- network(d["network"]),
@@ -167,6 +182,7 @@ defmodule Universe.Directive do
          service: name,
          lang: lang,
          code: code,
+         agent: agent,
          budget: budget,
          leases: leases,
          network: network,
@@ -182,7 +198,7 @@ defmodule Universe.Directive do
     with :ok <- known_fields(d, @call_fields),
          {:ok, label} <- label(d["label"], true),
          {:ok, service} <- service_name(d["service"]),
-         {:ok, fun} <- fn_name(d["fn"]),
+         {:ok, fun, args} <- call_target(d),
          {:ok, timeout} <- int_field(d["timeout_s"], "timeout_s", 1, @max_call_timeout_s, 60),
          {:ok, after_refs} <- after_refs(d["after"], false),
          {:ok, quiet} <- quiet(d["quiet"]) do
@@ -192,7 +208,7 @@ defmodule Universe.Directive do
          label: label,
          service: service,
          fn: fun,
-         args: d["args"],
+         args: args,
          timeout_s: timeout,
          after: after_refs,
          then: [],
@@ -200,6 +216,106 @@ defmodule Universe.Directive do
        }}
     end
   end
+
+  # A serve runs either code or an agent (a Claude session with a purpose).
+  defp serve_body(%{"agent" => agent} = d) do
+    cond do
+      Map.has_key?(d, "code") ->
+        {:error, "serve takes code or agent, not both"}
+
+      d["lang"] not in [nil, "agent"] ->
+        {:error, "an agent serve takes no lang"}
+
+      Map.has_key?(d, "network") ->
+        {:error, "agents take no network (they reach only the Claude API)"}
+
+      true ->
+        with {:ok, a} <- agent(agent, d["leases"]), do: {:ok, "agent", nil, a}
+    end
+  end
+
+  defp serve_body(d) do
+    with {:ok, lang} <- lang(d["lang"]),
+         {:ok, code} <- code(d["code"]),
+         do: {:ok, lang, code, nil}
+  end
+
+  defp agent(a, leases) when is_map(a) do
+    with :ok <- known_fields(a, @agent_fields),
+         {:ok, purpose} <- purpose(a["purpose"]),
+         {:ok, model} <- model(a["model"]),
+         {:ok, tools} <- agent_tools(a["tools"], leases),
+         {:ok, pool} <- pool(a["pool"]) do
+      {:ok, %{purpose: purpose, model: model, tools: tools, pool: pool}}
+    end
+  end
+
+  defp agent(_, _), do: {:error, "agent must be an object: {purpose, model, tools, pool}"}
+
+  defp purpose(p) when is_binary(p) do
+    cond do
+      String.trim(p) == "" -> {:error, "agent purpose is empty"}
+      byte_size(p) > @max_purpose_bytes -> {:error, "agent purpose is over 16 KB"}
+      true -> {:ok, p}
+    end
+  end
+
+  defp purpose(_), do: {:error, "agent needs a purpose (its system prompt)"}
+
+  defp model(nil), do: {:ok, nil}
+
+  defp model(m) when is_binary(m) do
+    if Regex.match?(~r/^[A-Za-z0-9][A-Za-z0-9._\[\]-]{0,63}$/, m),
+      do: {:ok, m},
+      else: {:error, "agent model must be a model name or alias like haiku, sonnet, opus"}
+  end
+
+  defp model(_), do: {:error, "agent model must be a string"}
+
+  defp agent_tools(nil, _leases), do: {:ok, @default_agent_tools}
+
+  defp agent_tools(tools, leases) when is_list(tools) do
+    cond do
+      not Enum.all?(tools, &(&1 in @agent_tools)) ->
+        bad = Enum.reject(tools, &(&1 in @agent_tools))
+
+        {:error,
+         "agent tools #{inspect(bad)} not allowed (allowed: #{Enum.join(@agent_tools, ", ")})"}
+
+      Enum.any?(tools, &(&1 in @agent_write_tools)) and leases in [nil, []] ->
+        {:error, "agent tools that write (#{Enum.join(@agent_write_tools, ", ")}) need leases"}
+
+      true ->
+        {:ok, Enum.uniq(tools)}
+    end
+  end
+
+  defp agent_tools(_, _), do: {:error, "agent tools must be a list of tool names"}
+
+  defp pool(nil), do: {:ok, nil}
+
+  defp pool(p) when is_binary(p) do
+    if Regex.match?(@label_re, p),
+      do: {:ok, p},
+      else: {:error, "agent pool must be 1-40 chars of letters, digits, _ . -"}
+  end
+
+  defp pool(_), do: {:error, "agent pool must be a string"}
+
+  defp call_target(%{"prompt" => prompt} = d) do
+    cond do
+      Map.has_key?(d, "fn") or Map.has_key?(d, "args") ->
+        {:error, "a call takes prompt (an agent task) or fn/args, not both"}
+
+      not is_binary(prompt) or String.trim(prompt) == "" ->
+        {:error, "prompt must be a non-empty string"}
+
+      true ->
+        {:ok, "task", %{"prompt" => prompt}}
+    end
+  end
+
+  defp call_target(d), do: with({:ok, f} <- fn_name(d["fn"]), do: {:ok, f, d["args"]})
 
   defp reply(d) do
     with :ok <- known_fields(d, @reply_fields),
@@ -220,7 +336,7 @@ defmodule Universe.Directive do
   defp service_name(_), do: {:error, "service must be a string"}
 
   defp fn_name(f) when is_binary(f) and f != "", do: {:ok, f}
-  defp fn_name(_), do: {:error, "call needs fn (a function name)"}
+  defp fn_name(_), do: {:error, "call needs fn (a function name), or prompt for an agent"}
 
   defp reply_text(t) when is_binary(t) and t != "" do
     if byte_size(t) <= 64 * 1024, do: {:ok, t}, else: {:error, "reply text is over 64 KB"}

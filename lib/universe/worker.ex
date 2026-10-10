@@ -11,6 +11,13 @@ defmodule Universe.Worker do
   Two kinds: `"run"` snippets (wall budget, exit ends them) and `"serve"`
   services (no wall budget unless given; they call `U.serve` and stay up).
 
+  An agent service (`lang: "agent"`) runs `priv/sdk/agent_bridge.py`, which
+  keeps one headless `claude` session and serves its `task` function. The
+  `claude` CLI needs your login (under `$HOME`) and the Claude API, so an
+  agent is not wrapped in the Seatbelt profile; it runs `claude --restricted`
+  instead: no code-running tools, file tools confined to the project, writes
+  only to its leases (permission rules), and `.universe/` denied.
+
   Files in `.universe/runs/<id>/`: the code file, `stdout`, `stderr`,
   `sandbox.sb`, `token`. Output goes to disk in full; events carry it only up
   to the `out_kb` budget per stream.
@@ -62,7 +69,27 @@ defmodule Universe.Worker do
   def run_dir(id), do: Path.join(Paths.runs_dir(), Integer.to_string(id))
 
   @doc "Name of the code file for a language."
+  def code_file("agent"), do: "agent.json"
   def code_file(lang), do: Map.fetch!(@runners, lang)
+
+  defp code_text(%{lang: "agent", agent: agent} = state, root) do
+    Jason.encode!(%{
+      "service" => state.service,
+      "purpose" => agent.purpose,
+      "model" => agent.model,
+      "tools" => agent.tools,
+      "leases" => state.leases,
+      "root" => root,
+      "claude" => claude_bin()
+    })
+  end
+
+  defp code_text(state, _root), do: state.code
+
+  @doc "The claude CLI agents run: `config :universe, claude_bin` or the one on PATH."
+  def claude_bin do
+    Application.get_env(:universe, :claude_bin) || System.find_executable("claude") || "claude"
+  end
 
   @doc """
   Directory of the SDK client libraries, symlinks resolved: in development
@@ -82,6 +109,7 @@ defmodule Universe.Worker do
       kind: Map.get(spec, :kind, "run"),
       lang: spec.lang,
       code: spec.code,
+      agent: Map.get(spec, :agent),
       wall_s: spec.budget[:wall_s],
       mem_mb: spec.budget[:mem_mb],
       out_cap: spec.budget.out_kb * 1024,
@@ -113,7 +141,7 @@ defmodule Universe.Worker do
     File.mkdir_p!(Path.join(state.run_dir, "tmp"))
     File.mkdir_p!(Path.join(state.run_dir, "home"))
     code_path = Path.join(state.run_dir, code_file(state.lang))
-    File.write!(code_path, state.code)
+    File.write!(code_path, code_text(state, root))
     token_path = Path.join(state.run_dir, "token")
     File.write!(token_path, state.token)
     File.chmod!(token_path, 0o600)
@@ -156,7 +184,7 @@ defmodule Universe.Worker do
           socket: Universe.SDK.Listener.socket_path()
         }
 
-        argv = Isolation.adapter().wrap(argv, spec)
+        argv = if state.lang == "agent", do: argv, else: Isolation.adapter().wrap(argv, spec)
 
         args =
           ["--fsize", Integer.to_string(fsize()), "--grace", Integer.to_string(@grace_ms), "--"] ++
@@ -256,6 +284,10 @@ defmodule Universe.Worker do
 
         "elixir" ->
           {"elixir", fn exe -> [exe, "-r", Path.join(sdk_dir(), "universe.exs"), code_path] end}
+
+        "agent" ->
+          bridge = Path.join(sdk_dir(), "agent_bridge.py")
+          {"python3", fn exe -> [exe, "-I", "-u", "-c", @python_boot, sdk_dir(), bridge] end}
       end
 
     {bin, build} = runner
@@ -269,18 +301,30 @@ defmodule Universe.Worker do
   defp env_args(state) do
     secrets = if state.kind == "serve" and state.service, do: Secrets.env(state.service), else: []
 
+    # claude finds your login through HOME and USER (keychain).
+    home =
+      if state.lang == "agent",
+        do: [
+          "HOME=#{System.user_home!()}",
+          "USER=#{System.get_env("USER", "")}",
+          "UNIVERSE_AGENT_CONFIG=#{Path.join(state.run_dir, "agent.json")}"
+        ],
+        else: ["HOME=#{Path.join(state.run_dir, "home")}"]
+
     [
       "/usr/bin/env",
       "-i",
-      "PATH=#{System.get_env("PATH", "/usr/bin:/bin")}",
-      "HOME=#{Path.join(state.run_dir, "home")}",
-      "TMPDIR=#{Path.join(state.run_dir, "tmp")}",
-      "LANG=en_US.UTF-8",
-      "UNIVERSE_ID=#{state.id}",
-      "UNIVERSE_RUN_DIR=#{state.run_dir}",
-      "UNIVERSE_SOCK=#{Universe.SDK.Listener.socket_path()}",
-      "UNIVERSE_TOKEN_FILE=#{Path.join(state.run_dir, "token")}"
-    ] ++ Enum.map(secrets, fn {k, v} -> "#{k}=#{v}" end)
+      "PATH=#{System.get_env("PATH", "/usr/bin:/bin")}"
+    ] ++
+      home ++
+      [
+        "TMPDIR=#{Path.join(state.run_dir, "tmp")}",
+        "LANG=en_US.UTF-8",
+        "UNIVERSE_ID=#{state.id}",
+        "UNIVERSE_RUN_DIR=#{state.run_dir}",
+        "UNIVERSE_SOCK=#{Universe.SDK.Listener.socket_path()}",
+        "UNIVERSE_TOKEN_FILE=#{Path.join(state.run_dir, "token")}"
+      ] ++ Enum.map(secrets, fn {k, v} -> "#{k}=#{v}" end)
   end
 
   ## Output
