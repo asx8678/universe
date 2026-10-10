@@ -1,37 +1,79 @@
 #!/usr/bin/env python3
 """Stands in for `claude -p --input-format stream-json` in agent tests.
 
-Answers each user message with one result. Records its argv in
-$TMPDIR/fake_claude_args.json. Message content steers it:
-  ASK     -> "QUESTION: which file?"; the next message is echoed as the answer
-  SLOW    -> waits 1.5 s first
-  CRASH   -> exits 7
-  anything else -> "done #<n>: <content>" (n counts messages, so one process
-                   shows a growing n)
+Answers each user message with one result and records its argv in
+$TMPDIR/fake_claude_args.json. Sessions (--session-id / --resume) persist
+their message count in ./.fake_sessions/<id>; resuming an unknown ID exits 1
+like a lost session. Message content steers it:
+  ASK    -> "QUESTION: which file?"; the next message is echoed as the answer
+  SLOW   -> waits 1.5 s first
+  SLEEP  -> works for 30 s unless interrupted (control_request interrupt)
+  CRASH  -> exits 7
+  else   -> "done #<n>: <content>" (n counts the session's messages)
 """
-import json, os, sys, time
+import json, os, queue, sys, threading, time
 
+args = sys.argv[1:]
 with open(os.path.join(os.environ.get("TMPDIR", "/tmp"), "fake_claude_args.json"), "w") as f:
-    json.dump(sys.argv[1:], f)
+    json.dump(args, f)
 
-n = 0
-for line in sys.stdin:
-    msg = json.loads(line)
+def opt(name):
+    return args[args.index(name) + 1] if name in args else None
+
+store = ".fake_sessions"
+sid = opt("--resume") or opt("--session-id") or "none"
+path = os.path.join(store, sid)
+if opt("--resume") and not os.path.exists(path):
+    print("No conversation found with session ID", file=sys.stderr)
+    sys.exit(1)
+n = int(open(path).read()) if os.path.exists(path) else 0
+
+lines = queue.Queue()
+threading.Thread(target=lambda: [lines.put(json.loads(l)) for l in sys.stdin] and None or lines.put(None),
+                 daemon=True).start()
+
+def emit(*events):
+    for e in events:
+        print(json.dumps(e), flush=True)
+
+def result(text, error=False, subtype="success"):
+    usage = {"input_tokens": 100 * n, "cache_read_input_tokens": 2900, "output_tokens": 5}
+    emit({"type": "system", "subtype": "init", "model": "fake", "session_id": sid},
+         {"type": "assistant", "message": {"id": f"m{n}", "usage": usage, "content": []}},
+         {"type": "result", "subtype": subtype, "is_error": error, "num_turns": 1,
+          "result": text, "session_id": sid})
+
+while True:
+    msg = lines.get()
+    if msg is None:
+        break
+    if msg.get("type") == "control_request":
+        emit({"type": "control_response", "response": {"subtype": "success", "request_id": msg["request_id"]}})
+        continue
     text = msg["message"]["content"]
     n += 1
+    os.makedirs(store, exist_ok=True)
+    open(path, "w").write(str(n))
     if "CRASH" in text:
         sys.exit(7)
     if "SLOW" in text:
         time.sleep(1.5)
+    if "SLEEP" in text:
+        end, stopped = time.time() + 30, False
+        while time.time() < end and not stopped:
+            try:
+                m = lines.get(timeout=0.1)
+            except queue.Empty:
+                continue
+            if m and m.get("type") == "control_request" and m["request"]["subtype"] == "interrupt":
+                emit({"type": "control_response", "response": {"subtype": "success", "request_id": m["request_id"]}})
+                stopped = True
+        if stopped:
+            result(None, error=True, subtype="error_during_execution")
+            continue
     if text.startswith("Answer from the orchestrator:"):
-        result = "got " + text.split(":", 1)[1].strip()
+        result("got " + text.split(":", 1)[1].strip())
     elif "ASK" in text:
-        result = "QUESTION: which file?"
+        result("QUESTION: which file?")
     else:
-        result = f"done #{n}: {text}"
-    usage = {"input_tokens": 100 * n, "cache_read_input_tokens": 2900, "output_tokens": 5}
-    for e in ({"type": "system", "subtype": "init", "model": "fake"},
-              {"type": "assistant", "message": {"id": f"m{n}", "usage": usage, "content": []}},
-              {"type": "result", "subtype": "success", "is_error": False, "num_turns": 1,
-               "result": result}):
-        print(json.dumps(e), flush=True)
+        result(f"done #{n}: {text}")

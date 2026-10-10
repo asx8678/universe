@@ -268,10 +268,20 @@ keeps, not on tick batching.
   pool of 3, found the existing pool in the manifest, added one agent, sent 20
   tasks in one tick and wrote a correct 20-line `index.md` in 9 turns / 47 s.
 
+**Follow-ups (done Oct 10, 2026)**
+- Sessions persist: each agent gets a `--session-id`, saved in
+  `.universe/agents/<name>.json` with a key of its config. Serving it again
+  resumes (`--resume`); a crash resumes in a new process; a session that
+  can't be resumed falls back to a new one. `"resume": false` opts out.
+  Verified with haiku across a full daemon restart.
+- Timeouts: the connection passes what is left of the caller's timeout to
+  the service (`timeout_ms` on `invoke`, `U.time_left()` in Python); the
+  bridge sends a stream-json `interrupt` control request at the deadline, so
+  the agent is free again. Invocations whose caller already gave up while
+  queued are dropped. Verified with haiku: a 5 s task stopped at ~4 s, the
+  next task ran at once.
+
 **Open**
-- Sessions don't survive a daemon restart (`--session-id`/`--resume` would
-  allow it).
-- A timed-out call leaves the session working on the old task.
 - Not benchmarked against Claude Code's own subagents.
 
 ---

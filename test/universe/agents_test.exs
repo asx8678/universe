@@ -67,7 +67,8 @@ defmodule Universe.AgentsTest do
                purpose: "Answer questions about the code.",
                model: "haiku",
                tools: ["Read", "Grep", "Glob"],
-               pool: "reviewers"
+               pool: "reviewers",
+               resume: true
              }
 
       {[c], []} = check(task("t1", "rev", "look at lib/"))
@@ -200,19 +201,69 @@ defmodule Universe.AgentsTest do
     kill(b)
   end
 
-  test "a crashed claude session fails its task; the next task gets a fresh session" do
+  test "a crashed claude session fails its task; the next task resumes it" do
     name = uniq("crashy")
     t = "c-#{name}"
     result = tick([agent(name), task(t, name, "CRASH")], %{"ids" => [t], "timeout_s" => 30})
 
     assert status(result, t) == "failed"
-    assert result.text =~ "claude session ended (exit 7)"
+    assert result.text =~ "claude session ended (exit 7); the next task resumes it"
 
     again =
       tick([task("c2-#{name}", name, "ok now")], %{"ids" => ["c2-#{name}"], "timeout_s" => 30})
 
     assert status(again, "c2-#{name}") == "done"
-    assert again.text =~ "done #1: ok now"
+    # Same session: the crashed message was #1.
+    assert again.text =~ "done #2: ok now"
+    kill(name)
+  end
+
+  test "serving an agent again resumes its session unless resume is false" do
+    name = uniq("keeper")
+    tick([agent(name), task("k1-#{name}", name, "first")])
+    kill(name)
+
+    back = tick([agent(name), task("k2-#{name}", name, "second")])
+    assert back.text =~ "done #2: second"
+    assert back.text =~ "resumed its earlier session"
+    kill(name)
+
+    fresh = tick([agent(name, %{"resume" => false}), task("k3-#{name}", name, "third")])
+    assert fresh.text =~ "done #1: third"
+    kill(name)
+
+    # A changed purpose is a different agent: new session.
+    other = tick([agent(name, %{"purpose" => "Something else."}), task("k4-#{name}", name, "x")])
+    assert other.text =~ "done #1: x"
+    kill(name)
+  end
+
+  test "a saved session that can't be resumed falls back to a new one" do
+    name = uniq("lost")
+    tick([agent(name), task("l1-#{name}", name, "first")])
+    kill(name)
+    File.rm_rf!(Path.join(Universe.Paths.project_root(), ".fake_sessions"))
+
+    back = tick([agent(name), task("l2-#{name}", name, "again")])
+    assert status(back, "l2-#{name}") == "done"
+    assert back.text =~ "done #1: again"
+    assert back.text =~ "saved session lost; new session"
+    kill(name)
+  end
+
+  test "a task past its timeout is interrupted and the agent is free again" do
+    name = uniq("sleepy")
+    t = "s-#{name}"
+    call = task(t, name, "SLEEP") |> Map.put("timeout_s", 3)
+    result = tick([agent(name), call], %{"ids" => [t], "timeout_s" => 30})
+
+    assert status(result, t) == "failed"
+    assert result.text =~ "task timed out; the agent stopped it and is idle again"
+
+    next =
+      tick([task("s2-#{name}", name, "quick")], %{"ids" => ["s2-#{name}"], "timeout_s" => 10})
+
+    assert status(next, "s2-#{name}") == "done"
     kill(name)
   end
 end

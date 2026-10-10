@@ -67,7 +67,8 @@ defmodule Universe.Services do
   end
 
   defp do_invoke(conn, fun, args, timeout_ms) do
-    GenServer.call(conn, {:invoke, fun, args}, timeout_ms)
+    # The connection gets the timeout too, to pass it on to the service.
+    GenServer.call(conn, {:invoke, fun, args, timeout_ms}, timeout_ms + 1_000)
   catch
     :exit, {:timeout, _} -> {:error, "service call timed out after #{div(timeout_ms, 1000)}s"}
     :exit, _ -> {:error, "service connection closed"}

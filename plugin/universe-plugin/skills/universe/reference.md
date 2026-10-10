@@ -126,7 +126,12 @@ follow-up to `rev-a` by name and it still knows what it read. They stop after
 Agent fields: `purpose` (its system prompt, required), `model` (`haiku`,
 `sonnet`, `opus` or a full model name; default: your CLI's default), `tools`
 (from `Read Grep Glob Edit Write NotebookEdit WebSearch WebFetch TodoWrite`;
-default `Read Grep Glob`; writing tools need `leases`), `pool`. Agents run
+default `Read Grep Glob`; writing tools need `leases`), `pool`, `resume`
+(default true: serving the same agent again, after a kill or a daemon
+restart, resumes its conversation; a changed purpose, model, tools or leases
+starts a new one). A task past its call's `timeout_s` (default 60, max 1800)
+is interrupted and the agent is free again; if its session crashes, the next
+task resumes it. Agents run
 `claude --restricted`: no Bash or other code-running tools, file tools confined
 to the project, writes only under their leases, `.universe/` unreadable. They
 run outside the code-worker sandbox, since `claude` needs your login and the

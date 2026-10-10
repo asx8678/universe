@@ -21,6 +21,7 @@ Return values must be JSON-serialisable (anything else is passed through
 
 import base64
 import json
+import time
 import os
 import socket
 import traceback
@@ -130,6 +131,14 @@ def ask(question):
     return _request("ask", question=str(question))
 
 
+_deadline = None
+
+
+def time_left():
+    """Inside a service function: seconds until the caller gives up, or None."""
+    return None if _deadline is None else max(0.0, _deadline - time.monotonic())
+
+
 def serve(name, fns, describe=""):
     """Turn this process into the named service. Never returns."""
     if not isinstance(fns, dict) or not fns:
@@ -140,6 +149,9 @@ def serve(name, fns, describe=""):
         if msg.get("op") != "invoke":
             continue
         cid, fn_name, args = msg.get("cid"), msg.get("fn"), msg.get("args")
+        global _deadline
+        left = msg.get("timeout_ms")
+        _deadline = time.monotonic() + left / 1000 if isinstance(left, (int, float)) else None
         try:
             fn = fns[fn_name]
             if isinstance(args, dict):

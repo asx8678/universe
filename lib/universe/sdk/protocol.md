@@ -46,8 +46,12 @@ Each request carries a `rid`, which the reply echoes:
 After `serve`, the daemon sends calls to the service one at a time:
 
 ```json
-{"op":"invoke","cid":9,"fn":"query","args":{"sql":"select 1"}}
+{"op":"invoke","cid":9,"fn":"query","args":{"sql":"select 1"},"timeout_ms":59000}
 ```
+
+`timeout_ms` is what is left of the caller's timeout (the Python client
+exposes it as `U.time_left()`); an invocation whose caller gave up while it
+was queued is never sent.
 
 The service answers with
 `{"op":"result","cid":9,"ok":true,"value":...}` or

@@ -17,9 +17,11 @@ defmodule Universe.SDK.Conn do
   Kernel → worker:
 
       {"rid":1,"ok":true,"result":"h:5/orders"}  |  {"rid":1,"ok":false,"error":"..."}
-      {"op":"invoke","cid":9,"fn":"query","args":{...}}         services only
+      {"op":"invoke","cid":9,"fn":"query","args":{...},"timeout_ms":59000}   services only
 
-  Invocations of a service are handed to it one at a time.
+  Invocations of a service are handed to it one at a time. `timeout_ms` is
+  what is left of the caller's timeout; an invocation whose caller has
+  already given up while it waited in the queue is dropped, not sent.
   """
 
   use GenServer, restart: :temporary
@@ -78,15 +80,18 @@ defmodule Universe.SDK.Conn do
   def handle_info(_msg, state), do: {:noreply, state}
 
   @impl true
-  def handle_call({:invoke, fun, args}, from, state) do
-    {:noreply, %{state | queue: :queue.in({fun, args, from}, state.queue)} |> dispatch()}
+  def handle_call({:invoke, fun, args, timeout_ms}, from, state) do
+    deadline = System.monotonic_time(:millisecond) + timeout_ms
+
+    {:noreply,
+     %{state | queue: :queue.in({fun, args, from, deadline}, state.queue)} |> dispatch()}
   end
 
   @impl true
   def terminate(_reason, state) do
     closed = {:error, "service connection closed"}
     if state.inflight, do: GenServer.reply(elem(state.inflight, 1), closed)
-    for {_, _, from} <- :queue.to_list(state.queue), do: GenServer.reply(from, closed)
+    for {_, _, from, _} <- :queue.to_list(state.queue), do: GenServer.reply(from, closed)
     :gen_tcp.close(state.sock)
   end
 
@@ -220,10 +225,25 @@ defmodule Universe.SDK.Conn do
 
   defp dispatch(%{inflight: nil} = state) do
     case :queue.out(state.queue) do
-      {{:value, {fun, args, from}}, queue} ->
-        cid = state.next_cid
-        send_line(state, %{"op" => "invoke", "cid" => cid, "fn" => fun, "args" => args})
-        %{state | queue: queue, inflight: {cid, from}, next_cid: cid + 1}
+      {{:value, {fun, args, from, deadline}}, queue} ->
+        left = deadline - System.monotonic_time(:millisecond)
+
+        if left <= 0 do
+          # The caller has timed out already; don't start work nobody awaits.
+          dispatch(%{state | queue: queue})
+        else
+          cid = state.next_cid
+
+          send_line(state, %{
+            "op" => "invoke",
+            "cid" => cid,
+            "fn" => fun,
+            "args" => args,
+            "timeout_ms" => left
+          })
+
+          %{state | queue: queue, inflight: {cid, from}, next_cid: cid + 1}
+        end
 
       {:empty, _} ->
         state

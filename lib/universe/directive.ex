@@ -43,7 +43,7 @@ defmodule Universe.Directive do
   @run_fields ~w(op label lang code budget leases after then quiet)
   @serve_fields ~w(op label name lang code agent budget leases network ttl_idle_s after quiet)
   @call_fields ~w(op label service fn args prompt timeout_s after quiet)
-  @agent_fields ~w(purpose model tools pool)
+  @agent_fields ~w(purpose model tools pool resume)
   # Built-in tools an agent may get. Code-running tools never: an agent runs
   # code through Universe workers, which are sandboxed.
   @agent_tools ~w(Read Grep Glob Edit Write NotebookEdit WebSearch WebFetch TodoWrite)
@@ -245,12 +245,13 @@ defmodule Universe.Directive do
          {:ok, purpose} <- purpose(a["purpose"]),
          {:ok, model} <- model(a["model"]),
          {:ok, tools} <- agent_tools(a["tools"], leases),
-         {:ok, pool} <- pool(a["pool"]) do
-      {:ok, %{purpose: purpose, model: model, tools: tools, pool: pool}}
+         {:ok, pool} <- pool(a["pool"]),
+         {:ok, resume} <- resume(a["resume"]) do
+      {:ok, %{purpose: purpose, model: model, tools: tools, pool: pool, resume: resume}}
     end
   end
 
-  defp agent(_, _), do: {:error, "agent must be an object: {purpose, model, tools, pool}"}
+  defp agent(_, _), do: {:error, "agent must be an object: {purpose, model, tools, pool, resume}"}
 
   defp purpose(p) when is_binary(p) do
     cond do
@@ -291,6 +292,10 @@ defmodule Universe.Directive do
   end
 
   defp agent_tools(_, _), do: {:error, "agent tools must be a list of tool names"}
+
+  defp resume(nil), do: {:ok, true}
+  defp resume(b) when is_boolean(b), do: {:ok, b}
+  defp resume(_), do: {:error, "agent resume must be true or false"}
 
   defp pool(nil), do: {:ok, nil}
 

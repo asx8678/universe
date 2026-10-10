@@ -36,7 +36,8 @@ digest. Bash is off in this project; read and edit files with your own tools.
   Agent tools default to `Read, Grep, Glob`; `Edit`/`Write` need `leases`. Agents
   can't run code. Give several agents the same `"pool":"reviewers"` and call
   the pool: each task goes to a free agent. An agent with a question shows as
-  `asking`; answer with `reply`.
+  `asking`; answer with `reply`. Serving the same agent again resumes its
+  conversation (`"resume": false` starts fresh). Give long tasks a `timeout_s`.
 - `kill`: `{"op":"kill","target":"#5"}`. `reply`: answer a worker that is
   `asking`: `{"op":"reply","target":"#9","text":"..."}`.
 
