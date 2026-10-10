@@ -66,3 +66,47 @@ model never sees the expected answers.
 
 Ran Oct 10, 2026: **NO-GO** (0 of 3 tasks won). See `RESULTS.md` and the M4
 section of `docs/PLAN.md`.
+
+# M6: agent pools vs Claude Code subagents
+
+Is delegating to Universe agent workers (M5) better than Claude Code's own
+subagents (the Agent tool)? Rule fixed **before** any run, Oct 10, 2026.
+
+## Setups
+
+Same orchestrator model, same task prompt (which asks for delegation to
+parallel helper agents), three runs each, fresh fixture copy per run.
+
+- **subagents** — Claude Code with its built-in tools including `Agent`,
+  no plugin, no Universe.
+- **agents** — the plugin plus a daemon; `Agent`/`Task` are not offered, so
+  delegation goes through Universe agent workers (`serve` with `agent`).
+
+## Tasks (fixture `fixtures/modules/`: a frozen copy of Universe's own
+`lib/universe`, 24 files, ~150 KB)
+
+1. **modules** — `index.md` with one line per file: path, purpose, main
+   functions. Grader: every file appears with one of its `def` names.
+2. **qa** — answer the 10 questions in `questions.md` (one integer each)
+   into `answers.md`. Grader: all 10 right.
+
+## Metrics
+
+As M4, plus helper tokens: subagent calls are in the transcript; agent
+workers log each task's tokens to `.universe/agents/*.usage.jsonl`, which
+`run.py` copies to `out/<cell>.helpers.json`. `total` = orchestrator +
+helpers.
+
+## Go / no-go
+
+- Agents **win a task** if every run passes in both setups, median `total`
+  tokens is **≤ 80 %** of subagents', median wall time is **≤ 120 %**, and
+  median end-of-run main context is **≤ 110 %**.
+- **Go** (recommend agent pools as the way to delegate) if agents win
+  **both** tasks. **No-go** otherwise: keep agent workers as an option and
+  document subagents as the default.
+
+```
+python3 bench/run.py --tasks modules,qa --setups subagents,agents --runs 3 --go
+python3 bench/collect.py bench/out6/*.jsonl > bench/RESULTS-M6.md
+```

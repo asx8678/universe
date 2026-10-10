@@ -104,7 +104,7 @@ def save_session_id(sid):
     os.replace(path + ".tmp", path)
 
 
-state = {"tasks": 0, "ctx": 0, "crashes": []}
+state = {"tasks": 0, "ctx": 0, "crashes": [], "calls": {}}
 session = {}
 
 
@@ -178,11 +178,14 @@ def until_result():
         if e is None:
             code = session["proc"].wait()
             raise SessionEnded(f"claude session ended (exit {code})")
-        if e.get("type") == "assistant" and not e.get("parent_tool_use_id"):
-            u = e.get("message", {}).get("usage") or {}
+        if e.get("type") == "assistant":
+            msg = e.get("message", {})
+            u = msg.get("usage") or {}
             ctx = u.get("input_tokens", 0) + u.get("cache_read_input_tokens", 0) + \
                 u.get("cache_creation_input_tokens", 0)
-            if ctx:
+            # Every model call once (stream-json repeats a message per block).
+            state["calls"][msg.get("id") or id(e)] = ctx + u.get("output_tokens", 0)
+            if ctx and not e.get("parent_tool_use_id"):
                 state["ctx"] = ctx
         elif e.get("type") == "result":
             session["confirmed"] = True
@@ -199,9 +202,22 @@ def idle_line():
     return line + (f" · {note}" if note else "")
 
 
+def log_usage(n, started, ok):
+    """Appends this task's tokens to .universe/agents/<name>.usage.jsonl."""
+    path = cfg.get("session_file")
+    if not path:
+        return
+    line = {"task": n, "ok": ok, "tokens": sum(state["calls"].values()), "calls": len(state["calls"]),
+            "wall_s": round(time.time() - started, 1), "model": cfg.get("model")}
+    with open(path.removesuffix(".json") + ".usage.jsonl", "a") as f:
+        f.write(json.dumps(line) + "\n")
+
+
 def task(prompt=None):
     if not isinstance(prompt, str) or not prompt.strip():
         raise ValueError("task needs a prompt")
+    state["calls"] = {}
+    ok = False
     state["tasks"] += 1
     n, started = state["tasks"], time.time()
     U.progress(f"busy · task {n}: {' '.join(prompt.split())[:80]}")
@@ -227,8 +243,10 @@ def task(prompt=None):
                 continue
             print(f"task {n} done in {time.time() - started:.1f}s · "
                   f"{result.get('num_turns', '?')} turns", flush=True)
+            ok = True
             return text
     finally:
+        log_usage(n, started, ok)
         U.progress(idle_line())
 
 

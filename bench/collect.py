@@ -24,6 +24,8 @@ import sys
 
 def parse(path):
     usage_by_msg = {}
+    helper_msgs = set()
+    delegations = 0
     main_ctx = 0
     wall_s = turns = 0
     model = "?"
@@ -42,18 +44,35 @@ def parse(path):
                 msg = e.get("message", {})
                 u = msg.get("usage") or {}
                 inp = u.get("input_tokens", 0) + u.get("cache_read_input_tokens", 0) + u.get("cache_creation_input_tokens", 0)
-                usage_by_msg[msg.get("id") or id(e)] = inp + u.get("output_tokens", 0)
-                if inp and not e.get("parent_tool_use_id"):
+                key = msg.get("id") or id(e)
+                usage_by_msg[key] = inp + u.get("output_tokens", 0)
+                if e.get("parent_tool_use_id"):
+                    helper_msgs.add(key)
+                elif inp:
                     main_ctx = inp
                 for c in msg.get("content", []):
-                    if c.get("type") == "tool_use" and c.get("name") == "ToolSearch":
+                    if c.get("type") != "tool_use":
+                        continue
+                    if c.get("name") == "ToolSearch":
                         tool_search = True
+                    elif c.get("name") in ("Agent", "Task"):
+                        delegations += 1
+                    elif c.get("name") == "mcp__universe__tick":
+                        delegations += sum(1 for d in c.get("input", {}).get("directives") or []
+                                           if isinstance(d, dict) and d.get("op") == "call" and "prompt" in d)
             elif t == "result":
                 turns = e.get("num_turns", 0)
                 wall_s = round((e.get("duration_ms") or 0) / 1000, 1)
 
-    return {"main_ctx": main_ctx, "total": sum(usage_by_msg.values()), "wall_s": wall_s,
-            "turns": turns, "model": model, "tool_search": tool_search}
+    helpers = sum(v for k, v in usage_by_msg.items() if k in helper_msgs)
+    side = path.removesuffix(".jsonl") + ".helpers.json"
+    if os.path.exists(side):
+        # Universe agent workers run outside this transcript; run.py saved their usage.
+        helpers += json.load(open(side))["tokens"]
+    orchestrator = sum(v for k, v in usage_by_msg.items() if k not in helper_msgs)
+    return {"main_ctx": main_ctx, "total": orchestrator + helpers, "helpers": helpers,
+            "wall_s": wall_s, "turns": turns, "model": model, "tool_search": tool_search,
+            "delegations": delegations}
 
 
 def main(paths):
@@ -68,16 +87,48 @@ def main(paths):
     print("# Benchmark results\n")
     models = sorted({r["model"] for r in rows})
     print(f"Model: {', '.join(models)}. Medians per cell; token counts from the API usage in each transcript.\n")
-    print("| Task | Setup | runs | pass | main ctx | total tokens | wall s | turns |")
-    print("|---|---|---|---|---|---|---|---|")
+    print("| Task | Setup | runs | pass | main ctx | total tokens | helper tokens | wall s | turns | delegations |")
+    print("|---|---|---|---|---|---|---|---|---|---|")
     cells = {}
     for r in rows:
         cells.setdefault((r["task"], r["setup"]), []).append(r)
     for (task, setup), rs in sorted(cells.items()):
         med = lambda k: statistics.median(r[k] for r in rs)
         print(f"| {task} | {setup} | {len(rs)} | {sum(r['success'] for r in rs)}/{len(rs)} | "
-              f"{med('main_ctx'):,.0f} | {med('total'):,.0f} | {med('wall_s'):g} | {med('turns'):g} |")
+              f"{med('main_ctx'):,.0f} | {med('total'):,.0f} | {med('helpers'):,.0f} | {med('wall_s'):g} | "
+              f"{med('turns'):g} | {med('delegations'):g} |")
 
+    if {r["setup"] for r in rows} <= {"subagents", "agents"}:
+        verdict_m6(rows, cells)
+    else:
+        verdict_m4(rows, cells)
+    runs_table(rows)
+
+
+def verdict_m6(rows, cells):
+    print("\n## Go / no-go (M6 rule fixed in README.md before the runs)\n")
+    m = lambda rs, k: statistics.median(r[k] for r in rs)
+    tasks = sorted({r["task"] for r in rows})
+    wins = 0
+    for task in tasks:
+        s, a = cells.get((task, "subagents")), cells.get((task, "agents"))
+        if not s or not a:
+            print(f"- **{task}:** incomplete")
+            continue
+        tokens = m(a, "total") / max(m(s, "total"), 1)
+        wall = m(a, "wall_s") / max(m(s, "wall_s"), 0.1)
+        ctx = m(a, "main_ctx") / max(m(s, "main_ctx"), 1)
+        passed = all(r["success"] for r in s + a)
+        win = passed and tokens <= 0.8 and wall <= 1.2 and ctx <= 1.1
+        wins += win
+        print(f"- **{task}:** agents/subagents total tokens {tokens:.0%} (need ≤ 80%), wall {wall:.0%} "
+              f"(≤ 120%), main ctx {ctx:.0%} (≤ 110%), all pass: {'yes' if passed else 'no'} "
+              f"→ **{'win' if win else 'no win'}**")
+    verdict = "GO" if wins == len(tasks) == 2 else "NO-GO"
+    print(f"\n**Verdict: {verdict}** ({wins} of {len(tasks)} tasks won; go needs both).\n")
+
+
+def verdict_m4(rows, cells):
     print("\n## Go / no-go (rule fixed in README.md before the runs)\n")
     wins = 0
     for task in sorted({r["task"] for r in rows}):
@@ -96,12 +147,15 @@ def main(paths):
     verdict = "GO" if wins >= 2 else "NO-GO"
     print(f"\n**Verdict: {verdict}** ({wins} of {len(set(r['task'] for r in rows))} tasks won; go needs 2).\n")
 
+
+def runs_table(rows):
     print("## Runs\n")
-    print("| Cell | grade | main ctx | total | wall s | turns | ToolSearch |")
-    print("|---|---|---|---|---|---|---|")
+    print("| Cell | grade | main ctx | total | helpers | wall s | turns | delegations | ToolSearch |")
+    print("|---|---|---|---|---|---|---|---|---|")
     for r in rows:
         print(f"| {r['task']}.{r['setup']}.{r['run']} | {r['grade']} | {r['main_ctx']:,} | {r['total']:,} | "
-              f"{r['wall_s']:g} | {r['turns']} | {'yes' if r['tool_search'] else 'no'} |")
+              f"{r['helpers']:,} | {r['wall_s']:g} | {r['turns']} | {r['delegations']} | "
+              f"{'yes' if r['tool_search'] else 'no'} |")
 
 
 if __name__ == "__main__":

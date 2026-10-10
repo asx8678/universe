@@ -29,7 +29,7 @@ import urllib.request
 
 BENCH = pathlib.Path(__file__).resolve().parent
 REPO = BENCH.parent
-OUT = BENCH / "out"
+OUT = pathlib.Path(os.environ.get("UNIVERSE_BENCH_OUT", BENCH / "out"))
 WORK = pathlib.Path(os.environ.get("UNIVERSE_BENCH_WORK", "/tmp/universe-bench"))
 UCTL = REPO / "_build/prod/rel/universe/bin/universectl"
 PLUGIN = REPO / "plugin/universe-plugin"
@@ -42,7 +42,14 @@ TASKS = {
     "and its call sites. The files are independent. Then run `python3 run_tests.py` and make it pass.",
     "dbchecks": "Answer the 20 checks in checks.md against the SQLite database data/app.db and write "
     "report.md exactly as checks.md describes.",
+    # M6: delegation, same wording for both setups.
+    "modules": "Summarise every file under lib/ into index.md, one line per file: its path, its purpose "
+    "and its main functions. Delegate reading the files to parallel helper agents; you coordinate "
+    "and write index.md.",
+    "qa": "Answer the questions in questions.md about the code under lib/ and write answers.md as it "
+    "describes. Delegate the reading to parallel helper agents; you coordinate and write answers.md.",
 }
+FIXTURE = {"modules": "modules", "qa": "modules"}
 
 COMMON_TOOLS = ["Bash", "Read", "Edit", "Write", "Glob", "Grep", "Agent", "Task"]
 UNIVERSE_TOOLS = ["mcp__universe__tick", "mcp__universe__inspect"]
@@ -59,7 +66,7 @@ def fresh_copy(task, cell):
     work = WORK / cell
     if work.exists():
         shutil.rmtree(work)
-    shutil.copytree(BENCH / "fixtures" / task, work)
+    shutil.copytree(BENCH / "fixtures" / FIXTURE.get(task, task), work)
     return work
 
 
@@ -107,9 +114,13 @@ def stop_daemon(proc):
 def command(task, setup, cfg_path):
     args = ["claude", "-p", TASKS[task], "--output-format", "stream-json", "--verbose", "--strict-mcp-config"]
     tools = COMMON_TOOLS
-    if setup == "universe":
+    if setup in ("universe", "agents"):
         args += ["--mcp-config", str(cfg_path), "--plugin-dir", str(PLUGIN)]
         tools = COMMON_TOOLS + UNIVERSE_TOOLS
+    if setup == "agents":
+        # Delegation must go through Universe agents, not the built-in Agent tool.
+        tools = [t for t in tools if t not in ("Agent", "Task")]
+        args += ["--disallowedTools", "Agent", "Task"]
     return args + ["--allowedTools", *tools]
 
 
@@ -121,7 +132,7 @@ def run_cell(task, setup, n, go):
     work = fresh_copy(task, cell)
     proc = cfg = None
     try:
-        if setup == "universe":
+        if setup in ("universe", "agents"):
             proc, cfg = start_daemon(work)
         log(f"start {cell}")
         started = time.time()
@@ -131,6 +142,13 @@ def run_cell(task, setup, n, go):
                                stdin=subprocess.DEVNULL, timeout=RUN_TIMEOUT_S)
             except subprocess.TimeoutExpired:
                 log(f"timeout {cell} after {RUN_TIMEOUT_S}s")
+        helpers = [json.loads(l) for f in sorted((work / ".universe/agents").glob("*.usage.jsonl"))
+                   for l in f.read_text().splitlines() if l.strip()]
+        if setup == "agents":
+            (OUT / f"{cell}.helpers.json").write_text(json.dumps({
+                "tokens": sum(h["tokens"] for h in helpers), "tasks": len(helpers),
+                "agents": len(list((work / ".universe/agents").glob("*.usage.jsonl"))),
+                "models": sorted({str(h.get("model")) for h in helpers})}))
         grade = subprocess.run([sys.executable, BENCH / "graders" / f"{task}.py"], cwd=work,
                                capture_output=True, text=True)
         verdict = (grade.stdout.strip().splitlines() or ["FAIL: grader printed nothing"])[-1]
@@ -155,7 +173,7 @@ def main():
         assert t in TASKS, t
     OUT.mkdir(exist_ok=True)
     WORK.mkdir(parents=True, exist_ok=True)
-    if "universe" in setups and not UCTL.exists():
+    if {"universe", "agents"} & set(setups) and not UCTL.exists():
         sys.exit(f"build the release first: MIX_ENV=prod mix release ({UCTL} missing)")
 
     for n in range(a.start, a.start + a.runs):
