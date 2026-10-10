@@ -40,6 +40,28 @@ Source: "Universe — Architecture & Action Plan" (Oct 10, 2026). This file turn
 - The tick tool description now lists the directive fields (776 chars), so the model can work before the skill exists.
 - Event types added beyond the design: `queued` and `rejected`.
 
+### M4 result (Oct 10, 2026): NO-GO under the pre-registered rule
+
+18 runs (3 tasks × 2 setups × 3), all graded PASS. Universe lost every task on
+every metric: end-of-run context +9 to +11%, total tokens 1.5–2×, slower, more
+turns. Full table in `bench/RESULTS.md`. Why:
+
+- **Fixed overhead dominates at this scale.** Turn 1 already carries ~26k tokens
+  (Claude Code's system prompt) in both setups; Universe adds ~1.5k. Task content
+  is only 2–7k on top, so the "≥50% less end-of-run context" bar was out of reach
+  for these fixtures whatever the design.
+- **Universe spends extra turns**: one to load the skill, one or two `inspect`
+  round-trips to read output the digest only summarised. Each turn re-sends ~30k.
+- **The fixtures are wide in count, tiny in data.** One shell loop handles all 20
+  items, so neither handles nor parallel workers have anything to save.
+
+Per the README's no-go clause: keep services + SDK as a plain MCP server, drop
+tick batching — or, as a *separate* experiment with its own thresholds set in
+advance, test the original thesis at a scale where it can matter (raw outputs
+far larger than the context, slow independent steps). Cheap fixes either way:
+skip the skill-load turn (the tick description now carries the essentials) and
+put more of what the model needs in digest lines so it calls `inspect` less.
+
 ### M2 + M3 findings (Oct 10, 2026)
 
 - **Incident — a process-killer almost shipped.** An experimental launcher sweep (`--probe`) tried to find processes that left a worker's group by their macOS sandbox identity (`sandbox_check` for write access to a per-run probe file). The check also matched *unrelated* sandboxed processes whose profile allowed writing that directory (tests used a dir under the repo; the release used `/private/tmp`). It ran on every worker exit from when `--probe` landed until it was disabled. The one surviving test log shows **45 kills in a single full-suite run** (summed `escaped_killed`); the probe was live across several full runs plus ~16 isolation-only runs whose logs the test alias then wiped, so the exact total is unknown — **at least 45 per full run, several runs**, plus **18 in one release smoke test**. What it could have hit: any sandboxed process on the machine (system XPC/helpers, possibly app processes). The sweep was **removed entirely** from `c_src/universe_run.c`, not just disabled. The `setsid`/daemonise escape is back to a **known gap**, with both tests tagged `:known_gap`.
@@ -50,7 +72,7 @@ Source: "Universe — Architecture & Action Plan" (Oct 10, 2026). This file turn
 - **Tool description must list every op.** First M2 acceptance run: the model tried `op:"service"` and hand-rolled a reader with `run`, because the tick description documented only run/kill/wait and the skill body didn't load headlessly. Fixed: the description now covers run/serve/call/kill/reply and the `U` SDK (1,503 chars). After the fix the model used serve+call and got a handle back.
 - **Handle preview crash (fixed).** A `{columns, rows}` table whose `rows` were objects (not arrays) crashed `inspect` ("Internal error"). The model produced exactly that. `Handles.table/1` now aligns object-rows to the columns; regression test added.
 - **Release:** `mix release` with a `universectl` front end (`init`/`up`/`manifest`). Distributed Erlang is disabled (`RELEASE_DISTRIBUTION=none`) — the design forbids exposing it, and it also let two daemons clash on the node name. Prod config is loopback-only http with a per-boot random cookie secret.
-- **SQLite sharp edge:** a read-only SQLite service may still fail to open a DB because SQLite wants to create lock/WAL sidecar files; either lease the DB's directory or open an in-memory snapshot. Worth a note in the reference.
+- **SQLite (and anything that resolves real paths) failed in the sandbox — fixed.** Not lock files: the profile denied `stat` on the project's ancestor directories under `$HOME`, which `realpath`-style resolution needs. Even `immutable=1` with `uri=True` failed. The profile now allows `file-read-metadata` on the exact ancestor directories only (no listing, no contents); `$HOME` stays unreadable. This cost the model ~10 turns in each acceptance run.
 
 ### Decision 1: isolation runs on macOS first, behind an adapter (recommended default)
 - Add the behaviour `Universe.Isolation` with `wrap(cmd, args, profile, opts) :: {cmd, args, env}` and `limits(profile)`.
@@ -196,9 +218,9 @@ Each milestone lists its tasks (with paths), its automated tests (ExUnit), its m
 - [x] `bench/fixtures/`: 20 modules or repos to summarize. A repo with 20 independent edits and a test suite. A SQLite database with 20 checks and a report checklist
 - [x] Baseline setup: the same model, Claude Code with Bash and subagents, no plugin. Universe setup: plugin plus the daemon
 - [x] Metrics capture: main-context tokens at the end, total tokens, wall time, model turns, success. Use `claude -p --output-format stream-json` and a parser script `bench/collect.py`
-- [ ] **Not run yet** (needs a decision — it spends many Claude sessions on the plan). `bench/run.py` prints the exact commands; `--go` launches.
-- [ ] Run each task 3 times per setup. Then vary the number of streams that need decisions per tick: 1, 3, 6, 10
-- [ ] Results table plus the go/no-go decision in `bench/RESULTS.md`
+- [x] Ran Oct 10, 2026: 18 runs, all passed. See `bench/RESULTS.md`.
+- [x] Run each task 3 times per setup. Then vary the number of streams that need decisions per tick: 1, 3, 6, 10
+- [x] Results table plus the go/no-go decision in `bench/RESULTS.md`
 
 **Done when:** the table is filled in and the decision is written down.
 

@@ -1,59 +1,167 @@
 #!/usr/bin/env python3
-"""Print (and optionally launch) the claude -p command for one benchmark cell.
+"""Run benchmark cells: fresh fixture copy → (daemon) → claude -p → grade.
 
-    python3 bench/run.py --task summarize --setup universe --runs 3
-    python3 bench/run.py --task summarize --setup universe --runs 3 --go
+    python3 bench/run.py --tasks summarize --setups universe --runs 1        # dry run
+    python3 bench/run.py --tasks summarize,edits,dbchecks --setups baseline,universe --runs 3 --go
 
-Without --go it only prints the commands and writes nothing: launching dozens
-of Claude sessions spends the user's plan, so that is a deliberate step. Each
-run writes bench/out/<task>.<setup>.<n>.jsonl, which collect.py reads.
+Without --go nothing is launched. With --go each cell writes
+bench/out/<task>.<setup>.<n>.jsonl (the stream-json transcript) and
+.<n>.grade (the grader's verdict); collect.py turns them into RESULTS.md.
+Cells run sequentially, interleaved by run number so time-of-day effects
+spread over both setups.
+
+Both setups use --strict-mcp-config, so neither sees the user's MCP servers;
+the universe setup gets only its own daemon through --mcp-config (nothing is
+written to ~/.claude.json) plus the plugin via --plugin-dir. Bash is allowed
+in both: in the universe setup the plugin's hook is what redirects it.
 """
 
 import argparse
+import json
 import os
 import pathlib
+import shutil
+import signal
 import subprocess
 import sys
+import time
+import urllib.request
 
-ROOT = pathlib.Path(__file__).resolve().parent
-OUT = ROOT / "out"
+BENCH = pathlib.Path(__file__).resolve().parent
+REPO = BENCH.parent
+OUT = BENCH / "out"
+WORK = pathlib.Path(os.environ.get("UNIVERSE_BENCH_WORK", "/tmp/universe-bench"))
+UCTL = REPO / "_build/prod/rel/universe/bin/universectl"
+PLUGIN = REPO / "plugin/universe-plugin"
+RUN_TIMEOUT_S = 20 * 60
 
 TASKS = {
-    "summarize": "Summarise every module under lib/ into a single index file, index.md, with one line per module (path, purpose, key functions). The modules are independent.",
-    "edits": "In each file under lib/, rename the function `old_api` to `new_api` (definition and call sites). The files are independent. Then run the tests with `mix test` and make them pass.",
-    "dbchecks": "Run the 20 checks listed in checks.md against data/app.db and write report.md marking each check pass or fail with the number it found.",
+    "summarize": "Summarise every module under lib/ into a single index file, index.md, "
+    "with one line per module: its path, its purpose, and its functions. The modules are independent.",
+    "edits": "In each file under lib/, rename the function old_api to new_api, both the definition "
+    "and its call sites. The files are independent. Then run `python3 run_tests.py` and make it pass.",
+    "dbchecks": "Answer the 20 checks in checks.md against the SQLite database data/app.db and write "
+    "report.md exactly as checks.md describes.",
 }
 
+COMMON_TOOLS = ["Bash", "Read", "Edit", "Write", "Glob", "Grep", "Agent", "Task"]
+UNIVERSE_TOOLS = ["mcp__universe__tick", "mcp__universe__inspect"]
 
-def command(task, setup, n, project):
-    out = OUT / f"{task}.{setup}.{n}.jsonl"
-    prompt = TASKS[task]
-    args = ["claude", "-p", prompt, "--output-format", "stream-json", "--verbose"]
+
+def log(msg):
+    line = f"{time.strftime('%H:%M:%S')} {msg}"
+    print(line, flush=True)
+    with open(OUT / "progress.log", "a") as f:
+        f.write(line + "\n")
+
+
+def fresh_copy(task, cell):
+    work = WORK / cell
+    if work.exists():
+        shutil.rmtree(work)
+    shutil.copytree(BENCH / "fixtures" / task, work)
+    return work
+
+
+def start_daemon(work):
+    subprocess.run([UCTL, "init", work, "--no-claude"], check=True, capture_output=True)
+    port = (work / ".universe/port").read_text().strip()
+    token = (work / ".universe/token").read_text().strip()
+    logf = open(work.parent / f"{work.name}.daemon.log", "w")
+    proc = subprocess.Popen([UCTL, "up", work], stdout=logf, stderr=subprocess.STDOUT, start_new_session=True)
+    for _ in range(80):
+        try:
+            urllib.request.urlopen(f"http://127.0.0.1:{port}/", timeout=1)
+            break
+        except Exception:
+            time.sleep(0.25)
+    else:
+        raise RuntimeError(f"daemon for {work} did not come up")
+    cfg = {
+        "mcpServers": {
+            "universe": {
+                "type": "http",
+                "url": f"http://127.0.0.1:{port}/mcp",
+                "headers": {"Authorization": f"Bearer {token}"},
+                "alwaysLoad": True,
+                "timeout": 120000,
+            }
+        }
+    }
+    cfg_path = work.parent / f"{work.name}.mcp.json"
+    cfg_path.write_text(json.dumps(cfg))
+    return proc, cfg_path
+
+
+def stop_daemon(proc):
+    try:
+        os.killpg(proc.pid, signal.SIGTERM)
+        proc.wait(timeout=15)
+    except Exception:
+        try:
+            os.killpg(proc.pid, signal.SIGKILL)
+        except Exception:
+            pass
+
+
+def command(task, setup, cfg_path):
+    args = ["claude", "-p", TASKS[task], "--output-format", "stream-json", "--verbose", "--strict-mcp-config"]
+    tools = COMMON_TOOLS
     if setup == "universe":
-        args += ["--plugin-dir", str(ROOT.parent / "plugin" / "universe-plugin")]
-    return args, out, project
+        args += ["--mcp-config", str(cfg_path), "--plugin-dir", str(PLUGIN)]
+        tools = COMMON_TOOLS + UNIVERSE_TOOLS
+    return args + ["--allowedTools", *tools]
+
+
+def run_cell(task, setup, n, go):
+    cell = f"{task}.{setup}.{n}"
+    if not go:
+        print(f"# {cell}: copy fixtures/{task} → {WORK / cell}; " + " ".join(command(task, setup, "<cfg>")[:8]) + " …")
+        return
+    work = fresh_copy(task, cell)
+    proc = cfg = None
+    try:
+        if setup == "universe":
+            proc, cfg = start_daemon(work)
+        log(f"start {cell}")
+        started = time.time()
+        with open(OUT / f"{cell}.jsonl", "w") as out:
+            try:
+                subprocess.run(command(task, setup, cfg), cwd=work, stdout=out, stderr=subprocess.STDOUT,
+                               stdin=subprocess.DEVNULL, timeout=RUN_TIMEOUT_S)
+            except subprocess.TimeoutExpired:
+                log(f"timeout {cell} after {RUN_TIMEOUT_S}s")
+        grade = subprocess.run([sys.executable, BENCH / "graders" / f"{task}.py"], cwd=work,
+                               capture_output=True, text=True)
+        verdict = (grade.stdout.strip().splitlines() or ["FAIL: grader printed nothing"])[-1]
+        (OUT / f"{cell}.grade").write_text(verdict + "\n")
+        log(f"done  {cell} in {time.time() - started:.0f}s · {verdict}")
+    finally:
+        if proc:
+            stop_daemon(proc)
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--task", required=True, choices=TASKS)
-    ap.add_argument("--setup", required=True, choices=["baseline", "universe"])
+    ap.add_argument("--tasks", default="summarize,edits,dbchecks")
+    ap.add_argument("--setups", default="baseline,universe")
     ap.add_argument("--runs", type=int, default=3)
-    ap.add_argument("--project", default=None, help="fixture working copy (cwd for claude)")
-    ap.add_argument("--go", action="store_true", help="actually launch (spends plan usage)")
+    ap.add_argument("--start", type=int, default=1, help="first run number")
+    ap.add_argument("--go", action="store_true", help="actually launch (spends Claude plan usage)")
     a = ap.parse_args()
 
+    tasks, setups = a.tasks.split(","), a.setups.split(",")
+    for t in tasks:
+        assert t in TASKS, t
     OUT.mkdir(exist_ok=True)
-    project = a.project or str(ROOT / "fixtures" / a.task)
+    WORK.mkdir(parents=True, exist_ok=True)
+    if "universe" in setups and not UCTL.exists():
+        sys.exit(f"build the release first: MIX_ENV=prod mix release ({UCTL} missing)")
 
-    for n in range(1, a.runs + 1):
-        args, out, cwd = command(a.task, a.setup, n, project)
-        printable = " ".join(f'"{x}"' if " " in x else x for x in args)
-        print(f"# run {n}: cd {cwd} && {printable} > {out}")
-        if a.go:
-            with open(out, "w") as f:
-                subprocess.run(args, cwd=cwd, stdout=f, stderr=subprocess.STDOUT, check=False)
-
+    for n in range(a.start, a.start + a.runs):
+        for task in tasks:
+            for setup in setups:
+                run_cell(task, setup, n, a.go)
     if not a.go:
         print("\n(dry run — pass --go to launch; this spends Claude plan usage)", file=sys.stderr)
 

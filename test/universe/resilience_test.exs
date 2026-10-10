@@ -163,6 +163,45 @@ defmodule Universe.ResilienceTest do
     File.rm(path)
   end
 
+  test "the sandbox allows stat on ancestor directories only" do
+    alias Universe.Isolation.SandboxExec
+
+    assert SandboxExec.ancestors("/Users/a/projects/x") == [
+             "/Users",
+             "/Users/a",
+             "/Users/a/projects"
+           ]
+
+    assert SandboxExec.ancestors("/x") == []
+  end
+
+  test "path-resolving tools like SQLite work inside the sandbox" do
+    label = uniq("sqlite")
+    root = Paths.project_root()
+    File.mkdir_p!(Path.join(root, "data"))
+    db = Path.join(root, "data/s.db")
+    File.rm(db)
+
+    {_, 0} =
+      System.cmd("python3", [
+        "-c",
+        "import sqlite3,sys; c=sqlite3.connect(sys.argv[1]); c.execute('create table t(x)'); c.executemany('insert into t values (?)', [(i,) for i in range(7)]); c.commit()",
+        db
+      ])
+
+    code =
+      "import sqlite3\nprint('rows', sqlite3.connect('data/s.db').execute('select count(*) from t').fetchone()[0])"
+
+    result =
+      API.tick(%{
+        "directives" => [%{"op" => "run", "label" => label, "lang" => "python", "code" => code}],
+        "wait" => %{"timeout_s" => 30}
+      })
+
+    assert status(result, label) == "done"
+    assert result.text =~ "rows 7"
+  end
+
   test "the sandbox maps declared hosts to Seatbelt rules" do
     alias Universe.Isolation.SandboxExec
     assert SandboxExec.host_rule("localhost:5432") == "localhost:5432"

@@ -54,6 +54,7 @@ defmodule Universe.Isolation.SandboxExec do
     (allow file-read*)
     (deny file-read* #{subpath(home)})
     (allow file-read* #{Enum.map_join([root | reads], " ", &subpath/1)})
+    #{ancestor_metadata([root | reads])}
     (deny file-read* #{subpath(Path.join(root, ".universe"))})
     (allow file-read* #{subpath(run_dir)})
 
@@ -67,6 +68,26 @@ defmodule Universe.Isolation.SandboxExec do
     #{network(spec.network)}
     """
   end
+
+  # Path resolution (SQLite, realpath, most runtimes) lstat()s every ancestor
+  # of a file. Under a denied $HOME that fails even though the file itself is
+  # readable, so allow metadata (stat only: no listing, no contents) on the
+  # exact ancestor directories of each readable root.
+  defp ancestor_metadata(paths) do
+    case paths |> Enum.flat_map(&ancestors/1) |> Enum.uniq() do
+      [] -> ""
+      dirs -> "(allow file-read-metadata #{Enum.map_join(dirs, " ", &literal/1)})"
+    end
+  end
+
+  @doc false
+  def ancestors(path) do
+    parts = Path.split(path)
+    # n = 1 would be "/" itself; stop before the path.
+    for n <- 2..(length(parts) - 1)//1, do: parts |> Enum.take(n) |> Path.join()
+  end
+
+  defp literal(path), do: ~s{(literal "#{escape(path)}")}
 
   defp socket(nil), do: ""
 

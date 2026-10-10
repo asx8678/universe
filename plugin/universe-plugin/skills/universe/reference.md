@@ -105,9 +105,3 @@ reads it with `U.get("h:7/q")`.
 
 Two directives can't lease overlapping paths at once; the second is rejected
 and names the holder.
-
-> A read-only SQLite service can still fail with "unable to open database
-> file": SQLite wants to create lock/WAL sidecar files next to the DB. Either
-> give the service a lease on the DB's directory, or open an in-memory
-> snapshot (read the bytes and `sqlite3.deserialize`). With a `file:` URI pass
-> `uri=True` to `sqlite3.connect`.

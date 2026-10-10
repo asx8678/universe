@@ -33,11 +33,11 @@ Same model, same task prompt, three runs each.
 
 ## Validity note
 
-Both M2/M3 acceptance runs lost ~10 turns to SQLite failing to open a
-read-only DB inside the sandbox. The baseline runs unsandboxed with Bash, so
-task 3 (dbchecks) is biased against Universe unless the prompt hints at
-`immutable=1`/`uri=True` or a lease on `data/`. Fix the hint (same for both
-setups) before the first run.
+The M2/M3 acceptance runs lost ~10 turns to SQLite failing to open a
+database inside the sandbox. The cause was a Universe bug, not SQLite: the
+profile denied `stat` on the project's ancestor directories under `$HOME`,
+which path resolution needs. It was fixed (stat-only on exact ancestors)
+before the benchmark, so task 3 runs with no hint in either setup.
 
 ## Go / no-go (fixed Oct 10, 2026, before the first run)
 
@@ -49,15 +49,20 @@ setups) before the first run.
 
 Record the filled table in `RESULTS.md`.
 
-## Running (not run yet — it spends many Claude sessions on the user's plan)
+## Running
 
 ```
-python3 bench/run.py --task summarize --setup baseline --runs 3
-python3 bench/run.py --task summarize --setup universe --runs 3
-# … per task and setup, then:
+python3 bench/run.py --runs 1                 # dry run: prints each cell
+python3 bench/run.py --runs 3 --go            # launches (spends Claude plan usage)
 python3 bench/collect.py bench/out/*.jsonl > bench/RESULTS.md
 ```
 
-`run.py` is intentionally a thin wrapper that prints the exact `claude -p`
-command for each cell; launching dozens of sessions is left to an explicit
-decision.
+Each cell gets a fresh copy of its fixture under `/tmp/universe-bench`
+(override with `UNIVERSE_BENCH_WORK`); the universe setup starts its own daemon
+from the release build. Graders live in `graders/`, outside the fixtures, so the
+model never sees the expected answers.
+
+## Result
+
+Ran Oct 10, 2026: **NO-GO** (0 of 3 tasks won). See `RESULTS.md` and the M4
+section of `docs/PLAN.md`.
