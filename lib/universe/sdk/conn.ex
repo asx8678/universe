@@ -28,7 +28,7 @@ defmodule Universe.SDK.Conn do
 
   @max_buffer 72 * 1024 * 1024
   @default_call_timeout_s 60
-  @max_call_timeout_s 300
+  @max_call_timeout_s 1800
 
   def start_link(sock), do: GenServer.start_link(__MODULE__, sock)
 

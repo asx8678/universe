@@ -98,7 +98,7 @@ put more of what the model needs in digest lines so it calls `inspect` less.
 
 - [x] **S1 Protocol version.** Done: 2026-07-28 (see M0 findings). Use a stub Plug that logs raw requests, run `claude mcp add` against it, and record the `protocolVersion` and headers that Claude Code 2.1.296 sends.
 - [x] **S2 Anubis fit.** Done: yes, with the `protocol_versions` opt-in. Does Anubis 2.1 accept S1's handshake, and does it serve `tools/call` without a session? The answer settles Decision 2.
-- [ ] **S3 Local-scope approval.** Does a server registered with `-s local` need a one-time approval per project? Does the `settings.local.json` allow-list stop the per-call prompts?
+- [ ] **S3 Local-scope approval.** (Headless `claude -p` runs need no approval; an interactive session is still untested.) Does a server registered with `-s local` need a one-time approval per project? Does the `settings.local.json` allow-list stop the per-call prompts?
 - [x] **S4 Tool deferral.** Confirmed: the tools are deferred. Are `mcp__universe__tick` and `mcp__universe__inspect` loaded on turn 1, or deferred behind ToolSearch? (This session showed MCP tools being deferred, so the risk is real.) Mitigation either way: name both full tool names in SKILL.md and CLAUDE.md.
 - [x] **S5 MuonTrap on macOS.** Run `MuonTrap.Daemon` with a child that forks grandchildren, kill the GenServer, and check with `pgrep` that the whole tree is gone. — Done: **MuonTrap fails.** It kills only the direct child, so grandchildren survive. Replaced by `c_src/universe_run.c` (own session, group kill on exit, kill or port close; tested).
 - [x] **S6 Sandbox.** Hand-write a snippet `.sb` and test it: writes in the lease work, writes elsewhere fail, a symlink escape fails, `curl` fails, and the Unix socket works. Compare with `srt` on the same cases. — Done: the hand-written profile passes the whole matrix (lease writes yes; src, /tmp, symlink, `..`, hardlink, token, `$HOME` and network no). srt not compared yet.
@@ -167,14 +167,14 @@ Each milestone lists its tasks (with paths), its automated tests (ExUnit), its m
 ### M2: services, SDK, handles (4–6 days)
 
 **Tasks**
-- [ ] `Universe.SDK.Listener`: a Unix socket at `.universe/sdk.sock` (mode 0600), newline-delimited JSON, every request authenticated by `UNIVERSE_ID` plus a per-worker `UNIVERSE_TOKEN`. On macOS, keep the socket path under 104 bytes (fall back to `$TMPDIR` plus a symlink when the project path is long)
-- [ ] SDK protocol, documented in `lib/universe/sdk/protocol.md`: `call`, `put`, `get`, `progress`, `ask`, `serve`, `fn_result`
-- [ ] `priv/sdk/universe.py`: standard library only (it runs under `-I`)
-- [ ] Service workers (`:transient`, at most 3 restarts in 60 s, then reported failed). `U.serve` registers the name, functions and description. The kernel routes `call` directives and `U.call` requests and enforces a timeout per call
-- [ ] Service sandbox profile: per-host network allow-list and `.universe/secrets/<name>.env` injected into that service only
-- [ ] `Universe.Handles`: `h:<id>/<name>`, kinds table/json/text/file, stored on disk under `.universe/handles/`, previews (table: schema plus first 5 rows plus row count; json: top-level keys plus size; text: head; file: size plus mime)
-- [ ] `inspect("manifest")`: live services and descriptions, saved tools in `.universe/tools/`, open leases, live IDs. Also as plain text for the hook (`mix universe.manifest` plus a `GET /manifest.txt` route behind the guard)
-- [ ] `inspect("h:…")`: preview only
+- [x] `Universe.SDK.Listener`: a Unix socket at `.universe/sdk.sock` (mode 0600), newline-delimited JSON, every request authenticated by `UNIVERSE_ID` plus a per-worker `UNIVERSE_TOKEN`. On macOS, keep the socket path under 104 bytes (fall back to `$TMPDIR` plus a symlink when the project path is long)
+- [x] SDK protocol, documented in `lib/universe/sdk/protocol.md`: `call`, `put`, `get`, `progress`, `ask`, `serve`, `fn_result` — done: `lib/universe/sdk/protocol.md`
+- [x] `priv/sdk/universe.py`: standard library only (it runs under `-I`)
+- [x] Service workers (`:transient`, at most 3 restarts in 60 s, then reported failed). `U.serve` registers the name, functions and description. The kernel routes `call` directives and `U.call` requests and enforces a timeout per call
+- [x] Service sandbox profile: per-host network allow-list and `.universe/secrets/<name>.env` injected into that service only — host part is coarse: Seatbelt can only allow a port on every host
+- [x] `Universe.Handles`: `h:<id>/<name>`, kinds table/json/text/file, stored on disk under `.universe/handles/`, previews (table: schema plus first 5 rows plus row count; json: top-level keys plus size; text: head; file: size plus mime) — file previews show size only, no mime type
+- [x] `inspect("manifest")`: live services and descriptions, saved tools in `.universe/tools/`, open leases, live IDs. Also as plain text for the hook (`mix universe.manifest` plus a `GET /manifest.txt` route behind the guard) — the hook reads `GET /hooks/manifest`, not `/manifest.txt`; no mix task
+- [x] `inspect("h:…")`: preview only
 - [x] Elixir runner (`elixir main.exs` in its own BEAM, never distributed) and `priv/sdk/universe.exs`
 
 **ExUnit**
@@ -189,18 +189,18 @@ Each milestone lists its tasks (with paths), its automated tests (ExUnit), its m
 ### M3: safety and plugin (3–4 days)
 
 **Tasks**
-- [ ] Leases (`Universe.Leases`): path and glob claims per ID, overlap check (glob against glob is done conservatively, by comparing prefixes), released on exit, rejected lines name the holder. They are enforced through the isolation adapter's writable paths
-- [ ] Escape test suite `test/isolation/escape_test.exs`, run against the configured adapter: write outside the lease, symlink inside the lease pointing outside, `..` traversal, hardlink, writes to `/tmp` and `$HOME`, network from a snippet, network to a host the service did not allow, reading `.universe/token` and `.universe/secrets` (must be denied)
+- [x] Leases (`Universe.Leases`): path and glob claims per ID, overlap check (glob against glob is done conservatively, by comparing prefixes), released on exit, rejected lines name the holder. They are enforced through the isolation adapter's writable paths — leases are path prefixes; globs are not accepted
+- [x] Escape test suite `test/isolation/escape_test.exs`, run against the configured adapter: write outside the lease, symlink inside the lease pointing outside, `..` traversal, hardlink, writes to `/tmp` and `$HOME`, network from a snippet, network to a host the service did not allow, reading `.universe/token` and `.universe/secrets` (must be denied)
 - [x] Budgets: wall clock (M1), output cap (M1), memory (RSS poller on macOS / prlimit on Linux) leading to `budget_hit` and status `budget`
-- [ ] `Universe.GC`: idle TTL (default 900 s), at most 20 live services (refuse the new one or reap the oldest idle one: pick one), prune run directories older than 7 days, a `gc` event for every stop
-- [ ] Stop all: `Universe.API.stop_all/0`, a button on `/workers`, a `stop_all` event that the next digest reports
-- [ ] `/workers` and `/workers/:id` LiveViews (process tree, budget used, leases, live stdout/stderr, handles created)
-- [ ] `plugin/universe-plugin/`: `plugin.json`, `skills/universe/SKILL.md` (the draft from the doc, plus both full tool names), `reference.md` (full schemas plus 3 worked examples), `hooks/hooks.json`
-- [ ] Development hazard: once this hook exists, a daemon running in a folder takes Bash away from Claude sessions there. Never run `universe.up` inside the universe repo with the plugin loaded. Test in `../universe-playground`
-- [ ] `hooks/redirect-bash.sh`: exit 0 if `.universe/port` is missing or the daemon does not answer (curl with a 200 ms timeout), else print the redirect message to stderr and exit 2. Count redirects through a small event endpoint
-- [ ] `hooks/manifest.sh`: fetch `/manifest.txt` and print it. Stay silent and exit 0 when the daemon is not running
-- [ ] Add one line to the project `CLAUDE.md`: "All execution in this project goes through Universe (mcp__universe__tick, mcp__universe__inspect). Use the universe skill."
-- [ ] Test the plugin with `claude --plugin-dir ./plugin/universe-plugin`, then through a local marketplace
+- [x] `Universe.GC`: idle TTL (default 900 s), at most 20 live services (refuse the new one or reap the oldest idle one: pick one), prune run directories older than 7 days, a `gc` event for every stop — at the cap a new service is refused
+- [x] Stop all: `Universe.API.stop_all/0`, a button on `/workers`, a `stop_all` event that the next digest reports
+- [x] `/workers` and `/workers/:id` LiveViews (process tree, budget used, leases, live stdout/stderr, handles created) — no process tree view yet
+- [x] `plugin/universe-plugin/`: `plugin.json`, `skills/universe/SKILL.md` (the draft from the doc, plus both full tool names), `reference.md` (full schemas plus 3 worked examples), `hooks/hooks.json`
+- [x] Development hazard: once this hook exists, a daemon running in a folder takes Bash away from Claude sessions there. Never run `universe.up` inside the universe repo with the plugin loaded. Test in `../universe-playground` — followed: tests ran in scratch projects
+- [x] `hooks/redirect-bash.sh`: exit 0 if `.universe/port` is missing or the daemon does not answer (curl with a 200 ms timeout), else print the redirect message to stderr and exit 2. Count redirects through a small event endpoint
+- [x] `hooks/manifest.sh`: fetch `/manifest.txt` and print it. Stay silent and exit 0 when the daemon is not running
+- [x] Add one line to the project `CLAUDE.md`: "All execution in this project goes through Universe (mcp__universe__tick, mcp__universe__inspect). Use the universe skill." — `universectl init` adds it
+- [x] Test the plugin with `claude --plugin-dir ./plugin/universe-plugin`, then through a local marketplace — `--plugin-dir` tested in headless runs; `claude plugin validate` passes on the marketplace; installing through the marketplace not tested
 
 **ExUnit**
 - `LeasesTest`: overlap, release on exit, glob conservatism
@@ -293,7 +293,7 @@ keeps, not on tick batching.
 
 - [ ] What is `box` exactly? It is probably prologic/box (Linux only). Is it needed at all if `srt` covers both operating systems?
 - [ ] Are handles readable by every worker, or only by the ID that created them plus explicit grants?
-- [ ] At the service cap: refuse the new service or reap the oldest idle one?
-- [ ] Should `U.ask` also block the worker until the model answers? If so, how does the answer come back: a new `reply` op, or `call` on the asking ID? The v1 ops leave this out, and `asking` needs an answer path. **Decide in M2.**
+- [x] At the service cap: refuse the new service or reap the oldest idle one? **Decided:** refuse, with "at most 20 live services; kill one first".
+- [x] Should `U.ask` also block the worker until the model answers? If so, how does the answer come back: a new `reply` op, or `call` on the asking ID? The v1 ops leave this out, and `asking` needs an answer path. **Decided:** `U.ask` blocks; the model answers with a `reply` op.
 - [ ] When a watched run has a `then` chain, does `tick` wake when the parent exits or when the whole chain finishes? The chain's children have no IDs when the watch is set. Proposal: by default the watch covers the chain, and the digest shows each step
 - [ ] Where does the event log rotate (size or time), and does `/replay` read rotated files?
