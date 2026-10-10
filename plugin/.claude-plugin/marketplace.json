@@ -1,0 +1,14 @@
+{
+  "name": "universe-local",
+  "description": "Local marketplace for the Universe Claude Code plugin.",
+  "owner": {
+    "name": "Adam"
+  },
+  "plugins": [
+    {
+      "name": "universe",
+      "source": "./universe-plugin",
+      "description": "Run all execution through a per-project Universe daemon."
+    }
+  ]
+}

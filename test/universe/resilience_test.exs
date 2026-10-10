@@ -1,0 +1,187 @@
+defmodule Universe.ResilienceTest do
+  # Restarts parts of the application; never async.
+  use ExUnit.Case, async: false
+
+  alias Universe.{API, EventLog, Paths, Tick}
+
+  defp uniq(label), do: "#{label}-#{System.unique_integer([:positive])}"
+
+  defp run(label, code, extra \\ %{}),
+    do: Map.merge(%{"op" => "run", "label" => label, "lang" => "bash", "code" => code}, extra)
+
+  defp tick(directives, wait \\ %{"timeout_s" => 30}),
+    do: API.tick(%{"directives" => directives, "wait" => wait})
+
+  defp status(result, label) do
+    Enum.find_value(result.structured["ids"], fn {_, v} -> v["label"] == label && v["status"] end)
+  end
+
+  test "a label rejected in this batch never resolves to an older worker" do
+    [build, holder, test_label, lease] = Enum.map(~w(build holder test lease), &uniq/1)
+    tick([run(build, "echo old")])
+    tick([run(holder, "sleep 5", %{"leases" => [lease]})], %{"timeout_s" => 0})
+
+    result =
+      tick([
+        run(build, "echo new", %{"leases" => [lease]}),
+        run(test_label, "echo test-ran", %{"after" => [build]})
+      ])
+
+    assert result.text =~ ~r/rejected #{build}\s+lease/
+    assert status(result, test_label) == "failed"
+    assert result.text =~ "dep #{build} was rejected"
+    tick([%{"op" => "kill", "target" => holder}], %{"timeout_s" => 5})
+  end
+
+  test "a Tick crash kills its workers; the new Tick recovers state from the log" do
+    [before, long] = Enum.map(~w(before long), &uniq/1)
+    tick([run(before, "echo ok")])
+    first = tick([run(long, "sleep 30")], %{"timeout_s" => 0})
+
+    long_id =
+      Enum.find_value(first.structured["ids"], fn {"#" <> id, v} -> v["label"] == long && id end)
+
+    old = Process.whereis(Tick)
+    Process.exit(old, :kill)
+    wait_until(fn -> Process.whereis(Tick) not in [nil, old] end)
+
+    # The worker's process tree died with it.
+    wait_until(fn -> DynamicSupervisor.count_children(Universe.WorkerSup).active == 0 end)
+    {out, _} = System.cmd("pgrep", ["-f", "runs/#{long_id}/"])
+    assert out == ""
+
+    snapshot = Tick.snapshot()
+    assert snapshot[String.to_integer(long_id)].status == "killed"
+    assert snapshot[String.to_integer(long_id)].summary["reason"] == "lost: Universe restarted"
+
+    # Labels from before the crash still resolve.
+    after_label = uniq("after")
+    result = tick([run(after_label, "echo fine", %{"after" => [before]})])
+    assert status(result, after_label) == "done"
+    assert result.text =~ ~r/killed\s+#{long}\s+lost: Universe restarted/
+  end
+
+  test "settled workers past max_settled are archived but still resolve" do
+    labels = for i <- 1..45, do: uniq("bulk#{i}")
+    result = tick(Enum.map(labels, &run(&1, "true")))
+
+    first_id =
+      result.structured["ids"]
+      |> Map.keys()
+      |> Enum.map(fn "#" <> n -> String.to_integer(n) end)
+      |> Enum.min()
+
+    settled =
+      Tick.snapshot()
+      |> Enum.count(fn {_, w} -> w.status in ~w(done failed budget killed rejected) end)
+
+    assert settled <= Application.get_env(:universe, :max_settled)
+    refute Map.has_key?(Tick.snapshot(), first_id)
+
+    dependent = uniq("dependent")
+    result = tick([run(dependent, "echo ok", %{"after" => ["##{first_id}"]})])
+    assert status(result, dependent) == "done"
+  end
+
+  test "settled workers drop their code" do
+    label = uniq("compact")
+    tick([run(label, "echo keep-me-small")])
+    w = Tick.snapshot() |> Map.values() |> Enum.find(&(&1.label == label))
+    assert w.spec.code == nil
+  end
+
+  test "the memory budget kills a process group that grows past it" do
+    label = uniq("mem")
+    code = "import time\nb = b'x' * (400 * 1024 * 1024)\ntime.sleep(20)"
+
+    result =
+      tick([
+        %{
+          "op" => "run",
+          "label" => label,
+          "lang" => "python",
+          "code" => code,
+          "budget" => %{"mem_mb" => 100}
+        }
+      ])
+
+    assert status(result, label) == "budget"
+    assert result.text =~ "memory budget 100 MB hit"
+  end
+
+  test "a process that calls setsid outlives its worker (known gap)" do
+    # Documents the containment gap: a snippet that deliberately leaves its
+    # process group is NOT killed when the worker ends. The kernel stays
+    # healthy; only the stray process lingers. See docs/PLAN.md.
+    label = uniq("escape")
+    marker = "universe-gap-#{System.unique_integer([:positive])}"
+
+    code =
+      "import subprocess\n" <>
+        "subprocess.Popen(['sleep', '300'], start_new_session=True)\n" <>
+        "print('spawned #{marker}')"
+
+    # Tag the escaped process so we only ever touch our own.
+    result =
+      API.tick(%{
+        "directives" => [%{"op" => "run", "label" => label, "lang" => "python", "code" => code}],
+        "wait" => %{"timeout_s" => 30}
+      })
+
+    assert status(result, label) == "done"
+    # The stray process is still alive; clean it up ourselves.
+    {out, _} = System.cmd("pgrep", ["-f", "sleep 300"])
+    assert out != ""
+    System.cmd("pkill", ["-f", "sleep 300"])
+  end
+
+  test "old run directories are pruned by gc" do
+    dir = Path.join(Paths.runs_dir(), "654321")
+    File.mkdir_p!(dir)
+    old = System.os_time(:second) - 8 * 86_400
+    File.touch!(dir, old)
+
+    assert %{run_dirs: pruned} = Universe.GC.sweep_now()
+    assert 654_321 in pruned
+    refute File.exists?(dir)
+  end
+
+  test "the daemon lock refuses a second live daemon and takes over a stale file" do
+    path = Universe.Lock.pid_file()
+    File.mkdir_p!(Path.dirname(path))
+    port = Port.open({:spawn_executable, "/bin/sleep"}, args: ["5"])
+    {:os_pid, live_pid} = Port.info(port, :os_pid)
+
+    File.write!(path, Integer.to_string(live_pid))
+    assert {:stop, "another Universe daemon (pid " <> _} = Universe.Lock.init([])
+
+    File.write!(path, "999999")
+    assert {:ok, _} = Universe.Lock.init([])
+    assert File.read!(path) == System.pid()
+
+    Port.close(port)
+    File.rm(path)
+  end
+
+  test "the sandbox maps declared hosts to Seatbelt rules" do
+    alias Universe.Isolation.SandboxExec
+    assert SandboxExec.host_rule("localhost:5432") == "localhost:5432"
+    assert SandboxExec.host_rule("127.0.0.1:8080") == "localhost:8080"
+    assert SandboxExec.host_rule("db.example.com:5432") == "*:5432"
+  end
+
+  test "events are flushed on shutdown and the event log survives" do
+    marker = EventLog.append("test_flush", data: %{"x" => 1})
+    :ok = EventLog.sync()
+    log = File.read!(Path.join(Paths.log_dir(), "events.jsonl"))
+    assert log =~ ~s("seq":#{marker["seq"]})
+  end
+
+  defp wait_until(fun, tries \\ 100) do
+    cond do
+      fun.() -> :ok
+      tries == 0 -> flunk("condition never became true")
+      true -> Process.sleep(50) && wait_until(fun, tries - 1)
+    end
+  end
+end

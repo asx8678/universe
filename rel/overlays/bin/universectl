@@ -1,0 +1,42 @@
+#!/bin/sh
+# Front end for the Universe release.
+#
+#   universectl init [DIR] [--no-claude] [--no-claude-md]   prepare a project folder
+#   universectl up [DIR]                                    run the daemon (foreground)
+#   universectl manifest [DIR]                              print the running daemon's manifest
+#
+# DIR defaults to the current directory.
+set -e
+SELF=$(cd "$(dirname "$0")" && pwd -P)
+cmd="${1:-}"; [ $# -gt 0 ] && shift
+dir="."
+case "${1:-}" in -*|"") ;; *) dir="$1"; shift ;; esac
+dir=$(cd "$dir" && pwd -P)
+
+case "$cmd" in
+  init)
+    flags=""
+    for a in "$@"; do
+      case "$a" in
+        --no-claude) flags="$flags, claude: false" ;;
+        --no-claude-md) flags="$flags, claude_md: false" ;;
+      esac
+    done
+    UNIVERSE_PROJECT="$dir" exec "$SELF/universe" eval \
+      "r = Universe.Init.run(System.fetch_env!(\"UNIVERSE_PROJECT\")$flags); IO.puts(\"universe initialised in #{System.fetch_env!(\"UNIVERSE_PROJECT\")} on port #{r.port}\")"
+    ;;
+  up)
+    [ -f "$dir/.universe/port" ] || { echo "no .universe/port in $dir; run: universectl init $dir" >&2; exit 1; }
+    export UNIVERSE_PROJECT="$dir" PORT="$(cat "$dir/.universe/port")" PHX_SERVER=true
+    echo "universe up · $dir · http://127.0.0.1:$PORT"
+    exec "$SELF/universe" start
+    ;;
+  manifest)
+    curl -s -f -H "Authorization: Bearer $(cat "$dir/.universe/token")" \
+      "http://127.0.0.1:$(cat "$dir/.universe/port")/hooks/manifest" && echo
+    ;;
+  *)
+    sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'
+    exit 1
+    ;;
+esac

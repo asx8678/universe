@@ -1,0 +1,119 @@
+defmodule Universe.Digest do
+  @moduledoc """
+  Renders what `tick` returns to the model: one line per worker that changed
+  since the last tick, worst news first, under a hard size cap.
+
+      t12 · 4 changed · 1 running · cursor 812
+      #7   failed   router-patch  exit 1 · test/router_test.exs:42 assertion failed
+      #9   asking   ui-build      Use the new tokens file or the old one?
+      #5   done     pg-extract    41s · 1240 rows
+      #8   running  dedupe        2m10s · last: scanning 800/1240
+      +2 auto-acked (lint, format) · inspect("t12") for all events
+
+  Rows are `%{id, label, status, detail, quiet}`; `id` is nil for rejected
+  directives, which never got one. Quiet rows that finished `done` collapse
+  into the auto-acked line.
+  """
+
+  # ~2,000 tokens at the chars/4 estimate used everywhere in Universe.
+  @max_chars 8_000
+  @detail_max 160
+
+  @order ~w(failed budget rejected asking killed done running queued)
+
+  @doc "Token estimate used for budgets and the observer (chars / 4)."
+  def estimate_tokens(text), do: div(String.length(text) + 3, 4)
+
+  def max_chars, do: @max_chars
+
+  @doc """
+  Builds the digest text. `info` has `:tick`, `:rows`, `:running`, `:queued`,
+  `:cursor` and `:wake` (`"settled" | "attention" | "timeout" | "now"`).
+  """
+  def build(info) do
+    {acked, rows} = Enum.split_with(info.rows, &(&1[:quiet] && &1.status == "done"))
+    rows = Enum.sort_by(rows, &{rank(&1.status), &1.id || 0})
+
+    header = header(info, length(info.rows))
+    width = rows |> Enum.map(&String.length(&1.label || "")) |> Enum.max(fn -> 0 end) |> min(24)
+    footer = footer(info.tick, acked)
+
+    {lines, dropped} =
+      fit(Enum.map(rows, &line(&1, width)), String.length(header) + String.length(footer) + 2)
+
+    overflow =
+      if dropped > 0,
+        do: [
+          "+#{dropped} more line#{if dropped == 1, do: "", else: "s"} · inspect(\"t#{info.tick}\")"
+        ],
+        else: []
+
+    Enum.join([header] ++ lines ++ overflow ++ [footer], "\n")
+  end
+
+  defp header(info, changed) do
+    parts =
+      ["t#{info.tick}", "#{changed} changed"] ++
+        count(info.running, "running") ++
+        count(info.queued, "queued") ++
+        ["cursor #{info.cursor}"] ++
+        if(info.wake == "timeout", do: ["woke on timeout"], else: [])
+
+    Enum.join(parts, " · ")
+  end
+
+  defp count(0, _what), do: []
+  defp count(n, what), do: ["#{n} #{what}"]
+
+  defp footer(tick, []), do: "inspect(\"t#{tick}\") for all events"
+
+  defp footer(tick, acked) do
+    names = acked |> Enum.map(& &1.label) |> Enum.take(6) |> Enum.join(", ")
+    more = if length(acked) > 6, do: ", …", else: ""
+    "+#{length(acked)} auto-acked (#{names}#{more}) · inspect(\"t#{tick}\") for all events"
+  end
+
+  defp line(row, width) do
+    id = if row.id, do: "##{row.id}", else: "--"
+    label = (row.label || "-") |> String.slice(0, 24) |> String.pad_trailing(width)
+    detail = clip(row[:detail] || "")
+
+    [String.pad_trailing(id, 4), String.pad_trailing(row.status, 8), label, detail]
+    |> Enum.join(" ")
+    |> String.trim_trailing()
+  end
+
+  # Keeps whole lines, in order, until the cap; reports how many didn't fit.
+  defp fit(lines, reserved) do
+    {kept, _used} =
+      Enum.reduce_while(lines, {[], reserved}, fn line, {acc, used} ->
+        size = String.length(line) + 1
+        # Leave room for the overflow pointer itself.
+        if used + size + 40 <= @max_chars,
+          do: {:cont, {[line | acc], used + size}},
+          else: {:halt, {acc, used}}
+      end)
+
+    {Enum.reverse(kept), length(lines) - length(kept)}
+  end
+
+  defp rank(status), do: Enum.find_index(@order, &(&1 == status)) || length(@order)
+
+  defp clip(text) do
+    text = text |> String.replace(~r/\s+/, " ") |> String.trim()
+
+    if String.length(text) > @detail_max,
+      do: String.slice(text, 0, @detail_max - 1) <> "…",
+      else: text
+  end
+
+  @doc "Formats milliseconds as 41s or 2m10s."
+  def duration(nil), do: ""
+  def duration(ms) when ms < 1_000, do: "#{ms}ms"
+  def duration(ms) when ms < 60_000, do: "#{div(ms, 1000)}s"
+
+  def duration(ms) do
+    s = div(ms, 1000)
+    "#{div(s, 60)}m#{String.pad_leading(Integer.to_string(rem(s, 60)), 2, "0")}s"
+  end
+end

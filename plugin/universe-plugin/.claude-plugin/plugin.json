@@ -1,0 +1,6 @@
+{
+  "name": "universe",
+  "version": "0.1.0",
+  "description": "Run all execution through a per-project Universe daemon: batched workers by ID, services, handles, one digest per tick.",
+  "author": { "name": "Adam" }
+}
