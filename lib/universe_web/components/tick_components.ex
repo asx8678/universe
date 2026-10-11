@@ -39,6 +39,7 @@ defmodule UniverseWeb.TickComponents do
 
   attr :id, :string, required: true
   attr :tick, :map, required: true
+  attr :flow_link, :boolean, default: false, doc: "link to the tick's flow diagram"
 
   def tick_card(assigns) do
     ~H"""
@@ -52,6 +53,14 @@ defmodule UniverseWeb.TickComponents do
         <span class="ml-auto font-mono text-xs opacity-70">
           ~{@tick.tokens_in} tok in → ~{@tick.tokens_out || "…"} tok out
         </span>
+        <.link
+          :if={@flow_link}
+          id={"flow-link-#{@tick.tick}"}
+          navigate={"/timeline/#{@tick.tick}"}
+          class="inline-flex items-center gap-1 rounded-lg bg-base-200 px-2 py-0.5 text-xs font-medium transition hover:bg-base-300"
+        >
+          flow →
+        </.link>
       </header>
 
       <div class="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-base-300">

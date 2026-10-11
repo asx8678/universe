@@ -71,7 +71,7 @@ defmodule UniverseWeb.TimelineLive do
       </div>
 
       <div id="ticks" phx-update="stream" class="space-y-4">
-        <.tick_card :for={{dom_id, t} <- @streams.ticks} id={dom_id} tick={t} />
+        <.tick_card :for={{dom_id, t} <- @streams.ticks} id={dom_id} tick={t} flow_link />
       </div>
     </Layouts.app>
     """

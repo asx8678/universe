@@ -60,6 +60,15 @@ defmodule Universe.EventLog do
     :ets.select(@table, [{{:"$1", :_, :_, :_, :"$2"}, [{:>, :"$1", since}], [:"$2"]}])
   end
 
+  @doc "Events with `from <= seq < to`, oldest first (`to: nil` means to the end)."
+  def between(from, nil), do: since(from - 1)
+
+  def between(from, to) do
+    :ets.select(@table, [
+      {{:"$1", :_, :_, :_, :"$2"}, [{:>=, :"$1", from}, {:<, :"$1", to}], [:"$2"]}
+    ])
+  end
+
   @doc "All events recorded under tick `n`, oldest first."
   def for_tick(n) do
     :ets.select(@table, [{{:_, n, :_, :_, :"$1"}, [], [:"$1"]}])
