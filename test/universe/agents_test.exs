@@ -251,6 +251,20 @@ defmodule Universe.AgentsTest do
     kill(name)
   end
 
+  test "a lost saved session is replaced at once, even before any task" do
+    name = uniq("lostidle")
+    tick([agent(name), task("li1-#{name}", name, "first")])
+    kill(name)
+    File.rm_rf!(Path.join(Universe.Paths.project_root(), ".fake_sessions"))
+
+    back = tick([agent(name)], %{"ids" => [name], "timeout_s" => 15})
+    assert back.text =~ ~r/#{name}.*saved session lost; new session/
+
+    next = tick([task("li2-#{name}", name, "again")])
+    assert status(next, "li2-#{name}") == "done"
+    kill(name)
+  end
+
   test "a task past its timeout is interrupted and the agent is free again" do
     name = uniq("sleepy")
     t = "s-#{name}"

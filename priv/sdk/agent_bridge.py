@@ -106,6 +106,9 @@ def save_session_id(sid):
 
 state = {"tasks": 0, "ctx": 0, "crashes": [], "calls": {}}
 session = {}
+# How long a resumed session gets to fail at boot ("No conversation found"
+# comes within a second) before the agent says it is ready.
+RESUME_CHECK_S = 2.5
 
 
 def start_session(resume):
@@ -140,7 +143,20 @@ def write(obj):
     session["proc"].stdin.flush()
 
 
+def lost_resume():
+    """True when a resumed session died before its first result: the saved
+    session is gone (claude says "No conversation found"), so start anew."""
+    return session["proc"].poll() is not None and session["resumed"] and not session["confirmed"]
+
+
+def start_fresh():
+    start_session(resume=False)
+    state["note"] = "saved session lost; new session"
+
+
 def send(text):
+    if lost_resume():
+        start_fresh()
     # A session that died (crash, killed) is resumed in a new process; more
     # than 3 deaths in 60 s ends the agent.
     if session["proc"].poll() is not None:
@@ -253,6 +269,13 @@ def task(prompt=None):
 session["id"] = saved_session_id()
 start_session(resume=session["id"] is not None)
 if session["resumed"]:
-    state["note"] = "resumed its earlier session"
+    try:
+        session["proc"].wait(timeout=RESUME_CHECK_S)
+    except subprocess.TimeoutExpired:
+        pass
+    if lost_resume():
+        start_fresh()
+    else:
+        state["note"] = "resumed its earlier session"
 U.progress(idle_line())
 U.serve(cfg["service"], {"task": task}, describe="agent: " + " ".join(cfg["purpose"].split())[:120])
