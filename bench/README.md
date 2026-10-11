@@ -217,6 +217,13 @@ The mid-run rule arrived with tasks in flight (window: yes); it was not
 steered (agents owned categories, not priorities): the orchestrator found
 the chargebacks itself and got all 52 right.
 
+**Pilot 3, Oct 11, 2026 (sonnet, after the fixes).** No helpers at all: it
+paged all 600 tickets through `run` output in ~50 chunks and judged them in
+its own context. Categories 600/600, priorities 598/600 (2 indirect
+chargebacks missed: FAIL), 66 turns, 6.9 M orchestrator tokens, 280 s. With
+the same model, pilot 2 delegated and pilot 3 didn't: the choice is not
+stable at this size for sonnet.
+
 **Stopping rule:** after these fixes and one more sonnet pilot, the Opus runs
 go ahead whatever pilot 3 shows, unless the harness itself breaks.
 Otherwise the acceptance turns into development.
@@ -265,4 +272,70 @@ python3 bench/gen_triage.py
 UNIVERSE_BENCH_OUT=bench/out7 python3 bench/run.py --tasks triage --setups accept --runs 3 --budget 25 --go
 UNIVERSE_BENCH_OUT=bench/out7 python3 bench/run.py --tasks triage --setups plain --runs 3 --budget 25 --go
 python3 bench/accept.py bench/out7/triage.*.jsonl
+```
+
+## M7 result (Oct 11, 2026): NOT ACCEPTED
+
+Three Opus 5.5 runs, `bench/out7/`, scored with `accept.py`:
+
+| run | grade | built | wired (agent U.calls) | turns | orchestrator tokens | helper tokens | cost (orch.) | steer |
+|---|---|---|---|---|---|---|---|---|
+| 1 | PASS | yes (db → db2 → db3) | 490 | 42 | 2.63 M | 1.45 M | $4.07 | n/a: no task in flight |
+| 2 | PASS | yes (tix, tix2) | 44 | 35 | 1.79 M | 1.11 M | $3.16 | none (window) |
+| 3 | PASS | no: agents read exported files | 0 | 41 | 2.02 M | 1.11 M | $3.43 | none (window) |
+
+0 of 3 runs pass (every run is over 25 turns), and no run with a steer
+window steered: **not accepted**. Built 2/3, wired 2/3, correct 3/3. Helpers
+paid off against pilot 3's no-helper path at this size (66 turns, 6.9 M
+tokens, FAIL), with the confound that pilot 3 was sonnet.
+
+Where the turns went (35–42 against M6's 7–13):
+
+- **inspect after nearly every run** (9–13 per run, ~25 %): the digest showed
+  one line per run.
+- **Agents couldn't read large service results**: over 8,000 characters
+  they got a handle and a preview cutting bodies at ~30 characters. In run 1
+  four agents stopped to ask, and the service was rebuilt twice (db → db2 →
+  db3) with its pools; run 3 avoided services for that reason.
+- **Pool calls routed to an agent being killed** in the same tick (run 1:
+  40 "no live service a1" failures).
+- **`leases` inside the agent block** got "unknown field leases"; run 3
+  then grepped the plugin's reference to learn the syntax.
+- Verification passes the model chose itself (second-opinion pools, diffs).
+
+Steering: in run 2 the rule arrived while tasks ran; the orchestrator killed
+them and re-dispatched, which is right for this task: the rule changes
+output already produced, so steering the remaining work can't fix done
+work. This task shape cannot tell whether the model steers when it should.
+
+Side effect: run 2's orchestrator wrote Claude Code auto-memory under
+`~/.claude/projects/-private-tmp-universe-bench-triage-accept-2/`. Work
+dirs are reused by path across rounds, so a later round could read it.
+
+Fixed in 4260748 (with tests): agents page through a handle's whole value
+with `handle_read`; pool routing and direct calls skip agents being killed;
+"leases go on the serve, next to agent, not inside it"; a finished run's
+stdout of ≤ 20 lines / 1,500 chars shows whole in the digest (≤ 3,000
+chars a tick). Earlier, from the pilots (e7d5937): tasks for a busy agent
+wait in the Tick (timeout starts with the task), `memory: "task"`.
+
+# M7.1 acceptance (pre-registered Oct 11, 2026, before any run)
+
+Same task, fixture, prompt, mid-run message, setups and criteria as M7,
+on 4260748, with two changes, both decided before any run:
+
+- **Steer is reported, not gated** (see M7: this task can't discriminate
+  it). A steer acceptance needs a long single-task shape whose direction
+  changes (a review or investigation); that is future work.
+- **A fresh work path per round** (`UNIVERSE_BENCH_WORK=/tmp/universe-bench-m71`)
+  so no run reads an earlier round's auto-memory.
+
+The 25-turn gate stays. **Accepted** if at least 2 of 3 runs are built,
+wired, correct and within 25 turns. M7.1 is the last round before the
+benchmark; whatever it shows is recorded as is.
+
+```
+UNIVERSE_BENCH_OUT=bench/out71 UNIVERSE_BENCH_WORK=/tmp/universe-bench-m71 \
+  python3 bench/run.py --tasks triage --setups accept --runs 3 --budget 25 --go
+python3 bench/accept.py bench/out71/triage.accept.*.jsonl
 ```
