@@ -41,6 +41,21 @@ defmodule Universe.WorkerTest do
              ~w(exit spawn stderr stdout)
   end
 
+  test "output events carry whole lines, even when a line arrives in pieces" do
+    id = start("printf 'half '; sleep 0.1; printf 'and half\\n'; printf 'no newline'")
+    await(id)
+    :ok = EventLog.sync()
+
+    texts = for e <- EventLog.for_id(id), e["type"] == "stdout", do: e["data"]["text"]
+    assert Enum.join(texts) == "half and half\nno newline"
+    assert "half and half\n" in texts
+  end
+
+  test "the worker's own HOME shows as ~/ in last lines" do
+    s = await(start("echo \"$HOME/.ssh\"; exit 1"))
+    assert s["last_out"] == "~/.ssh"
+  end
+
   test "non-zero exit is failed, with the code" do
     assert %{"status" => "failed", "code" => 3} = await(start("exit 3"))
   end

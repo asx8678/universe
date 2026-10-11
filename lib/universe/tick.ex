@@ -547,7 +547,7 @@ defmodule Universe.Tick do
         state
 
       _ ->
-        Worker.kill(id)
+        Worker.kill(id, {:kill, reason})
         state
     end
   end

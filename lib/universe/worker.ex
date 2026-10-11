@@ -41,6 +41,9 @@ defmodule Universe.Worker do
 
   @grace_ms 2_000
   @line_max 300
+  # Output events: a partial line waits this long, or up to this size.
+  @flush_ms 300
+  @pending_max 4096
   @default_fsize 1_073_741_824
 
   def langs, do: Map.keys(@runners)
@@ -125,10 +128,14 @@ defmodule Universe.Worker do
       os_pid: nil,
       started_ms: System.monotonic_time(:millisecond),
       killed_by: nil,
+      kill_reason: nil,
       files: %{},
       emitted: %{stdout: 0, stderr: 0},
       truncated: %{stdout: false, stderr: false},
       partial: %{stdout: "", stderr: ""},
+      # Output not yet logged: events carry whole lines (see output/3).
+      pending: %{stdout: "", stderr: ""},
+      flush_timer: %{stdout: nil, stderr: nil},
       last: %{stdout: nil, stderr: nil},
       strip: strip_prefixes(run_dir(spec.id)),
       done: false
@@ -213,7 +220,13 @@ defmodule Universe.Worker do
       do: event(state, "budget_hit", %{"budget" => "mem_mb", "limit" => state.mem_mb})
 
     Port.command(port, "K")
-    {:noreply, %{state | killed_by: if(why == :mem, do: :mem, else: :kill)}}
+
+    {:noreply,
+     %{
+       state
+       | killed_by: if(why == :mem, do: :mem, else: :kill),
+         kill_reason: match?({:kill, r} when is_binary(r), why) && elem(why, 1)
+     }}
   end
 
   def handle_cast({:kill, _why}, state), do: {:noreply, state}
@@ -235,7 +248,7 @@ defmodule Universe.Worker do
       case {state.killed_by, code} do
         {:budget, _} -> {"budget", "wall budget #{state.wall_s}s hit"}
         {:mem, _} -> {"budget", "memory budget #{state.mem_mb} MB hit"}
-        {:kill, _} -> {"killed", nil}
+        {:kill, _} -> {"killed", state.kill_reason || nil}
         {nil, 0} -> {"done", nil}
         {nil, _} -> {"failed", nil}
       end
@@ -254,13 +267,16 @@ defmodule Universe.Worker do
   def handle_info(:wall_budget, state), do: {:noreply, state}
 
   def handle_info({:EXIT, port, reason}, %{port: port, done: false} = state) do
-    finish(state, %{
-      "status" => "failed",
-      "code" => nil,
-      "signal" => nil,
-      "reason" => "launcher exited: #{inspect(reason)}"
-    })
+    why =
+      if reason == :normal,
+        do: "the launcher stopped without reporting an exit status",
+        else: "the launcher crashed: #{inspect(reason)}"
+
+    finish(state, %{"status" => "failed", "code" => nil, "signal" => nil, "reason" => why})
   end
+
+  def handle_info({:flush, stream}, %{done: false} = state),
+    do: {:noreply, state |> put_in([:flush_timer, stream], nil) |> flush(stream)}
 
   def handle_info(_msg, state), do: {:noreply, state}
 
@@ -331,9 +347,43 @@ defmodule Universe.Worker do
 
   ## Output
 
+  # Output events carry whole lines: a chunk is logged up to its last
+  # newline and the rest waits for more, at most @flush_ms (a prompt with no
+  # newline still shows) or @pending_max bytes, and is flushed before exit.
   defp output(state, stream, chunk) do
     :ok = :file.write(state.files[stream], chunk)
     state = track_lines(state, stream, chunk)
+    buffered = state.pending[stream] <> chunk
+
+    {ready, rest} =
+      case :binary.matches(buffered, "\n") do
+        [] -> {"", buffered}
+        matches -> buffered |> :erlang.split_binary(elem(List.last(matches), 0) + 1)
+      end
+
+    {ready, rest} =
+      if byte_size(rest) > @pending_max, do: {ready <> rest, ""}, else: {ready, rest}
+
+    state = put_in(state.pending[stream], rest)
+    state = if ready == "", do: state, else: emit(state, stream, ready)
+
+    cond do
+      rest == "" or state.flush_timer[stream] ->
+        state
+
+      true ->
+        put_in(state.flush_timer[stream], Process.send_after(self(), {:flush, stream}, @flush_ms))
+    end
+  end
+
+  defp flush(state, stream) do
+    case state.pending[stream] do
+      "" -> state
+      rest -> state |> put_in([:pending, stream], "") |> emit(stream, rest)
+    end
+  end
+
+  defp emit(state, stream, chunk) do
     emitted = state.emitted[stream]
 
     cond do
@@ -394,6 +444,8 @@ defmodule Universe.Worker do
   ## Exit
 
   defp finish(state, summary) do
+    state = state |> flush(:stdout) |> flush(:stderr)
+
     summary =
       Map.merge(summary, %{
         "wall_ms" => System.monotonic_time(:millisecond) - state.started_ms,
@@ -430,12 +482,22 @@ defmodule Universe.Worker do
   defp strip_prefixes(run_dir) do
     root = Paths.project_root()
 
-    [run_dir, Isolation.realpath(run_dir), root, Isolation.realpath(root)]
-    |> Enum.uniq()
-    |> Enum.map(&(&1 <> "/"))
+    home = Path.join(run_dir, "home")
+
+    # The worker's own HOME reads as ~/, so "~/.ssh" is not mistaken for a
+    # project folder called home.
+    homes = Enum.uniq([home, Isolation.realpath(home)]) |> Enum.map(&{&1 <> "/", "~/"})
+
+    rest =
+      [run_dir, Isolation.realpath(run_dir), root, Isolation.realpath(root)]
+      |> Enum.uniq()
+      |> Enum.map(&{&1 <> "/", ""})
+
+    homes ++ rest
   end
 
-  defp shorten(line, prefixes), do: Enum.reduce(prefixes, line, &String.replace(&2, &1, ""))
+  defp shorten(line, prefixes),
+    do: Enum.reduce(prefixes, line, fn {from, to}, acc -> String.replace(acc, from, to) end)
 
   defp safe_close(port) do
     Port.close(port)

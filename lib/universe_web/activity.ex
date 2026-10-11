@@ -224,10 +224,12 @@ defmodule UniverseWeb.Activity do
         _ -> :muted
       end
 
+    # A killed worker's last output line is not why it ended.
+    last = if d["status"] == "killed", do: nil, else: d["last_err"] || d["last_out"]
+
     detail =
       d["reason"] || (d["handle"] && "→ #{d["handle"]}") ||
-        (d["result_text"] && "→ #{result_text(d["result_text"])}") || d["last_err"] ||
-        d["last_out"]
+        (d["result_text"] && "→ #{result_text(d["result_text"])}") || last
 
     took = d["wall_ms"] && Digest.duration(d["wall_ms"])
     {tone, Enum.join(Enum.filter([d["status"], took, detail], & &1), " · ")}
