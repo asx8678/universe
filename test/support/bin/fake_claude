@@ -15,6 +15,8 @@ like a lost session. Message content steers it:
             meanwhile starts a turn of its own afterwards
   LAZY   -> answers "lazy done", then waits 7 s before reading on: a steer
             sent meanwhile starts its turn after the bridge stopped waiting
+  STALL  -> works 3 s without reading, then "stalled: <content>"
+  STUBBORN -> works 4 s without reading or stopping, then "stubborn done"
   CRASH  -> exits 7
   else   -> "done #<n>: <content>" (n counts the session's messages)
 With --replay-user-messages each message is echoed (isReplay) when taken in.
@@ -72,6 +74,14 @@ while True:
     open(path, "w").write(str(n))
     if "CRASH" in text:
         sys.exit(7)
+    if "STALL" in text:
+        time.sleep(3)
+        result("stalled: " + text)
+        continue
+    if "STUBBORN" in text:
+        time.sleep(4)
+        result("stubborn done")
+        continue
     if "SLOW" in text:
         time.sleep(1.5)
     if "SLEEP" in text:

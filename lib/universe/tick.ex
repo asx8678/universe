@@ -23,7 +23,9 @@ defmodule Universe.Tick do
   crashing service restarts, at most 3 times in 60 s.
 
   `steer` hands an instruction to a busy agent's SDK connection, for the task
-  in hand; the agent's bridge fetches it from there.
+  in hand; the agent's bridge fetches it from there. The connection decides
+  whether the agent is busy and, for a steer aimed at a call, whether that
+  call is the task in hand.
 
   On boot the worker table is rebuilt from the event log; IDs that were live
   when Universe stopped are recorded as `killed` ("lost: Universe restarted").
@@ -33,7 +35,18 @@ defmodule Universe.Tick do
 
   use GenServer
 
-  alias Universe.{Digest, Directive, EventLog, Handles, Ids, Leases, Secrets, Services, Worker}
+  alias Universe.{
+    Digest,
+    Directive,
+    EventLog,
+    Handles,
+    Ids,
+    Leases,
+    SDK,
+    Secrets,
+    Services,
+    Worker
+  }
 
   @default_timeout_s 60
   @max_timeout_s 90
@@ -83,9 +96,13 @@ defmodule Universe.Tick do
   @doc "Called by a worker's SDK connection; blocks until the model replies."
   def ask(id, question), do: GenServer.call(__MODULE__, {:ask, id, question}, :infinity)
 
-  @doc "Called by a worker's SDK connection once `U.serve` registered it."
-  def service_ready(id, name, fns, describe),
-    do: GenServer.call(__MODULE__, {:service_ready, id, name, fns, describe})
+  @doc """
+  Called by a worker's SDK connection on `U.serve`. The Tick checks the
+  serve and registers `info` (with `conn`) in `Services` in the same step,
+  so a refused serve is never routable.
+  """
+  def service_ready(id, name, info),
+    do: GenServer.call(__MODULE__, {:service_ready, id, name, info})
 
   def max_timeout_s, do: @max_timeout_s
 
@@ -201,7 +218,7 @@ defmodule Universe.Tick do
     end
   end
 
-  def handle_call({:service_ready, id, name, fns, describe}, _from, state) do
+  def handle_call({:service_ready, id, name, info}, _from, state) do
     holder = state.services[name]
 
     cond do
@@ -222,6 +239,15 @@ defmodule Universe.Tick do
         {:reply, {:error, "service name #{name} is taken by ##{holder}"}, state}
 
       true ->
+        register_service(state, id, name, info)
+    end
+  end
+
+  # Routable only now that the serve is approved; the registry still refuses
+  # a name a live connection holds.
+  defp register_service(state, id, name, %{fns: fns, describe: describe} = info) do
+    case Services.register(name, info) do
+      :ok ->
         w = state.workers[id]
 
         EventLog.append("serve",
@@ -233,6 +259,9 @@ defmodule Universe.Tick do
         w = %{w | status: "serving", service: name, fns: fns, describe: describe}
         state = %{state | services: Map.put(state.services, name, id)} |> put_worker(w)
         {:reply, :ok, state |> schedule() |> check_waiters()}
+
+      {:error, _} = refused ->
+        {:reply, refused, state}
     end
   end
 
@@ -499,17 +528,34 @@ defmodule Universe.Tick do
   end
 
   defp place(state, _tick, %{op: "steer", target: target} = d, _) do
+    steer = %{"text" => d.text, "interrupt" => d.interrupt}
+
     with {:ok, id} <- resolve_or_error(state, target),
          {:ok, agent} <- steer_target(state, state.workers[id], target),
-         {:ok, %{conn: conn}} <- steer_conn(agent, target) do
+         {:ok, %{conn: conn}} <- steer_conn(agent, target),
+         :ok <- deliver_steer(conn, steer, state.workers[id], target) do
       EventLog.append("steer",
         tick: agent.tick,
         id: agent.id,
         data: %{"text" => String.slice(d.text, 0, 2000), "interrupt" => d.interrupt}
       )
 
-      send(conn, {:steer, %{"text" => d.text, "interrupt" => d.interrupt}})
       {:ok, state}
+    end
+  end
+
+  # Aimed at a call, the steer is for that call's task only; aimed at the
+  # agent, for whatever task it has in hand (a call's or a worker's U.call).
+  defp deliver_steer(conn, steer, w, target) do
+    caller = if w.kind == "call", do: w.id
+
+    case SDK.Conn.steer(conn, steer, caller) do
+      :ok -> :ok
+      {:error, :idle} -> {:error, "#{target} is idle: give it a task with call"}
+      {:error, :queued} -> {:error, "#{target} has not started: its agent is on another task"}
+      {:error, :ended} -> {:error, "#{target}'s task has ended"}
+      {:error, :full} -> {:error, "#{target} has too many steers it has not taken in yet"}
+      {:error, :unresponsive} -> {:error, "#{target}'s agent did not answer; steer again"}
     end
   end
 
@@ -583,9 +629,6 @@ defmodule Universe.Tick do
       agent.status != "serving" ->
         {:error, "#{target} is #{agent.status}"}
 
-      not busy?(state, agent.service) ->
-        {:error, "#{target} is idle: give it a task with call"}
-
       true ->
         {:ok, agent}
     end
@@ -596,12 +639,6 @@ defmodule Universe.Tick do
       {:ok, info} -> {:ok, info}
       :error -> {:error, "#{target} is restarting; steer again in a moment"}
     end
-  end
-
-  defp busy?(state, service) do
-    Enum.any?(state.workers, fn {_, w} ->
-      w.kind == "call" and w.status == "running" and w.spec.service == service
-    end)
   end
 
   # Who answers a reply aimed at `w`: `w` itself when it asks, or the agent
@@ -892,7 +929,7 @@ defmodule Universe.Tick do
 
     task =
       Task.Supervisor.async_nolink(Universe.TaskSup, fn ->
-        Services.invoke(service, fun, args, timeout * 1000)
+        Services.invoke(service, fun, args, timeout * 1000, w.id)
       end)
 
     state = %{state | tasks: Map.put(state.tasks, task.ref, {w.id, task.pid})}
@@ -1472,8 +1509,10 @@ defmodule Universe.Tick do
       end
 
     dropped =
-      Enum.any?(recent, &(&1["type"] == "steer_dropped")) &&
-        "a steer came after its task ended, so it was not delivered"
+      case recent |> Enum.filter(&(&1["type"] == "steer_dropped")) |> List.last() do
+        nil -> nil
+        e -> "a steer was not delivered: #{e["data"]["reason"]}"
+      end
 
     join([
       "agent #{w.service}",

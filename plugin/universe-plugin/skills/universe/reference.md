@@ -162,7 +162,9 @@ service function. The kernel lets an agent call only its listed services.
 it in at its next tool step, and the task's answer comes after it. With
 `"interrupt": true` the turn stops first and the instruction starts the next
 one. A steer to an idle or asking agent is rejected: give it a task, or
-`reply`.
+`reply`. Aimed at a task (call ID or label), it reaches only that task: one
+still waiting behind another task of the agent is rejected, so steer it once
+it starts.
 
 Agents run `claude --restricted`: no Bash or other code-running tools, file
 tools confined to the project, writes only under their leases, `.universe/`

@@ -93,6 +93,17 @@ defmodule Universe.EventLogTest do
     assert List.last(EventLog.since(a["seq"]))["seq"] == b["seq"]
   end
 
+  test "a worker's first and newest events are read without the rest" do
+    id = 900_007
+    seqs = for i <- 1..30, do: EventLog.append("test_ht", id: id, data: %{"i" => i})["seq"]
+    _other = EventLog.append("test_ht", id: id + 1, data: %{})
+
+    assert Enum.map(EventLog.head_for_id(id, 3), & &1["seq"]) == Enum.take(seqs, 3)
+    assert Enum.map(EventLog.tail_for_id(id, 3), & &1["seq"]) == Enum.take(seqs, -3)
+    assert length(EventLog.tail_for_id(id, 100)) == 30
+    assert EventLog.tail_for_id(900_999_999, 5) == []
+  end
+
   test "Redact.scrub/2 walks nested terms and skips tiny values" do
     secrets = [{"a", "abcd1234"}, {"tiny", "ab"}]
     term = %{"x" => ["abcd1234", %{"y" => "pre abcd1234 post"}], "n" => 3, "s" => "ab"}

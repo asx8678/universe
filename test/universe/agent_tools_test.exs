@@ -433,19 +433,111 @@ defmodule Universe.AgentToolsTest do
       for n <- [name, asker], do: kill(n)
     end
 
-    test "a steer that reaches the agent after its task ended is dropped and reported" do
-      name = uniq("late")
-      tick([agent(name), task("l1-#{name}", name, "hello")])
+    test "a steer turn longer than the bridge's wait never becomes the next task's answer" do
+      previous = Application.get_env(:universe, :agent_expect_wait_s)
+      Application.put_env(:universe, :agent_expect_wait_s, 1)
+
+      on_exit(fn ->
+        if previous,
+          do: Application.put_env(:universe, :agent_expect_wait_s, previous),
+          else: Application.delete_env(:universe, :agent_expect_wait_s)
+      end)
+
+      name = uniq("stall")
+      t = "st-#{name}"
+      tick([agent(name), task(t, name, "SLOW then LAZY")], %{"ids" => [name], "timeout_s" => 15})
+
+      # Taken in only after the task's answer; its own turn then runs 3 s,
+      # past the bridge's (shortened) 1 s wait.
+      first = tick([steer(t, "STALL and count")], %{"ids" => [t], "timeout_s" => 30})
+      assert first.text =~ "lazy done"
+
+      next =
+        tick([task("n-#{name}", name, "hello")], %{"ids" => ["n-#{name}"], "timeout_s" => 30})
+
+      assert next.text =~ ~r/done #\d+: hello/
+      refute next.text =~ "stalled"
+      kill(name)
+    end
+
+    test "a steer aimed at a task that hasn't started never reaches the task in hand" do
+      name = uniq("queue")
+      [t1, t2] = ["a-#{name}", "b-#{name}"]
+
+      tick([agent(name), task(t1, name, "WORK on it"), task(t2, name, "hello")], %{
+        "ids" => [name],
+        "timeout_s" => 15
+      })
+
+      rejected = tick([steer(t2, "only lib/")], %{"timeout_s" => 0})
+      assert rejected.text =~ ~r/#{t2} (has not started|is queued)/
+
+      done = tick([], %{"ids" => [t1, t2], "timeout_s" => 20})
+      assert done.text =~ "worked"
+      refute done.text =~ "only lib/"
+      kill(name)
+    end
+
+    test "a steer reaches an agent busy with a worker's own U.call" do
+      name = uniq("sdkbusy")
+      caller = "c-#{name}"
+      tick([agent(name)], %{"ids" => [name], "timeout_s" => 15})
+
+      code = "print(U.call(#{inspect(name)}, 'task', {'prompt': 'WORK it'}, timeout_s=20))"
+
+      started =
+        tick([%{"op" => "run", "label" => caller, "lang" => "python", "code" => code}], %{
+          "timeout_s" => 0
+        })
 
       {:ok, %{conn: conn}} = Services.lookup(name)
-      send(conn, {:steer, %{"text" => "too late", "interrupt" => false}})
-      _ = :sys.get_state(conn)
+      eventually(fn -> :sys.get_state(conn).inflight != nil end)
 
-      result = tick([task("l2-#{name}", name, "hello again")], %{"ids" => ["l2-#{name}"]})
-      assert result.text =~ "a steer came after its task ended, so it was not delivered"
-      # The next task never sees it.
-      assert result.text =~ "done #2: hello again"
+      accepted = tick([steer(name, "only lib/")], %{"ids" => [caller], "timeout_s" => 20})
+      refute accepted.text =~ "is idle"
+
+      eventually(fn ->
+        API.inspect(%{"target" => "##{id_of(started, caller)}"}).text =~
+          "steered: Message from the orchestrator"
+      end)
+
       kill(name)
+    end
+
+    test "an interrupting steer still waiting when the task times out is reported as dropped" do
+      name = uniq("stubborn")
+      t = "sb-#{name}"
+
+      first =
+        tick([agent(name), Map.put(task(t, name, "STUBBORN"), "timeout_s", 3)], %{
+          "ids" => [name],
+          "timeout_s" => 15
+        })
+
+      agent_id = id_of(first, name)
+      tick([steer(t, "stop now", %{"interrupt" => true})], %{"ids" => [t], "timeout_s" => 15})
+
+      eventually(fn ->
+        Enum.any?(
+          EventLog.for_id(agent_id),
+          &(&1["type"] == "steer_dropped" and &1["data"]["text"] =~ "stop now")
+        )
+      end)
+
+      # The digest tells the model, and the next task never sees it.
+      result = tick([task("n-#{name}", name, "hello")], %{"ids" => ["n-#{name}"]})
+      assert result.text =~ "a steer was not delivered: the task ended before the agent took"
+      assert result.text =~ ~r/done #\d+: hello/
+      refute result.text =~ "stop now"
+      kill(name)
+    end
+  end
+
+  defp eventually(fun, tries \\ 80) do
+    cond do
+      fun.() -> true
+      tries == 0 -> flunk("condition never became true")
+      true -> receive(after: (100 -> eventually(fun, tries - 1)))
     end
   end
 end

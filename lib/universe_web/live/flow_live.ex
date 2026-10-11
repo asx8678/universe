@@ -37,6 +37,8 @@ defmodule UniverseWeb.FlowLive do
        pulses: %{},
        seen: EventLog.last_seq(),
        window_s: 300,
+       # The handles node's summary, read from disk only when a put came.
+       handles: nil,
        selected: if(is_binary(params["node"]), do: params["node"])
      )
      |> load(false)}
@@ -108,8 +110,10 @@ defmodule UniverseWeb.FlowLive do
         else: %{}
 
     pulses = Map.merge(socket.assigns.pulses, fresh)
+    put? = Enum.any?(events, &(&1["seq"] > socket.assigns.seen and &1["type"] == "put"))
 
     socket
+    |> then(&if(put?, do: assign(&1, :handles, nil), else: &1))
     |> assign(
       graph: graph,
       live: live,
@@ -130,9 +134,22 @@ defmodule UniverseWeb.FlowLive do
     %{selected: key, graph: graph, live: live} = socket.assigns
 
     case Enum.find(graph.nodes, &(&1.key == key)) do
-      nil -> assign(socket, selected: nil, details: nil)
-      node -> assign(socket, :details, Map.merge(about(node, live), %{links: links(graph, key)}))
+      nil ->
+        assign(socket, selected: nil, details: nil)
+
+      %{key: "handles"} = node ->
+        socket = if socket.assigns.handles, do: socket, else: assign(socket, :handles, handles())
+        details = about(node, socket.assigns.handles)
+        assign(socket, :details, Map.put(details, :links, links(graph, key)))
+
+      node ->
+        assign(socket, :details, Map.put(about(node, live), :links, links(graph, key)))
     end
+  end
+
+  defp handles do
+    list = Handles.list()
+    %{count: length(list), latest: list |> Enum.take(-3) |> Enum.map(& &1["handle"])}
   end
 
   # Who the node talked to in the window: per partner, messages each way
@@ -158,9 +175,11 @@ defmodule UniverseWeb.FlowLive do
   defp about(%{key: "w:" <> id} = node, live) do
     id = String.to_integer(id)
     w = live[id]
-    events = id |> EventLog.for_id() |> Enum.take(-400)
-    spawn = Enum.find(events, &(&1["type"] == "spawn"))
-    serve = events |> Enum.filter(&(&1["type"] == "serve")) |> List.last()
+    # Bounded reads: spawn and the first serve come early, the rest is recent.
+    head = EventLog.head_for_id(id, 20)
+    events = EventLog.tail_for_id(id, 400)
+    spawn = Enum.find(head ++ events, &(&1["type"] == "spawn"))
+    serve = (head ++ events) |> Enum.filter(&(&1["type"] == "serve")) |> List.last()
     exit = events |> Enum.filter(&(&1["type"] == "exit")) |> List.last()
     agent = w && w.spec[:agent]
     status = (w && w.status) || node.status
@@ -227,9 +246,7 @@ defmodule UniverseWeb.FlowLive do
     }
   end
 
-  defp about(%{key: "handles"}, _live) do
-    handles = Handles.list()
-
+  defp about(%{key: "handles"}, handles) do
     %{
       title: "Handles",
       kind: "stored data",
@@ -240,8 +257,8 @@ defmodule UniverseWeb.FlowLive do
         "Values workers stored with U.put. Only previews reach the model; code reads them back with U.get.",
       doing: nil,
       facts: [
-        {"Stored", to_string(length(handles))},
-        {"Latest", handles |> Enum.take(-3) |> Enum.map(& &1["handle"]) |> join()}
+        {"Stored", to_string(handles.count)},
+        {"Latest", join(handles.latest)}
       ],
       started: nil
     }

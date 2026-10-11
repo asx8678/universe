@@ -331,7 +331,8 @@ service, and `reply` reached only an agent that was asking.
   stdin. The task's answer is the first result after every message was
   taken in. `interrupt: true` stops the turn first and sends the
   instruction as the next message. A steer to an idle or asking agent is
-  rejected; one still undelivered when the task ends is dropped and logged.
+  rejected, as is one aimed at a task still waiting behind another; one
+  still undelivered when the task ends is dropped and logged.
 - Teaching the orchestrator (M2: the model uses what the tick description
   lists): the tick description (still under 2,048 chars), the SessionStart
   hook, SKILL.md and reference.md say to build helpers when they pay off,
@@ -408,6 +409,33 @@ and `agent_tools_test.exs`:
   malformed MCP cancels.
 - Left as is: abstract Unix sockets with `--share-net` on Linux, a ~200 ms
   "stopping" window for a service killed mid-restart.
+
+### Review of the M7 commit (Oct 11, 2026)
+
+Fixed, with regressions in `review_fixes_test.exs`, `agent_tools_test.exs`,
+`event_log_test.exs` and `flow_live_test.exs`:
+- A steer went to whatever invocation the agent's connection had in flight:
+  aimed at a queued call it reached another caller's task, and an agent busy
+  with a worker's `U.call` was "idle". Invocations now carry their caller;
+  the Tick asks the connection (`Conn.steer/3`), which accepts a steer only
+  for the task in hand and refuses one past 20 waiting (was dropped
+  silently).
+- The bridge stopped skipping an earlier task's stray steer turn after
+  30 s; it now waits for the prompt's echo (the time limit stays only for a
+  session that never echoes). Steers fetched but not delivered are reported
+  (`steers_dropped` SDK op), and none are fetched while a result is held.
+- The Tick now approves a serve and registers it in one step: a refused
+  serve was briefly routable and left a monitor behind.
+- `put_file` needed python3 for every language: perl, then `sh` with a
+  watchdog, are bounded fallbacks.
+- Bubblewrap's empty `/run` hid NixOS's program trees (`/run/current-system`,
+  `/run/wrappers`); they are re-bound read-only.
+- Smaller: async SDK tasks copied the whole connection state; Flow details
+  read every event of the selected worker (and lost an old worker's spawn)
+  and every handle's meta on each refresh; one `inspect` re-read the
+  secrets files three times.
+- Left as is: the `inspect` manifest's agent busy/idle still counts only
+  call directives, so an agent on a worker's `U.call` shows idle there.
 
 ## 3b. Carry-forward notes (from the M1 review)
 

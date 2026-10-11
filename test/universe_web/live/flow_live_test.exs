@@ -69,4 +69,45 @@ defmodule UniverseWeb.FlowLiveTest do
     view |> element("#flow-details-close") |> render_click()
     refute has_element?(view, ".flow-node-selected")
   end
+
+  test "a long-lived worker's details still show how it started", %{conn: conn} do
+    label = uniq("chatty")
+
+    result =
+      tick([%{"op" => "run", "label" => label, "lang" => "python", "code" => "print('hi')"}])
+
+    [{"#" <> id, _}] = Map.to_list(result.structured["ids"])
+    # More events than the details read from the end.
+    for i <- 1..450,
+        do:
+          Universe.EventLog.append("test_noise",
+            id: String.to_integer(id),
+            data: %{"text" => "p#{i}"}
+          )
+
+    {:ok, view, _html} = live(conn, ~p"/flow?node=w:#{id}")
+    assert has_element?(view, "#flow-details", "python")
+    # Move the digest cursor past the extra events, so the next tick is clean.
+    tick([], %{"timeout_s" => 0})
+  end
+
+  test "the handles node's count follows new handles", %{conn: conn} do
+    stored = fn n -> ~s(#flow-details dd[title="#{n}"]) end
+    {:ok, view, _html} = live(conn, ~p"/flow")
+
+    tick([
+      %{"op" => "run", "label" => uniq("putter"), "lang" => "python", "code" => "U.put('a', [1])"}
+    ])
+
+    eventually(fn -> has_element?(view, "#node-handles") end)
+    view |> element("#node-handles") |> render_click()
+    before = length(Universe.Handles.list())
+    eventually(fn -> has_element?(view, stored.(before)) end)
+
+    tick([
+      %{"op" => "run", "label" => uniq("putter"), "lang" => "python", "code" => "U.put('b', [2])"}
+    ])
+
+    eventually(fn -> has_element?(view, stored.(before + 1)) end)
+  end
 end

@@ -73,8 +73,11 @@ defmodule Universe.Isolation.Bubblewrap do
   # sockets (/run/docker.sock, the systemd user bus at /run/user/<uid>/bus),
   # each a way out of the sandbox. Empty tmpfs over /run (and /var/run when
   # it isn't just a link to it); a service with network gets the resolver's
-  # directory back so names still resolve.
+  # directory back so names still resolve. Trees of programs that live under
+  # /run (NixOS: /run/current-system/sw/bin/python3, /run/wrappers) come
+  # back read-only, or the worker's interpreter wouldn't exist.
   @resolver "/run/systemd/resolve"
+  @run_programs ~w(/run/current-system /run/booted-system /run/wrappers /run/opengl-driver)
   defp hide_runtime_sockets(network) do
     var_run =
       case File.lstat("/var/run") do
@@ -83,7 +86,13 @@ defmodule Universe.Isolation.Bubblewrap do
       end
 
     resolver = if network != :none, do: Enum.flat_map(resolver_dirs(), &ro_bind/1), else: []
-    ["--tmpfs", "/run"] ++ var_run ++ resolver
+
+    programs =
+      Application.get_env(:universe, :bwrap_run_programs, @run_programs)
+      |> Enum.filter(&File.exists?/1)
+      |> Enum.flat_map(&ro_bind/1)
+
+    ["--tmpfs", "/run"] ++ var_run ++ programs ++ resolver
   end
 
   # Where names are resolved from under /run: systemd-resolved's directory,

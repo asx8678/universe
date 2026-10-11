@@ -43,6 +43,7 @@ Each request carries a `rid`, which the reply echoes:
 | `services` | `names` | per name `{name, live, fns, describe, sigs}` (`{name, live: false}` when it isn't running) |
 | `preview` | `handle` | the handle's bounded text preview (what `inspect` shows) |
 | `inbox` | | the model's steers for the call in progress, `[{text, interrupt}]`, each returned once |
+| `steers_dropped` | `texts`, `reason` | `true`; logs fetched steers the service could not deliver (event `steer_dropped`) |
 
 `sigs` describes the functions for agents' tool schemas:
 `{"query": {"params": ["sql", "limit"], "required": ["sql"], "doc": "Run SQL",
@@ -63,9 +64,11 @@ After `serve`, the daemon sends calls to the service one at a time:
 
 `timeout_ms` is what is left of the caller's timeout (the Python client
 exposes it as `U.time_left()`); an invocation whose caller gave up while it
-was queued is never sent. A `steer` directive aimed at an agent while it
-works on an invocation waits for an `inbox` request; one not fetched before
-the invocation's `result` is dropped (event `steer_dropped`).
+was queued is never sent. A `steer` directive is accepted only while the
+agent works on an invocation, and when it names a call, only while that
+call's invocation is the one in progress (one still queued is rejected).
+At most 20 wait for an `inbox` request; one not fetched before the
+invocation's `result` is dropped (event `steer_dropped`).
 
 The service answers with
 `{"op":"result","cid":9,"ok":true,"value":...}` or

@@ -91,7 +91,10 @@ defmodule Universe.Worker do
       "resume" => Map.get(agent, :resume, true),
       "session_file" => Path.join([Paths.universe_dir(), "agents", "#{state.service}.json"]),
       "root" => root,
-      "claude" => claude_bin()
+      "claude" => claude_bin(),
+      # Tests shorten how long the bridge skips results of a session that
+      # doesn't echo the messages it takes in.
+      "expect_wait_s" => Application.get_env(:universe, :agent_expect_wait_s, 30)
     })
   end
 

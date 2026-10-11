@@ -2,7 +2,8 @@ defmodule Universe.ReviewFixesTest do
   # Regressions for the defects the Universe code review found (Oct 11, 2026).
   use ExUnit.Case, async: false
 
-  alias Universe.{API, Directive, Handles, Paths, Redact, Secrets, Services}
+  alias Universe.{API, Directive, EventLog, Handles, Paths, Redact, Secrets, Services}
+  alias Universe.SDK.Conn
 
   defp uniq(label), do: "#{label}-#{System.unique_integer([:positive])}"
 
@@ -57,6 +58,37 @@ defmodule Universe.ReviewFixesTest do
     assert card =~ "key=«redacted:#{name}.API_KEY»"
     refute card =~ secret
     kill(name)
+  end
+
+  test "one inspect reads the secrets files once" do
+    name = uniq("once")
+    secret!(name)
+
+    result =
+      tick([%{"op" => "run", "label" => name, "lang" => "python", "code" => "print('hi')"}], %{
+        "ids" => [name],
+        "timeout_s" => 15
+      })
+
+    # Count Secrets.all/0 calls in a separate process (a process can't be
+    # its own call tracer here).
+    me = self()
+    target = "##{id_of(result, name)}"
+
+    reader =
+      spawn(fn ->
+        receive(do: (:go -> send(me, {:inspected, Universe.Inspect.run(%{"target" => target})})))
+      end)
+
+    :erlang.trace(reader, true, [:call, {:tracer, me}])
+    :erlang.trace_pattern({Secrets, :all, 0}, true, [:local])
+    on_exit(fn -> :erlang.trace_pattern({Secrets, :all, 0}, false, [:local]) end)
+    send(reader, :go)
+
+    assert_receive {:inspected, %{text: text}}, 5_000
+    assert text =~ "hi"
+    assert_received {:trace, ^reader, :call, {Secrets, :all, []}}
+    refute_received {:trace, ^reader, :call, {Secrets, :all, []}}
   end
 
   test "a handle preview redacts before it cuts long lines" do
@@ -124,7 +156,7 @@ defmodule Universe.ReviewFixesTest do
 
     assert status(result, ghost) == "done"
     assert result.text =~ "only a serve directive can serve"
-    # The refused name was taken back out of the registry.
+    # The refused name was never put in the registry.
     assert Services.lookup(ghost) == :error
 
     eventually(fn ->
@@ -134,6 +166,80 @@ defmodule Universe.ReviewFixesTest do
 
     assert Services.lookup(other) == :error
     kill(real)
+  end
+
+  test "a refused serve is never routable and leaves no monitor behind" do
+    ghost = uniq("ghost")
+
+    code =
+      "import time\ntry:\n    U.serve(#{inspect(ghost)}, {'ping': lambda: 'pong'}, '')\n" <>
+        "except U.UniverseError as e:\n    print('refused:', e, flush=True)\ntime.sleep(30)"
+
+    result =
+      tick([%{"op" => "run", "label" => ghost, "lang" => "python", "code" => code}], %{
+        "timeout_s" => 0
+      })
+
+    # Checked while the refused worker (and its connection) still lives.
+    eventually(fn ->
+      API.inspect(%{"target" => "##{id_of(result, ghost)}"}).text =~ "refused:"
+    end)
+
+    assert Services.lookup(ghost) == :error
+    refute ghost in Map.values(:sys.get_state(Services).monitors)
+    kill(ghost)
+  end
+
+  describe "steers reach only the invocation in flight" do
+    setup do
+      name = uniq("steered")
+
+      code =
+        "import time\ndef work(s):\n    time.sleep(s)\n    return 'ok'\n" <>
+          "U.serve(#{inspect(name)}, {'work': work}, '')"
+
+      result =
+        tick([%{"op" => "serve", "label" => name, "lang" => "python", "code" => code}], %{
+          "ids" => [name],
+          "timeout_s" => 15
+        })
+
+      on_exit(fn -> kill(name) end)
+      {:ok, %{conn: conn}} = Services.lookup(name)
+      %{name: name, conn: conn, id: id_of(result, name)}
+    end
+
+    test "a steer for a named call is refused while another call's invocation runs", c do
+      steer = %{"text" => "only lib/", "interrupt" => false}
+      assert Conn.steer(c.conn, steer, nil) == {:error, :idle}
+
+      first = Task.async(fn -> Services.invoke(c.name, "work", [1.5], 10_000, 111) end)
+      eventually(fn -> :sys.get_state(c.conn).inflight != nil end)
+      second = Task.async(fn -> Services.invoke(c.name, "work", [0], 10_000, 222) end)
+      eventually(fn -> :queue.len(:sys.get_state(c.conn).queue) == 1 end)
+
+      assert Conn.steer(c.conn, steer, 222) == {:error, :queued}
+      assert Conn.steer(c.conn, steer, 333) == {:error, :ended}
+      assert :sys.get_state(c.conn).inbox == []
+      assert Conn.steer(c.conn, steer, 111) == :ok
+
+      assert {:ok, "ok"} = Task.await(first)
+      assert {:ok, "ok"} = Task.await(second)
+    end
+
+    test "a full inbox refuses more steers, and unfetched ones are logged as dropped", c do
+      steer = %{"text" => "only lib/", "interrupt" => false}
+      first = Task.async(fn -> Services.invoke(c.name, "work", [1], 10_000, nil) end)
+      eventually(fn -> :sys.get_state(c.conn).inflight != nil end)
+
+      for _ <- 1..20, do: assert(Conn.steer(c.conn, steer, nil) == :ok)
+      assert Conn.steer(c.conn, steer, nil) == {:error, :full}
+      assert {:ok, "ok"} = Task.await(first)
+      _ = :sys.get_state(c.conn)
+
+      assert [%{"data" => %{"count" => 20}}] =
+               c.id |> EventLog.for_id() |> Enum.filter(&(&1["type"] == "steer_dropped"))
+    end
   end
 
   test "the Linux sandbox hides the host's runtime sockets" do
@@ -146,5 +252,57 @@ defmodule Universe.ReviewFixesTest do
 
     args = Universe.Isolation.Bubblewrap.args(spec)
     assert Enum.chunk_every(args, 2, 1) |> Enum.member?(["--tmpfs", "/run"])
+  end
+
+  test "the Linux sandbox keeps the program trees NixOS puts under /run" do
+    # Stand-ins for /run/current-system and a tree this host doesn't have.
+    present = Path.join(System.tmp_dir!(), uniq("current-system"))
+    File.mkdir_p!(present)
+    missing = Path.join(System.tmp_dir!(), uniq("wrappers"))
+    previous = Application.get_env(:universe, :bwrap_run_programs)
+    Application.put_env(:universe, :bwrap_run_programs, [present, missing])
+
+    on_exit(fn ->
+      File.rm_rf(present)
+
+      if previous,
+        do: Application.put_env(:universe, :bwrap_run_programs, previous),
+        else: Application.delete_env(:universe, :bwrap_run_programs)
+    end)
+
+    spec = %{
+      root: Paths.project_root(),
+      run_dir: Paths.project_root(),
+      writable: [],
+      network: :none
+    }
+
+    args = Universe.Isolation.Bubblewrap.args(spec)
+    pairs = Enum.chunk_every(args, 3, 1)
+    run_at = Enum.find_index(pairs, &match?(["--tmpfs", "/run" | _], &1))
+    kept_at = Enum.find_index(pairs, &(&1 == ["--ro-bind", present, present]))
+
+    assert kept_at > run_at
+    refute missing in args
+  end
+
+  test "put_file has a bounded reader without python3: perl, then sh" do
+    dir = Path.join(System.tmp_dir!(), uniq("readers"))
+    File.mkdir_p!(dir)
+    on_exit(fn -> File.rm_rf(dir) end)
+    file = Path.join(dir, "data.bin")
+    File.write!(file, :crypto.strong_rand_bytes(100_000))
+    fifo = Path.join(dir, "fifo")
+    {_, 0} = System.cmd("mkfifo", [fifo])
+
+    for program <- ["perl", "sh"], System.find_executable(program) do
+      {:ok, [cmd | args]} = Conn.reader_argv(file, program)
+      assert System.cmd(cmd, args) == {File.read!(file), 0}
+
+      # A FIFO is refused at once, not read (which would block).
+      {:ok, [cmd | args]} = Conn.reader_argv(fifo, program)
+      assert {_, code} = System.cmd(cmd, args)
+      assert code != 0
+    end
   end
 end

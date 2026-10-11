@@ -196,7 +196,7 @@ sequenceDiagram
   end
   opt the model steers the busy agent
     M->>T: steer {target: 9 or its task, text}
-    T->>C: {:steer, text} into the inbox
+    T->>C: Conn.steer (checks the task in hand) → inbox
     B->>C: inbox (every 0.5 s while a task runs)
     B->>CL: Message from the orchestrator ...
     Note over CL: taken in at its next tool step (isReplay)
@@ -249,8 +249,8 @@ flowchart LR
 | `Worker` | launcher | Erlang port, `{packet, 4}` | start, `K` kill; back: `P` pid, `O`/`E` output, `X` exit |
 | `Worker` | `Tick` | message `{:worker_exit, ...}` | summary when the process ends |
 | worker code | `Listener` → `Conn` | Unix socket, JSON lines | `put`, `get`, `progress`, `ask`, `call`, `serve` |
-| `Conn` | `Tick` | `GenServer.call` | `ask` (blocks for the model's reply), `service_ready` |
-| `Tick` | agent's `Conn` | message `{:steer, ...}` | a steer for the task in hand; the bridge fetches it with `inbox` |
+| `Conn` | `Tick` | `GenServer.call` | `ask` (blocks for the model's reply), `service_ready` (the Tick checks the serve and registers it in `Services`) |
+| `Tick` | agent's `Conn` | `GenServer.call {:steer, ...}` (2 s) | a steer for the task in hand, accepted or refused by the conn; the bridge fetches it with `inbox` |
 | `agent_mcp.py` | `Listener` → `Conn` | Unix socket, as the agent's ID | `services`, `call`, `put`, `preview` for the agent's tools |
 | `Conn`, call `Task` | `Services` → service `Conn` | `GenServer.call {:invoke, ...}` | a service function call |
 | `GC` | `Tick`, `Worker` | casts | stop idle services, kill over-budget groups |

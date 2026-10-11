@@ -190,7 +190,10 @@ def start_session(resume):
     # "confirmed" turns true at the first result: a resume that dies before
     # then (session gone) falls back to a new session.
     # "stray": a steer of the last task may still produce a result of its own.
-    session.update(proc=proc, events=events, resumed=resume, confirmed=False, stray=False)
+    # "replays": the session has echoed a user message it took in, so a
+    # prompt's echo can be waited for.
+    session.update(proc=proc, events=events, resumed=resume, confirmed=False, stray=False,
+                   replays=False)
 
 
 def write(obj):
@@ -238,9 +241,10 @@ def message_text(content):
     return content
 
 
-# How long to skip an earlier task's leftover results waiting for this
-# task's prompt to be taken in; past it, results count again.
-EXPECT_WAIT_S = 30.0
+# A session that has never echoed a user message may not echo at all: then
+# an earlier task's leftover results are skipped for this long at most.
+# Once it has echoed one, results are skipped until the prompt's echo.
+EXPECT_WAIT_S = float(cfg.get("expect_wait_s") or 30)
 
 
 def interrupt():
@@ -286,19 +290,34 @@ def until_result(expect=None):
 
     With ``expect`` (the prompt just sent), results that come before the
     session takes that prompt in belong to an earlier task's leftover steer
-    turn and are skipped."""
+    turn and are skipped. Steers aren't fetched while such a turn may run
+    or while a result is held: left in the inbox, they are dropped and
+    logged if the task ends first. Steers fetched but never delivered (the
+    task timed out or the session ended) are reported as dropped."""
+    stopping = []  # steers waiting for the turn they interrupted to end
+    try:
+        return _until_result(expect, stopping)
+    except BaseException:
+        if stopping:
+            try:
+                U.steers_dropped(stopping, "the task ended before the agent took them in")
+            except U.UniverseError:
+                pass
+        raise
+
+
+def _until_result(expect, stopping):
     interrupted_at = None
     expect_until = time.time() + EXPECT_WAIT_S
     pending = []   # steers written, not yet taken in by the session
-    stopping = []  # steers waiting for the turn they interrupted to end
     held = None    # a result a pending steer's own turn may still replace
     held_at = 0.0
     next_poll = 0.0
     while True:
         now = time.time()
         left = U.time_left()
-        if expect is not None and now > expect_until:
-            expect = None  # the prompt's replay never came; don't skip forever
+        if expect is not None and not session["replays"] and now > expect_until:
+            expect = None  # this session doesn't echo; don't skip forever
             session["stray"] = False
         if held is not None and (now - held_at > STEER_TURN_WAIT_S
                                  or (left is not None and left <= 1.5)):
@@ -316,7 +335,7 @@ def until_result(expect=None):
             except subprocess.TimeoutExpired:
                 pass
             raise TimeoutError("task timed out; the session did not stop, so it was restarted")
-        if interrupted_at is None and now >= next_poll:
+        if interrupted_at is None and expect is None and held is None and now >= next_poll:
             next_poll = now + STEER_POLL_S
             fetch_steers(pending, stopping)
         try:
@@ -327,6 +346,7 @@ def until_result(expect=None):
             code = session["proc"].wait()
             raise SessionEnded(f"claude session ended (exit {code})")
         if e.get("type") == "user" and e.get("isReplay"):
+            session["replays"] = True
             content = message_text((e.get("message") or {}).get("content"))
             if expect is not None and content == expect:
                 expect = None

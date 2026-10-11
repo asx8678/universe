@@ -11,8 +11,9 @@ defmodule Universe.Services do
     * calls    - `name => last_call_ms`, written by callers; kept apart so a
                  caller racing a dying service can never re-create its entry
 
-  A service is registered by its SDK connection process (`U.serve`) and
-  removed when that process exits, so a dead service can't be called.
+  A service is registered by the Tick once it approves a connection's
+  `U.serve` (so a refused serve is never routable), and removed when that
+  connection process exits, so a dead service can't be called.
   """
 
   use GenServer
@@ -42,13 +43,9 @@ defmodule Universe.Services do
 
   ## Services
 
-  @doc "Registers `name` for the calling connection process."
-  def register(name, info) do
-    GenServer.call(__MODULE__, {:register, name, Map.put(info, :conn, self())})
-  end
-
-  @doc "Drops `name` if the calling connection holds it (a serve the kernel refused)."
-  def unregister(name), do: GenServer.call(__MODULE__, {:unregister, name, self()})
+  @doc "Registers `name` for the connection process `info.conn`."
+  def register(name, %{conn: conn} = info) when is_pid(conn),
+    do: GenServer.call(__MODULE__, {:register, name, info})
 
   def lookup(name) do
     case :ets.lookup(@services, name) do
@@ -69,15 +66,18 @@ defmodule Universe.Services do
     end
   end
 
-  @doc "Calls `fn` on service `name`. Returns `{:ok, value}` or `{:error, reason}`."
-  def invoke(name, fun, args, timeout_ms) do
+  @doc """
+  Calls `fn` on service `name`. Returns `{:ok, value}` or `{:error, reason}`.
+  `caller` (a call directive's ID, or nil) is what a steer for it names.
+  """
+  def invoke(name, fun, args, timeout_ms, caller \\ nil) do
     case lookup(name) do
       {:ok, %{conn: conn, fns: fns}} ->
         if fns != [] and fun not in fns do
           {:error, "service #{name} has no function #{fun} (has: #{Enum.join(fns, ", ")})"}
         else
           :ets.insert(@calls, {name, now()})
-          do_invoke(conn, fun, args, timeout_ms)
+          do_invoke(conn, {:invoke, fun, args, timeout_ms, caller}, timeout_ms)
         end
 
       :error ->
@@ -85,9 +85,9 @@ defmodule Universe.Services do
     end
   end
 
-  defp do_invoke(conn, fun, args, timeout_ms) do
+  defp do_invoke(conn, request, timeout_ms) do
     # The connection gets the timeout too, to pass it on to the service.
-    GenServer.call(conn, {:invoke, fun, args, timeout_ms}, timeout_ms + 1_000)
+    GenServer.call(conn, request, timeout_ms + 1_000)
   catch
     :exit, {:timeout, _} -> {:error, "service call timed out after #{div(timeout_ms, 1000)}s"}
     :exit, _ -> {:error, "service connection closed"}
@@ -117,15 +117,6 @@ defmodule Universe.Services do
       _ ->
         {:reply, put_service(name, info), track(state, name, info.conn)}
     end
-  end
-
-  def handle_call({:unregister, name, conn}, _from, state) do
-    case :ets.lookup(@services, name) do
-      [{^name, %{conn: ^conn}}] -> :ets.delete(@services, name)
-      _ -> :ok
-    end
-
-    {:reply, :ok, state}
   end
 
   defp put_service(name, info) do

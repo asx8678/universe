@@ -80,6 +80,18 @@ defmodule Universe.EventLog do
   @doc "Events of worker `id` with `seq > since`, oldest first."
   def for_id_since(id, since), do: @by_id |> seqs(id, since) |> events()
 
+  @doc "The first `n` events of worker `id`, oldest first; reads only those."
+  def head_for_id(id, n), do: :ets.select(@by_id, id_seqs(id), n) |> limited(& &1)
+
+  @doc "The newest `n` events of worker `id`, oldest first; reads only those."
+  def tail_for_id(id, n),
+    do: :ets.select_reverse(@by_id, id_seqs(id), n) |> limited(&Enum.reverse/1)
+
+  defp id_seqs(id), do: [{{{id, :"$1"}}, [], [:"$1"]}]
+
+  defp limited({seqs, _continuation}, order), do: seqs |> order.() |> events()
+  defp limited(:"$end_of_table", _order), do: []
+
   # Seqs under `key` in an index, above `since`. The key is bound in the
   # pattern, so the ordered set only visits that key's entries.
   defp seqs(_index, nil, _since), do: []

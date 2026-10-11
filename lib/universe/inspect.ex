@@ -24,7 +24,9 @@ defmodule Universe.Inspect do
   @grep_ms 1_000
 
   def run(args) do
+    # Read once: every part of the reply is scrubbed with the same secrets.
     opts = %{
+      secrets: Universe.Secrets.all(),
       offset: int(args["offset"], nil),
       limit: args["limit"] |> int(@default_limit) |> max(1) |> min(@max_limit),
       grep: matcher(args["grep"])
@@ -44,7 +46,7 @@ defmodule Universe.Inspect do
 
     # Event data is redacted when logged; the run directory's files and
     # anything built from them are not, so the reply is scrubbed as a whole.
-    %{text: text |> scrub() |> cap(), structured: %{"target" => target}}
+    %{text: text |> scrub(opts.secrets) |> cap(), structured: %{"target" => target}}
   end
 
   ## manifest
@@ -147,7 +149,7 @@ defmodule Universe.Inspect do
         live = Map.get(Tick.snapshot(), id)
         dir = Worker.run_dir(id)
 
-        ([card(id, events, spawn, exit, live), code(dir, spawn), call_section(events, exit)] ++
+        ([card(id, events, spawn, exit, live), code(dir, spawn, opts), call_section(events, exit)] ++
            outputs(dir, opts))
         |> Enum.reject(&is_nil/1)
         |> Enum.join("\n")
@@ -209,14 +211,14 @@ defmodule Universe.Inspect do
     end
   end
 
-  defp code(_dir, nil), do: nil
+  defp code(_dir, nil, _opts), do: nil
 
-  defp code(dir, spawn) do
+  defp code(dir, spawn, opts) do
     file = Worker.code_file(spawn["data"]["lang"])
 
     case File.read(Path.join(dir, file)) do
       {:ok, text} ->
-        lines = text |> scrub() |> String.split("\n")
+        lines = text |> scrub(opts.secrets) |> String.split("\n")
         shown = Enum.take(lines, @code_lines)
         more = length(lines) - length(shown)
 
@@ -241,7 +243,11 @@ defmodule Universe.Inspect do
           page(
             "--- #{stream}",
             # Scrubbed before paging and grep cut lines: a cut secret wouldn't match.
-            text |> Worker.utf8() |> scrub() |> String.split("\n") |> drop_last_empty(),
+            text
+            |> Worker.utf8()
+            |> scrub(opts.secrets)
+            |> String.split("\n")
+            |> drop_last_empty(),
             opts
           )
 
@@ -251,7 +257,7 @@ defmodule Universe.Inspect do
     end
   end
 
-  defp scrub(text), do: Universe.Redact.scrub(text, Universe.Secrets.all())
+  defp scrub(text, secrets), do: Universe.Redact.scrub(text, secrets)
 
   ## t<n>
 

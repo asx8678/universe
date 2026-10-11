@@ -145,6 +145,12 @@ def inbox():
     return _request("inbox") or []
 
 
+def steers_dropped(texts, reason):
+    """Inside a service function: reports steers fetched with ``inbox`` that
+    could not be delivered, so the model learns they were dropped."""
+    _request("steers_dropped", texts=[str(t) for t in texts], reason=str(reason))
+
+
 _deadline = None
 
 
