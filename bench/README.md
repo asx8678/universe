@@ -460,3 +460,21 @@ that mention several orders or products (only one is the subject), types
 stated indirectly ("it showed up the day after the party", "two lines on my
 statement"), and policy exceptions that turn on what the customer says (a
 gift sent to another address, a defect caused by the customer).
+
+## Steer acceptance, round 2 (Oct 11, 2026): ACCEPTED (2 of 3)
+
+Fix between rounds: while an agent task runs, a tick waits at most 20 s
+and says "back early: helpers still working" (the skill says: steer now if
+the plan changed, else tick again). Same task, criteria and model,
+`bench/outsteer2/`:
+
+| run | steer reached the task after | grade | turns | orch. cost | wall s |
+|---|---|---|---|---|---|
+| 1 | 23 s (was 95 s) | PASS | 11 | $0.29 | 111 |
+| 2 | 22 s | FAIL (64 % docstring, 9 in web/) | 12 | $0.25 | 126 |
+| 3 | ~20 s | PASS | 12 | $0.28 | 159 |
+
+Run 2: the orchestrator gave the review the default 60 s call timeout, so
+the reviewer stopped mid-way; the "continue" task it sent next didn't carry
+the change, and the later web/ files got reviewed. Turns fell from 14–23 to
+11–12, orchestrator cost from $0.61–1.25 to $0.25–0.29.

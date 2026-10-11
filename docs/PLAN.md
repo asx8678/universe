@@ -394,8 +394,12 @@ harness now allows `Skill` (M4–M6 ran with it denied).
 - ~~Steer acceptance~~ run Oct 11 (`bench/README.md`): Opus steered the
   running review in 3 of 3 runs and never restarted it; accepted 1 of 3 on
   the grader, because the steer reached the reviewer only when the model's
-  90 s tick returned. Next: a shorter wait while helpers run, or wake the
-  model on a user message.
+  90 s tick returned. Fixed: ticks come back within 20 s while agent tasks
+  run; round 2 accepted 2 of 3 (steer after ~22 s).
+- Done Oct 11: a directive waits for a lease held by a worker being killed
+  (kill and write in one tick); agent `budget_usd` caps a helper's spend.
+- Still untested: an interactive (non-headless) Claude Code session's
+  one-time MCP approval; needs a person at the terminal.
 - Benchmark (M8): fixture built (300 refund claims, `bench/gen_claims.py`),
   but its gate failed: a regex-and-SQL script decides 88.7 %. Not run; the
   fixture needs claims that only reading can decide (see `bench/README.md`).
