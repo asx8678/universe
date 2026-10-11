@@ -294,7 +294,7 @@ the default. Details in `bench/README.md` and `bench/RESULTS-M6.md`.
 
 - [x] **Memory growth:** `Universe.Tick` keeps every worker ever created, including `directive.code` and the `then` steps. M3 GC: drop the code on settle, and prune settled workers past a cap (the event log and run dirs keep the history).
 - [x] **Escape matrix (M3):** add "a snippet that calls `setsid` outlives its kill" as a known-failing case so it is measured, not forgotten. Also narrow `(allow mach-lookup)`.
-- [ ] `c_src/universe_run.c` is built with `-Werror` and has only been tested on macOS. Build and test it on Linux before the Linux adapter. (Oct 11: portable harness `c_src/test/launcher_test.py` — exit codes, signals, framing, group kill on K and on EOF, grace, RLIMIT_FSIZE — passes 12/12 on macOS. The Linux run was skipped: no Linux VM yet.)
+- [~] `c_src/universe_run.c` is built with `-Werror` and has only been tested on macOS. Build and test it on Linux before the Linux adapter. (Oct 11: portable harness `c_src/test/launcher_test.py` — exit codes, signals, framing, group kill on K and on EOF, grace, RLIMIT_FSIZE — passes 12/12 on macOS. The Linux run was skipped: no Linux VM yet.)
 - [x] Unknown `wait.ids` now come back as `rejected` lines (they used to shrink the watch silently and return at once).
 - [x] The redaction test flushes the log (`EventLog.sync/0`) before checking the file.
 
@@ -310,12 +310,21 @@ the default. Details in `bench/README.md` and `bench/RESULTS-M6.md`.
 - Coarser than macOS: a service with network gets all hosts, not just its
   ports.
 - Verified so far: the argv layering (`test/isolation/bubblewrap_test.exs`).
-- [ ] Run on Linux: `c_src/test/launcher_test.py` (with gcc and clang) and
+- [~] Run on Linux (deferred, see section 4): `c_src/test/launcher_test.py` (with gcc and clang) and
   the escape matrix `c_src/test/linux_escape.sh` (args files are generated
   from the adapter), then the full suite.
 
 ## 4. Blocked or deferred
 
+- **Deferred (Oct 11, 2026): Linux testing.** Nothing Linux-side has run yet;
+  pick it up when a Linux machine or VM is available. Steps:
+  1. `cc -O2 -Wall -Wextra -Werror -std=c99 -D_DEFAULT_SOURCE -o /tmp/universe_run c_src/universe_run.c`
+     with gcc and clang, then `python3 c_src/test/launcher_test.py /tmp/universe_run` (12 checks).
+  2. Install bubblewrap, then `sh c_src/test/linux_escape.sh /tmp/universe_run c_src/test/bwrap_args.txt c_src/test/bwrap_args_net.txt`
+     as a normal user (escape matrix, SDK socket, setsid kill, process groups for memory budgets).
+  3. Install Elixir 1.20 / OTP 29 and run `mix test` with the Bubblewrap adapter.
+  On macOS, Apple's `container` CLI works once its default kernel is installed
+  (`container system start --enable-kernel-install`; a large download from GitHub).
 - **Blocked:** Kiro integration (MCP registration, steering file, blocking its shell tool). Kiro CLI is not installed. Pick it up after M3 once it is installed and its syntax is checked.
 - **Deferred (not v1):** brain mode, Context-Folding and AgentFold, web chat, 3D view, several clients on one Universe, the Linux `box` adapter (unless srt covers it), SQLite event index, the bash `u` helper.
 
