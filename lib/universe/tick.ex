@@ -63,6 +63,9 @@ defmodule Universe.Tick do
   @doc "Currently held leases: `%{id => [path]}`."
   def leases, do: GenServer.call(__MODULE__, :leases)
 
+  @doc "In-flight call tasks: `%{task_pid => call_id}` (for the observer)."
+  def call_tasks, do: GenServer.call(__MODULE__, :call_tasks)
+
   @doc "IDs that are queued, running, serving or asking."
   def live_ids, do: GenServer.call(__MODULE__, :live_ids)
 
@@ -150,6 +153,9 @@ defmodule Universe.Tick do
 
   def handle_call(:snapshot, _from, state), do: {:reply, state.workers, state}
   def handle_call(:leases, _from, state), do: {:reply, state.leases, state}
+
+  def handle_call(:call_tasks, _from, state),
+    do: {:reply, Map.new(state.tasks, fn {_ref, {id, pid}} -> {pid, id} end), state}
 
   def handle_call(:live_ids, _from, state) do
     {:reply, for({id, w} <- state.workers, w.status in @live, into: MapSet.new(), do: id), state}

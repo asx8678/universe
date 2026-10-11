@@ -44,6 +44,7 @@ defmodule UniverseWeb.Layouts do
         <.link navigate="/" class="btn btn-ghost btn-sm">Now</.link>
         <.link navigate="/timeline" class="btn btn-ghost btn-sm">Timeline</.link>
         <.link navigate="/workers" class="btn btn-ghost btn-sm">Workers</.link>
+        <.link navigate="/system" class="btn btn-ghost btn-sm">System</.link>
         <.link navigate="/handles" class="btn btn-ghost btn-sm">Handles</.link>
         <.link navigate="/replay" class="btn btn-ghost btn-sm">Replay</.link>
         <a href="/dashboard" class="btn btn-ghost btn-sm">Dashboard</a>
