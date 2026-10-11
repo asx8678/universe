@@ -11,7 +11,10 @@ defmodule Universe.SDK.Conn do
       {"rid":4,"op":"progress","text":"scanning 800/1240"}
       {"rid":5,"op":"ask","question":"Use the new tokens file?"}  blocks for the reply
       {"rid":6,"op":"call","service":"pg","fn":"query","args":{...},"timeout_s":60}
-      {"rid":7,"op":"serve","name":"pg","fns":["query"],"describe":"..."}
+      {"rid":7,"op":"serve","name":"pg","fns":["query"],"describe":"...","sigs":{...}}
+      {"rid":8,"op":"services","names":["pg"]}       fns, describe and sigs of each
+      {"rid":9,"op":"preview","handle":"h:5/orders"}  a handle's bounded preview
+      {"rid":10,"op":"inbox"}                         steers for the call in progress
       {"op":"result","cid":9,"ok":true,"value":...}              answer to an invoke
 
   Kernel → worker:
@@ -19,9 +22,16 @@ defmodule Universe.SDK.Conn do
       {"rid":1,"ok":true,"result":"h:5/orders"}  |  {"rid":1,"ok":false,"error":"..."}
       {"op":"invoke","cid":9,"fn":"query","args":{...},"timeout_ms":59000}   services only
 
-  Events: `get` (handle reads), `call` with `"via" => "sdk"` and a matching
-  `call_done` when the answer comes back, `put`, `progress`; `ask` and
-  `serve` are logged by the Tick.
+  Events: `get` (handle reads and previews), `call` with `"via" => "sdk"`
+  and a matching `call_done` when the answer comes back, `put`, `progress`,
+  `steer_dropped`; `ask`, `serve` and `steer` are logged by the Tick.
+
+  An agent's connections may `call` only the code services it was given
+  (`allow`, from its token); everyone else may call any service.
+
+  A `steer` from the model (`{:steer, %{"text", "interrupt"}}` from the Tick)
+  waits in the inbox until the service fetches it with `inbox`; one still
+  there when the call in progress ends is dropped and logged.
 
   Invocations of a service are handed to it one at a time. `timeout_ms` is
   what is left of the caller's timeout; an invocation whose caller has
@@ -48,6 +58,10 @@ defmodule Universe.SDK.Conn do
   @copy_timeout_ms 30_000
   @default_call_timeout_s 60
   @max_call_timeout_s 1800
+  @max_inbox 20
+  # put_file copies (and other blocking requests) running at once.
+  @max_tasks 16
+  @max_params 32
 
   def start_link(sock), do: GenServer.start_link(__MODULE__, sock)
 
@@ -59,6 +73,8 @@ defmodule Universe.SDK.Conn do
        buf: "",
        worker: nil,
        tick: nil,
+       allow: :any,
+       inbox: [],
        service: nil,
        queue: :queue.new(),
        inflight: nil,
@@ -121,13 +137,27 @@ defmodule Universe.SDK.Conn do
   # A service that didn't answer in time: fail that call, serve the next.
   def handle_info({:invoke_timeout, cid}, %{inflight: {cid, from, _timer}} = state) do
     GenServer.reply(from, {:error, "service did not answer in time"})
-    {:noreply, dispatch(%{state | inflight: nil})}
+    {:noreply, state |> drop_steers() |> Map.put(:inflight, nil) |> dispatch()}
   end
 
   def handle_info({:invoke_timeout, _cid}, state), do: {:noreply, state}
 
   def handle_info(:flush_progress, state),
     do: {:noreply, %{state | progress_timer: nil} |> progress(nil)}
+
+  # A steer is for the call in progress; with none, it came too late.
+  def handle_info({:steer, steer}, %{inflight: {_, _, _}} = state),
+    do: {:noreply, %{state | inbox: Enum.take(state.inbox ++ [steer], -@max_inbox)}}
+
+  def handle_info({:steer, steer}, state) do
+    event(state, "steer_dropped", %{
+      "count" => 1,
+      "text" => String.slice(steer["text"], 0, 200),
+      "reason" => "the task had ended"
+    })
+
+    {:noreply, state}
+  end
 
   def handle_info(_msg, state), do: {:noreply, state}
 
@@ -203,7 +233,7 @@ defmodule Universe.SDK.Conn do
           {cid, {cid, from, timer}} when is_integer(cid) ->
             Process.cancel_timer(timer)
             GenServer.reply(from, {:error, "the service's result was not valid JSON"})
-            dispatch(%{state | inflight: nil})
+            state |> drop_steers() |> Map.put(:inflight, nil) |> dispatch()
 
           _ ->
             state
@@ -220,9 +250,9 @@ defmodule Universe.SDK.Conn do
 
   defp handle_msg(%{"op" => "hello", "id" => id, "token" => token} = msg, %{worker: nil} = state) do
     case Services.token_owner(token) do
-      {:ok, ^id, tick} ->
+      {:ok, ^id, tick, allow} ->
         reply(state, msg["rid"], {:ok, "hello ##{id}"})
-        %{state | worker: id, tick: tick}
+        %{state | worker: id, tick: tick, allow: allow}
 
       _ ->
         reply(state, msg["rid"], {:error, "bad credentials"})
@@ -251,28 +281,20 @@ defmodule Universe.SDK.Conn do
     state
   end
 
+  # The copy can take up to @copy_timeout_ms; it runs beside the connection
+  # so invocations and results keep flowing meanwhile.
   defp handle_msg(%{"op" => "put_file", "name" => name, "path" => path} = msg, state) do
-    result =
-      with {:ok, source} <- readable_source(state.worker, path),
-           {:ok, copy} <- sandboxed_copy(state.worker, source) do
-        try do
-          with {:ok, handle, meta} <-
-                 Handles.put_file(state.worker, name, copy, Path.basename(source)) do
-            event(state, "put", %{
-              "handle" => handle,
-              "kind" => "file",
-              "summary" => meta["summary"]
-            })
+    if MapSet.size(state.tasks) >= @max_tasks do
+      reply(
+        state,
+        msg["rid"],
+        {:error, "put_file: #{@max_tasks} requests already running on this connection"}
+      )
 
-            {:ok, handle}
-          end
-        after
-          File.rm(copy)
-        end
-      end
-
-    reply(state, msg["rid"], result)
-    state
+      state
+    else
+      async(state, msg["rid"], fn -> put_file(state, name, path) end)
+    end
   end
 
   defp handle_msg(%{"op" => "get", "handle" => handle} = msg, state) do
@@ -297,6 +319,120 @@ defmodule Universe.SDK.Conn do
 
   defp handle_msg(%{"op" => "call", "service" => service, "fn" => fun} = msg, state)
        when is_binary(service) and is_binary(fun) do
+    case may_call(state, service) do
+      :ok ->
+        sdk_call(state, msg, service, fun)
+
+      {:error, _} = refused ->
+        reply(state, msg["rid"], refused)
+        state
+    end
+  end
+
+  # What an agent's tools are built from: each named service's functions,
+  # description and signatures, for the services this connection may call.
+  defp handle_msg(%{"op" => "services", "names" => names} = msg, state) when is_list(names) do
+    infos =
+      for name <- Enum.uniq(names), is_binary(name), may_call(state, name) == :ok do
+        case Services.lookup(name) do
+          {:ok, info} ->
+            %{
+              "name" => name,
+              "live" => true,
+              "fns" => info.fns,
+              "describe" => info.describe,
+              "sigs" => Map.get(info, :sigs, %{})
+            }
+
+          :error ->
+            %{"name" => name, "live" => false}
+        end
+      end
+
+    reply(state, msg["rid"], {:ok, infos})
+    state
+  end
+
+  defp handle_msg(%{"op" => "preview", "handle" => handle} = msg, state) when is_binary(handle) do
+    result = Handles.preview(handle)
+
+    event(state, "get", %{
+      "handle" => String.slice(handle, 0, 200),
+      "ok" => match?({:ok, _}, result),
+      "preview" => true
+    })
+
+    reply(state, msg["rid"], result)
+    state
+  end
+
+  defp handle_msg(%{"op" => "inbox"} = msg, state) do
+    reply(state, msg["rid"], {:ok, state.inbox})
+    %{state | inbox: []}
+  end
+
+  defp handle_msg(%{"op" => "serve", "name" => name} = msg, state) when is_binary(name) do
+    fns = msg["fns"] |> List.wrap() |> Enum.filter(&is_binary/1)
+    describe = if is_binary(msg["describe"]), do: String.slice(msg["describe"], 0, 500), else: ""
+
+    info = %{
+      id: state.worker,
+      fns: fns,
+      describe: describe,
+      sigs: sigs(msg["sigs"], fns),
+      # Agents can't call agents (yet): an agent's own service is marked.
+      agent: state.allow != :any
+    }
+
+    result =
+      cond do
+        not Handles.valid_name?(name) ->
+          {:error, "service name must be 1-64 chars of letters, digits, _ . -"}
+
+        state.service ->
+          {:error, "already serving #{state.service}"}
+
+        true ->
+          with :ok <- Services.register(name, info) do
+            case Tick.service_ready(state.worker, name, fns, describe) do
+              :ok ->
+                {:ok, true}
+
+              # Refused by the kernel: the name must not stay routed here.
+              refused ->
+                Services.unregister(name)
+                refused
+            end
+          end
+      end
+
+    reply(state, msg["rid"], result)
+    if result == {:ok, true}, do: %{state | service: name}, else: state
+  end
+
+  defp handle_msg(
+         %{"op" => "result", "cid" => cid} = msg,
+         %{inflight: {cid, from, timer}} = state
+       ) do
+    Process.cancel_timer(timer)
+
+    answer =
+      if msg["ok"] == true,
+        do: {:ok, msg["value"]},
+        else: {:error, text(msg["error"] || "service function failed")}
+
+    GenServer.reply(from, answer)
+    state |> drop_steers() |> Map.put(:inflight, nil) |> dispatch()
+  end
+
+  defp handle_msg(%{"op" => "result"}, state), do: state
+
+  defp handle_msg(msg, state) do
+    reply(state, msg["rid"], {:error, "unknown or malformed op #{inspect(msg["op"])}"})
+    state
+  end
+
+  defp sdk_call(state, msg, service, fun) do
     timeout = call_timeout(msg["timeout_s"])
 
     async(state, msg["rid"], fn ->
@@ -329,52 +465,79 @@ defmodule Universe.SDK.Conn do
     end)
   end
 
-  defp handle_msg(%{"op" => "serve", "name" => name} = msg, state) when is_binary(name) do
-    fns = msg["fns"] |> List.wrap() |> Enum.filter(&is_binary/1)
-    describe = if is_binary(msg["describe"]), do: String.slice(msg["describe"], 0, 500), else: ""
-
-    result =
-      cond do
-        not Handles.valid_name?(name) ->
-          {:error, "service name must be 1-64 chars of letters, digits, _ . -"}
-
-        state.service ->
-          {:error, "already serving #{state.service}"}
-
-        true ->
-          with :ok <- Services.register(name, %{id: state.worker, fns: fns, describe: describe}),
-               :ok <- Tick.service_ready(state.worker, name, fns, describe) do
-            {:ok, true}
-          end
-      end
-
-    reply(state, msg["rid"], result)
-    if result == {:ok, true}, do: %{state | service: name}, else: state
-  end
-
-  defp handle_msg(
-         %{"op" => "result", "cid" => cid} = msg,
-         %{inflight: {cid, from, timer}} = state
-       ) do
-    Process.cancel_timer(timer)
-
-    answer =
-      if msg["ok"] == true,
-        do: {:ok, msg["value"]},
-        else: {:error, text(msg["error"] || "service function failed")}
-
-    GenServer.reply(from, answer)
-    dispatch(%{state | inflight: nil})
-  end
-
-  defp handle_msg(%{"op" => "result"}, state), do: state
-
-  defp handle_msg(msg, state) do
-    reply(state, msg["rid"], {:error, "unknown or malformed op #{inspect(msg["op"])}"})
-    state
-  end
-
   ## Helpers
+
+  defp put_file(state, name, path) do
+    with {:ok, source} <- readable_source(state.worker, path),
+         {:ok, copy} <- sandboxed_copy(state.worker, source) do
+      try do
+        with {:ok, handle, meta} <-
+               Handles.put_file(state.worker, name, copy, Path.basename(source)) do
+          event(state, "put", %{
+            "handle" => handle,
+            "kind" => "file",
+            "summary" => meta["summary"]
+          })
+
+          {:ok, handle}
+        end
+      after
+        File.rm(copy)
+      end
+    end
+  end
+
+  defp may_call(%{allow: :any}, _service), do: :ok
+
+  defp may_call(%{allow: allow}, service) do
+    cond do
+      service not in allow and allow == [] ->
+        {:error, "this agent was given no services, so it can't call #{service}"}
+
+      service not in allow ->
+        {:error, "this agent may call only #{Enum.join(allow, ", ")}, not #{service}"}
+
+      match?({:ok, %{agent: true}}, Services.lookup(service)) ->
+        {:error, "#{service} is an agent; agents can't call agents"}
+
+      true ->
+        :ok
+    end
+  end
+
+  # Signatures of the service's functions, bounded: an agent's tool schemas
+  # are built from them. `{fn => %{params, required, doc, extra}}`.
+  defp sigs(sigs, fns) when is_map(sigs) do
+    for fun <- Enum.take(fns, 64), %{} = sig <- [sigs[fun]], into: %{} do
+      params = sig["params"] |> List.wrap() |> Enum.filter(&param?/1) |> Enum.take(@max_params)
+      doc = if is_binary(sig["doc"]), do: String.slice(sig["doc"], 0, 500), else: ""
+
+      {fun,
+       %{
+         "params" => params,
+         "required" => sig["required"] |> List.wrap() |> Enum.filter(&(&1 in params)),
+         "doc" => doc,
+         "extra" => sig["extra"] == true
+       }}
+    end
+  end
+
+  defp sigs(_, _fns), do: %{}
+
+  defp param?(p), do: is_binary(p) and Regex.match?(~r/^[A-Za-z_][A-Za-z0-9_]{0,63}$/, p)
+
+  # Steers for a call that just ended were never fetched: they are dropped.
+  defp drop_steers(%{inbox: []} = state), do: state
+
+  defp drop_steers(state) do
+    event(state, "steer_dropped", %{
+      "count" => length(state.inbox),
+      "text" => String.slice(hd(state.inbox)["text"], 0, 200),
+      "reason" => "the task ended before it took them"
+    })
+
+    %{state | inbox: []}
+  end
 
   # Blocking work runs in a linked task; the connection keeps serving.
   defp async(state, rid, fun) do
@@ -477,8 +640,12 @@ defmodule Universe.SDK.Conn do
       profile: "#{worker}-put_file"
     }
 
-    argv = Isolation.adapter().wrap(reader_argv(source), spec)
+    with {:ok, reader} <- reader_argv(source) do
+      copy_with(Isolation.adapter().wrap(reader, spec), copy, source, root)
+    end
+  end
 
+  defp copy_with(argv, copy, source, root) do
     task =
       Task.async(fn ->
         System.cmd(hd(argv), tl(argv),
@@ -510,8 +677,11 @@ defmodule Universe.SDK.Conn do
     {:error, reason}
   end
 
+  # The reader ends itself at the copy timeout: killing the waiting task
+  # doesn't reach an OS process stuck in a slow read.
   @reader """
-  import os, stat, sys
+  import os, signal, stat, sys
+  signal.alarm(int(sys.argv[3]))
   fd = os.open(sys.argv[1], os.O_RDONLY | os.O_NONBLOCK)
   if not stat.S_ISREG(os.fstat(fd).st_mode): sys.exit(3)
   os.set_blocking(fd, True)
@@ -522,12 +692,19 @@ defmodule Universe.SDK.Conn do
       sys.stdout.buffer.write(chunk); left -= len(chunk)
   """
 
+  # python3 only: a `head` fallback could block on a slow file past the
+  # timeout, and killing the task left it running. Python workers need
+  # python3 anyway.
   defp reader_argv(source) do
     limit = Integer.to_string(@max_file_bytes + 1)
 
     case System.find_executable("python3") do
-      nil -> ["/usr/bin/head", "-c", limit, "--", source]
-      py -> [py, "-I", "-c", @reader, source, limit]
+      nil ->
+        {:error, "put_file needs python3"}
+
+      py ->
+        {:ok,
+         [py, "-I", "-c", @reader, source, limit, to_string(div(@copy_timeout_ms, 1000) + 1)]}
     end
   end
 end

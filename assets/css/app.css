@@ -129,14 +129,54 @@
   to { opacity: 1; transform: none; }
 }
 
-/* Flow graph: edges with fresh traffic march toward their target. */
-@keyframes flow-dash {
-  to { stroke-dashoffset: -24; }
+/* Flow graph: text gets a halo in the page colour, so lines pass behind it. */
+.flow-label {
+  paint-order: stroke;
+  stroke: var(--color-base-100);
+  stroke-width: 4px;
+  stroke-linejoin: round;
 }
-.flow-dash {
-  stroke-dasharray: 8 4;
-  animation: flow-dash 0.7s linear infinite;
+/* Flow graph nodes: a card that only shows on hover, and takes the node's
+   colour when selected; the dot grows a little with it. */
+.flow-node {
+  --card: var(--color-base-100);
+  cursor: pointer;
+  outline: none;
 }
+.flow-node:hover, .flow-node:focus-visible, .flow-node-selected {
+  --card: color-mix(in oklab, var(--color-base-200) 70%, var(--color-base-100));
+}
+.flow-node .flow-card {
+  fill: var(--card);
+  stroke-opacity: 0;
+  stroke-width: 1.5;
+  transition: fill 160ms ease, stroke-opacity 200ms ease;
+}
+.flow-node:focus-visible .flow-card { stroke-opacity: 0.5; }
+.flow-node-selected .flow-card { stroke-opacity: 1; }
+.flow-node .flow-disc { fill: var(--card); transition: fill 160ms ease; }
+.flow-node .flow-label { stroke: none; }
+.flow-node .flow-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 200ms cubic-bezier(.2, .8, .2, 1.4);
+}
+.flow-node:hover .flow-dot { transform: scale(1.25); }
+.flow-node-selected .flow-dot { transform: scale(1.35); }
+
+/* The details panel slides in beside the graph. */
+@keyframes flow-panel-in {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: none; }
+}
+.flow-panel { animation: flow-panel-in 220ms ease-out; }
+
 @media (prefers-reduced-motion: reduce) {
-  .flow-dash { animation: none; }
+  .flow-node .flow-dot, .flow-node .flow-card { transition: none; }
+  .flow-panel { animation: none; }
+}
+
+/* The dot that travels a lit line; the line's colour still shows it. */
+@media (prefers-reduced-motion: reduce) {
+  .flow-pulse { display: none; }
 }

@@ -214,130 +214,303 @@ defmodule UniverseWeb.FlowComponents do
   end
 
   attr :graph, :map, required: true
-  attr :active, :any, required: true, doc: "MapSet of {from, to} edges to animate"
 
-  @doc "The live who-talks-to-whom graph (see `UniverseWeb.Topology`)."
+  attr :active, :any,
+    required: true,
+    doc: "MapSet of {from, to} edges that just carried a message"
+
+  attr :selected, :string, default: nil, doc: "key of the clicked node, if any"
+
+  @doc """
+  The live who-talks-to-whom graph (see `UniverseWeb.Topology`): each node a
+  dot in its kind's colour with its name below, one hairline per pair of
+  nodes that talked. While a pair is in `active` its line takes the colour
+  of the message, a dot travels the way it went and the message shows.
+
+  A line is masked where it crosses another node's dot and name, so it
+  passes under that node instead of seeming to connect to it. Only nodes it
+  can cross get masked: those in the columns between its ends (or, for a
+  loop within a column, the rows between).
+  """
   def topology(assigns) do
     nodes = Map.new(assigns.graph.nodes, &{&1.key, &1})
-    {node_w, node_h} = UniverseWeb.Topology.node_size()
+    views = Enum.map(assigns.graph.nodes, &node_view/1)
 
-    edges =
-      for e <- assigns.graph.edges,
-          from = nodes[e.from],
-          to = nodes[e.to],
-          not is_nil(from) and not is_nil(to) do
-        {mx, my} = UniverseWeb.Topology.midpoint(from, to)
+    links =
+      assigns.graph.edges
+      |> Enum.filter(&(nodes[&1.from] && nodes[&1.to] && &1.from != &1.to))
+      |> Enum.group_by(&pair(nodes[&1.from], nodes[&1.to]))
+      |> Enum.map(fn {{a, b}, edges} ->
+        nodes[a]
+        |> link(nodes[b], edges, assigns.active)
+        |> Map.put(:under, under(views, nodes[a], nodes[b]))
+      end)
+      # Lit lines last, so they draw over quiet ones.
+      |> Enum.sort_by(& &1.active)
 
-        Map.merge(e, %{
-          d: UniverseWeb.Topology.path(from, to),
-          mx: mx,
-          my: my,
-          active: MapSet.member?(assigns.active, {e.from, e.to})
-        })
+    sel = assigns.selected
+    links = Enum.map(links, &Map.put(&1, :focus, sel && (&1.a == sel or &1.b == sel)))
+
+    # Only as wide as the columns in use, so the graph stays large beside
+    # the details panel.
+    {x0, x1} =
+      case Enum.map(views, & &1.x) do
+        [] -> {0, UniverseWeb.Topology.width()}
+        xs -> {max(Enum.min(xs) - 96, 0), min(Enum.max(xs) + 130, UniverseWeb.Topology.width())}
       end
 
     assigns =
       assign(assigns,
-        edges: edges,
+        links: links,
+        nodes: views,
         width: UniverseWeb.Topology.width(),
-        node_w: node_w,
-        node_h: node_h
+        x0: x0,
+        view_w: x1 - x0
       )
 
     ~H"""
     <svg
       id="topology"
-      viewBox={"0 0 #{@width} #{@graph.height}"}
-      class="block h-auto w-full font-sans"
+      viewBox={"#{@x0} 0 #{@view_w} #{@graph.height}"}
+      width={@view_w}
+      height={@graph.height}
+      class="block h-auto max-w-full font-sans"
       role="img"
       aria-label="Who talks to whom"
     >
+      <defs>
+        <mask
+          :for={l <- @links}
+          :if={l.under != []}
+          id={"mask-" <> l.dom}
+          maskUnits="userSpaceOnUse"
+          x="0"
+          y="0"
+          width={@width}
+          height={@graph.height}
+        >
+          <rect x="0" y="0" width={@width} height={@graph.height} fill="white" />
+          <rect
+            :for={n <- l.under}
+            x={n.fx}
+            y={n.fy}
+            width={n.fw}
+            height={n.fh}
+            rx="6"
+            fill="black"
+          />
+        </mask>
+      </defs>
+
       <g id="edges">
         <g
-          :for={e <- @edges}
-          id={"edge-" <> dom(e.from) <> "--" <> dom(e.to)}
-          class={["flow-edge", e.active && "flow-edge-active"]}
+          :for={l <- @links}
+          id={"edge-" <> l.dom}
+          class={[
+            "flow-edge transition-opacity duration-300",
+            l.active && "flow-edge-active",
+            @selected && !l.focus && !l.active && "opacity-25"
+          ]}
         >
-          <title>{e.count} message(s) · last: {e.label}</title>
-          <path
-            d={e.d}
-            fill="none"
-            class={[tone_stroke(e.tone), not e.active && "opacity-35", e.active && "flow-dash"]}
-            stroke-width={edge_width(e.count)}
-            stroke-linecap="round"
-          />
-          <circle :if={e.active} r="4" class={tone_fill(e.tone)}>
-            <animateMotion dur="1.1s" repeatCount="indefinite" path={e.d} />
-          </circle>
+          <title>{l.title}</title>
+          <g mask={l.under != [] && "url(#mask-#{l.dom})"}>
+            <path
+              d={l.d}
+              fill="none"
+              class={["transition-[stroke]", line_class(l)]}
+              stroke-width={l.width}
+              stroke-linecap="round"
+            />
+            <circle :if={l.active} r="2.5" class={["flow-pulse", tone_fill(l.tone)]}>
+              <animateMotion dur="1.2s" repeatCount="indefinite" path={l.travel} />
+            </circle>
+          </g>
           <text
-            :if={e.active}
-            x={e.mx}
-            y={e.my - 14}
+            :if={l.active}
+            x={l.mx}
+            y={l.my - 9}
             text-anchor="middle"
-            class={["text-[12px] font-medium", tone_fill(e.tone)]}
+            class={["flow-label text-[11px]", tone_fill(l.tone)]}
           >
-            {fit(e.label, 240)} · {e.count}×
+            {fit(l.label, 240)}
           </text>
         </g>
       </g>
 
       <g id="nodes">
-        <g :for={n <- @graph.nodes} id={"node-" <> dom(n.key)}>
-          <title>{n.label} · {n.sub}{if n.status, do: " · #{n.status}"}</title>
-          <%!-- An opaque base, so edges pass behind nodes instead of through them. --%>
+        <g
+          :for={n <- @nodes}
+          id={"node-" <> dom(n.key)}
+          class={["flow-node", n.gone && "opacity-50", @selected == n.key && "flow-node-selected"]}
+          phx-click="select"
+          phx-keydown="select"
+          phx-key="Enter"
+          phx-value-key={n.key}
+          role="button"
+          tabindex="0"
+          aria-label={"Show details of " <> n.title}
+          aria-pressed={to_string(@selected == n.key)}
+        >
+          <title>{n.title}</title>
+          <%!-- A soft card: brighter on hover, outlined in the node's colour when selected. --%>
           <rect
-            x={n.x - @node_w / 2}
-            y={n.y - @node_h / 2}
-            width={@node_w}
-            height={@node_h}
-            rx="12"
-            class="fill-base-100"
+            x={n.fx}
+            y={n.fy - 4}
+            width={n.fw}
+            height={n.fh + 2}
+            rx="10"
+            class={["flow-card", n.ring]}
           />
-          <rect
-            x={n.x - @node_w / 2}
-            y={n.y - @node_h / 2}
-            width={@node_w}
-            height={@node_h}
-            rx="12"
-            class={[lane_class(n.kind), n.status == "gone" && "opacity-40"]}
-            stroke-width="1.3"
-          />
+          <%!-- A disc in the card colour, so lines stop short of the dot. --%>
+          <circle cx={n.x} cy={n.y} r="9" class="flow-disc" />
           <circle
-            :if={n.status}
-            cx={n.x - @node_w / 2 + 12}
-            cy={n.y - 6}
-            r="3.5"
-            class={status_dot(n.status)}
+            :if={n.asking}
+            cx={n.x}
+            cy={n.y}
+            r="8"
+            fill="none"
+            class="stroke-warning"
+            stroke-width="1.5"
           />
+          <circle cx={n.x} cy={n.y} r="4.5" class={["flow-dot", n.dot]} />
+          <%!-- No whitespace inside: SVG would draw it as a gap. --%>
           <text
             x={n.x}
-            y={n.y - 2}
+            y={n.y + 24}
             text-anchor="middle"
-            class="fill-base-content text-[12px] font-semibold"
-          >
-            {fit(n.label, @node_w - 30)}
-          </text>
-          <text x={n.x} y={n.y + 13} text-anchor="middle" class="fill-base-content/60 text-[11px]">
-            {fit(
-              n.sub <> if(n.status && n.status != "gone", do: " · #{n.status}", else: ""),
-              @node_w - 16
-            )}
-          </text>
+            class="flow-label fill-base-content text-[12px] font-medium"
+            phx-no-format
+          ><tspan :if={n.id} class="fill-base-content/45">{n.id}</tspan><tspan dx={n.id && "4"}>{n.name}</tspan></text>
+          <text
+            x={n.x}
+            y={n.y + 39}
+            text-anchor="middle"
+            class={["flow-label text-[11px]", n.sub_class]}
+            phx-no-format
+          >{n.sub}</text>
         </g>
       </g>
     </svg>
     """
   end
 
+  # Two nodes' line, keyed left to right (by column, then key).
+  defp pair(a, b),
+    do: if({a.col, a.key} <= {b.col, b.key}, do: {a.key, b.key}, else: {b.key, a.key})
+
+  # Both directions between a pair as one line; the newest lit direction
+  # (else the newest overall) gives the colour, the label and the way the
+  # dot travels.
+  defp link(a, b, edges, active) do
+    lit = Enum.filter(edges, &MapSet.member?(active, {&1.from, &1.to}))
+    shown = Enum.max_by(if(lit == [], do: edges, else: lit), & &1.seq)
+    count = edges |> Enum.map(& &1.count) |> Enum.sum()
+    {mx, my} = UniverseWeb.Topology.midpoint(a, b)
+    {from, to} = if shown.from == a.key, do: {a, b}, else: {b, a}
+
+    %{
+      a: a.key,
+      b: b.key,
+      dom: dom(a.key) <> "--" <> dom(b.key),
+      d: UniverseWeb.Topology.curve(a, b),
+      travel: UniverseWeb.Topology.curve(from, to),
+      active: lit != [],
+      tone: shown.tone,
+      label: shown.label,
+      width: Float.round(min(1.0 + :math.log2(count) * 0.3, 2.4), 2),
+      mx: mx,
+      my: my,
+      title:
+        "#{a.label} and #{b.label}: #{count} #{plural(count, "message")}, last: #{shown.label}"
+    }
+  end
+
+  # The nodes a pair's line can cross: those in the columns strictly between
+  # its ends, or for a loop within one column the rows between. Lines leave
+  # and reach a dot level, so nodes beside an end are never in the way.
+  defp under(views, a, b) do
+    if a.col == b.col do
+      {lo, hi} = Enum.min_max([a.y, b.y])
+      Enum.filter(views, &(&1.col == a.col and &1.y > lo and &1.y < hi))
+    else
+      {lo, hi} = Enum.min_max([a.col, b.col])
+      Enum.filter(views, &(&1.col > lo and &1.col < hi))
+    end
+  end
+
+  defp line_class(%{active: true, tone: tone}), do: tone_stroke(tone)
+  defp line_class(%{focus: true}), do: "stroke-base-content/55"
+  defp line_class(_link), do: "stroke-base-content/20"
+
+  defp node_view(n) do
+    {id, name} =
+      case Regex.run(~r/^(#\d+) (.+)$/, n.label) do
+        [_, id, name] -> {id, name}
+        _ -> {nil, n.label}
+      end
+
+    name = fit(name, if(id, do: 120, else: 150))
+    sub = if(n.status == "asking", do: "asking", else: kind_word(n))
+    # The dot and both lines of text: what other nodes' lines pass under.
+    footprint =
+      Enum.max([
+        String.length(name) * 7 + if(id, do: String.length(id) * 7 + 4, else: 0),
+        String.length(sub) * 6.3,
+        64
+      ]) + 16
+
+    %{
+      key: n.key,
+      x: n.x,
+      y: n.y,
+      col: n.col,
+      fx: n.x - footprint / 2,
+      fy: n.y - 10,
+      fw: footprint,
+      fh: 56,
+      id: id,
+      name: name,
+      sub: sub,
+      sub_class: if(n.status == "asking", do: "fill-warning", else: "fill-base-content/50"),
+      dot: dot_class(n),
+      ring: kind_stroke(n.kind),
+      asking: n.status == "asking",
+      gone: n.status == "gone",
+      title: Enum.join([n.label, n.sub, n.status] |> Enum.reject(&is_nil/1), ", ")
+    }
+  end
+
+  defp kind_word(%{more: true} = n), do: n.sub
+  defp kind_word(%{kind: :model}), do: "Claude Code"
+  defp kind_word(%{kind: :universe}), do: "kernel"
+  defp kind_word(%{kind: :handles}), do: "stored data"
+  defp kind_word(%{kind: :run}), do: "run"
+  defp kind_word(%{kind: kind}), do: Atom.to_string(kind)
+
+  defp dot_class(%{more: true}), do: "fill-base-100 stroke-base-content/40"
+
+  defp dot_class(n) do
+    [kind_fill(n.kind), n.status in ["running", "queued"] && "motion-safe:animate-pulse"]
+  end
+
+  defp kind_stroke(:model), do: "stroke-primary"
+  defp kind_stroke(:universe), do: "stroke-base-content/60"
+  defp kind_stroke(:agent), do: "stroke-accent"
+  defp kind_stroke(:service), do: "stroke-success"
+  defp kind_stroke(:handles), do: "stroke-warning"
+  defp kind_stroke(_), do: "stroke-info"
+
+  defp kind_fill(:model), do: "fill-primary"
+  defp kind_fill(:universe), do: "fill-base-content/70"
+  defp kind_fill(:agent), do: "fill-accent"
+  defp kind_fill(:service), do: "fill-success"
+  defp kind_fill(:handles), do: "fill-warning"
+  defp kind_fill(_), do: "fill-info"
+
+  defp plural(1, word), do: word
+  defp plural(_, word), do: word <> "s"
+
   defp dom(key), do: key |> String.replace(~r/[^A-Za-z0-9_-]+/, "-") |> String.trim("-")
-
-  defp edge_width(count), do: Float.round(1.4 + :math.log2(count) * 0.7, 1)
-
-  defp status_dot("serving"), do: "fill-success"
-  defp status_dot("asking"), do: "fill-warning"
-  defp status_dot(s) when s in ["running", "queued"], do: "fill-info animate-pulse"
-  defp status_dot("gone"), do: "fill-base-content/30"
-  defp status_dot(_), do: "fill-base-content/50"
 
   defp x(i, lw), do: @left + i * lw + lw / 2
 

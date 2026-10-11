@@ -3,10 +3,11 @@ defmodule Universe.Services do
   Registry of live services and of SDK credentials.
 
   Owns three public ETS tables:
-    * tokens   - `token => {worker_id, tick}`; a worker's SDK connection proves
-                 who it is with the token it got in `UNIVERSE_TOKEN`
-    * services - `name => %{id, conn, fns, describe, since_ms}`, written only
-                 by this process (register, and removal when the conn dies)
+    * tokens   - `token => {worker_id, tick, allow}`; a worker's SDK connection
+                 proves who it is with the token it got in `UNIVERSE_TOKEN`.
+                 `allow` is `:any`, or for an agent the services it may call
+    * services - `name => %{id, conn, fns, describe, sigs, since_ms}`, written
+                 only by this process (register, and removal when the conn dies)
     * calls    - `name => last_call_ms`, written by callers; kept apart so a
                  caller racing a dying service can never re-create its entry
 
@@ -24,12 +25,15 @@ defmodule Universe.Services do
 
   ## Tokens
 
-  def put_token(token, worker_id, tick), do: :ets.insert(@tokens, {token, worker_id, tick})
+  def put_token(token, worker_id, tick, allow \\ :any),
+    do: :ets.insert(@tokens, {token, worker_id, tick, allow})
+
   def delete_token(token), do: :ets.delete(@tokens, token)
 
+  @doc "`{:ok, worker_id, tick, allow}` for a live worker's token."
   def token_owner(token) when is_binary(token) do
     case :ets.lookup(@tokens, token) do
-      [{^token, id, tick}] -> {:ok, id, tick}
+      [{^token, id, tick, allow}] -> {:ok, id, tick, allow}
       [] -> :error
     end
   end
@@ -42,6 +46,9 @@ defmodule Universe.Services do
   def register(name, info) do
     GenServer.call(__MODULE__, {:register, name, Map.put(info, :conn, self())})
   end
+
+  @doc "Drops `name` if the calling connection holds it (a serve the kernel refused)."
+  def unregister(name), do: GenServer.call(__MODULE__, {:unregister, name, self()})
 
   def lookup(name) do
     case :ets.lookup(@services, name) do
@@ -110,6 +117,15 @@ defmodule Universe.Services do
       _ ->
         {:reply, put_service(name, info), track(state, name, info.conn)}
     end
+  end
+
+  def handle_call({:unregister, name, conn}, _from, state) do
+    case :ets.lookup(@services, name) do
+      [{^name, %{conn: ^conn}}] -> :ets.delete(@services, name)
+      _ -> :ok
+    end
+
+    {:reply, :ok, state}
   end
 
   defp put_service(name, info) do

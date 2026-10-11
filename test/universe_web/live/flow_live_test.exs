@@ -43,4 +43,30 @@ defmodule UniverseWeb.FlowLiveTest do
     eventually(fn -> has_element?(view, "#edge-model--universe.flow-edge-active") end)
     assert has_element?(view, "#flow-recent", "store h:#{id}/x")
   end
+
+  test "clicking a node opens its details; clicking again or close shuts them", %{conn: conn} do
+    label = uniq("detail")
+
+    result =
+      tick([%{"op" => "run", "label" => label, "lang" => "python", "code" => "print('hi')"}])
+
+    [{"#" <> id, _}] = Map.to_list(result.structured["ids"])
+    {:ok, view, _html} = live(conn, ~p"/flow")
+    refute has_element?(view, "#flow-details-close")
+
+    view |> element("#node-w-#{id}") |> render_click()
+    assert has_element?(view, "#flow-details", "##{id} #{label}")
+    assert has_element?(view, "#flow-details-doing", "Done")
+    assert has_element?(view, "#flow-details-links", "Universe")
+    assert has_element?(view, "#node-w-#{id}.flow-node-selected")
+    assert has_element?(view, ~s(#flow-details-open[href="/workers/#{id}"]))
+
+    view |> element("#node-w-#{id}") |> render_click()
+    refute has_element?(view, "#flow-details-close")
+
+    view |> element("#node-universe") |> render_click()
+    assert has_element?(view, "#flow-details", "kernel")
+    view |> element("#flow-details-close") |> render_click()
+    refute has_element?(view, ".flow-node-selected")
+  end
 end

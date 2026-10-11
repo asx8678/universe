@@ -1,6 +1,6 @@
 ---
 name: universe
-description: Run all code, tests, builds, DB queries and long-lived helpers through the Universe daemon (mcp__universe__tick, mcp__universe__inspect) instead of Bash. Use for any execution, for parallel work across files, or when a task needs a persistent connector or tool.
+description: Run all code, tests, builds, DB queries and long-lived helpers through the Universe daemon (mcp__universe__tick, mcp__universe__inspect) instead of Bash. Use for any execution, for parallel work across files, when a task needs a persistent connector or tool, or helper agents that use those tools.
 allowed-tools: mcp__universe__tick, mcp__universe__inspect
 ---
 
@@ -16,6 +16,21 @@ digest. Bash is off in this project; read and edit files with your own tools.
 3. Read the digest. Act on `failed` and `asking` lines first.
 4. Call `mcp__universe__inspect` only when a line isn't enough (`#5` for code
    and output, `t12` for every event of a tick, `h:5/rows` for a handle).
+
+## Plan your helpers
+Before a task with many steps, decide what would make it cheaper and build it
+in the first tick:
+- A **service** for anything you'll use more than once: a database connection,
+  an API client with its secrets, an index or a parsed dataset that is slow to
+  build. Its functions return handles for large results.
+- An **agent** for each chunk of judgment work (reviews, triage, summaries), with
+  a precise `purpose` and the `services` it needs, so it fetches its own data.
+  Serve it and send its first task in the same tick.
+- `steer` an agent that drifts, `reply` to one that asks, and `kill` helpers
+  when the task is done.
+
+Don't build for one-off work: one `run` is cheaper than a service, and a task
+you can finish with a few reads needs no agent.
 
 ## Directives
 - `run`: one-shot code. `{"op":"run","label":"tests","lang":"bash","code":"mix test"}`.
@@ -34,10 +49,18 @@ digest. Bash is off in this project; read and edit files with your own tools.
   `{"op":"serve","label":"reviewer","agent":{"purpose":"Review Elixir code for bugs","model":"haiku"}}`
   then `{"op":"call","label":"r1","service":"reviewer","prompt":"Review lib/x.ex"}`.
   Agent tools default to `Read, Grep, Glob`; `Edit`/`Write` need `leases`. Agents
-  can't run code. Give several agents the same `"pool":"reviewers"` and call
-  the pool: each task goes to a free agent. An agent with a question shows as
-  `asking`; answer with `reply`. Serving the same agent again resumes its
-  conversation (`"resume": false` starts fresh). Give long tasks a `timeout_s`.
+  can't run code, but `"services":["db"]` makes your code services their tools
+  (`mcp__services__db__query`): the agent queries the data itself and the rows
+  never pass through you. Each listed service must be live or served in the
+  same tick (the agent starts once it serves). Give several agents the same
+  `"pool":"reviewers"` and call the pool: each task goes to a free agent. An
+  agent with a question shows as `asking`; answer with `reply`. Serving the
+  same agent again resumes its conversation (`"resume": false` starts fresh).
+  Give long tasks a `timeout_s`.
+- `steer`: add to a busy agent's task while it works:
+  `{"op":"steer","target":"r1","text":"only lib/, skip the tests"}` (the agent
+  or its task). It lands at the agent's next tool step; `"interrupt": true`
+  stops the turn first. An idle agent takes a new task instead.
 - `kill`: `{"op":"kill","target":"#5"}`. `reply`: answer a worker that is
   `asking`: `{"op":"reply","target":"#9","text":"..."}`.
 

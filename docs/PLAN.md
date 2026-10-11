@@ -288,7 +288,126 @@ time (no win), driven by orchestrator turns (13 vs 7). Confound: subagents
 ran Opus, agents haiku/sonnet. Agent workers stay an option; subagents stay
 the default. Details in `bench/README.md` and `bench/RESULTS-M6.md`.
 
+### M7: agents with tools, steering, an orchestrator that builds helpers (Oct 11, 2026)
+
+Goal: Claude Code builds what a task needs (services for resources it will
+use more than once, agents with a purpose for judgment work), hands the
+agents those services as tools, and steers them while they work. Until now
+an agent had no MCP tools and couldn't run code, so it couldn't use any
+service, and `reply` reached only an agent that was asking.
+
+**Probes (haiku, the bridge's exact flags)**
+- `--restricted --strict-mcp-config` plus `--mcp-config` with a stdio
+  server works: the agent saw `mcp__codes__lookup`, called it and returned
+  the right value (allow rule `mcp__codes` in `--settings`; not tried
+  without it). Claude Code sent `server/discover` first, then `initialize`.
+- A user message written to stdin mid-turn joins the running turn at the
+  next tool step: the agent read 1 of 5 files and answered `STEERED alpha`
+  in one result (2 of 2 runs). With `--replay-user-messages` each message
+  is echoed (`"isReplay": true`) when the session takes it in.
+
+**Design**
+- `agent.services: ["db", ...]`: the code services an agent may call. Each
+  must be live or served in the same batch; agents and pools can't be
+  listed (no agent-to-agent calls yet). An agent waits for the listed
+  services of its batch to serve before it starts, so its tool list is
+  complete.
+- `priv/sdk/agent_mcp.py` (standard library, stdio MCP): the bridge lists
+  it in a per-run `--mcp-config` (`mcp.json` in the run dir: socket path,
+  ID and token *file* path, no secrets) and allows `mcp__services`. It
+  connects to the SDK socket as the agent's own worker ID and offers one
+  tool per service function (`db__query`), with parameters from `U.serve`
+  (Python now sends each function's signature and docstring), plus
+  `handle_preview`. Results over 8,000 chars become a handle and its
+  preview. No `get`, `put`, `progress` or `ask`: big data stays out of the
+  agent's context, and the bridge keeps the agent's digest line.
+- The kernel enforces the list: an agent's SDK connections may `call` only
+  its `agent.services`. Calls are logged as `call` with `via: sdk` under
+  the agent's ID, so `/flow` draws agent → service edges.
+- `steer`: `{"op":"steer","target":"rev or its task","text":"...",
+  "interrupt":false}` adds an instruction to a busy agent's current task.
+  The kernel hands it to the agent's SDK connection; the bridge fetches it
+  (SDK `inbox`, every 0.5 s while a task runs) and writes it to claude's
+  stdin. The task's answer is the first result after every message was
+  taken in. `interrupt: true` stops the turn first and sends the
+  instruction as the next message. A steer to an idle or asking agent is
+  rejected; one still undelivered when the task ends is dropped and logged.
+- Teaching the orchestrator (M2: the model uses what the tick description
+  lists): the tick description (still under 2,048 chars), the SessionStart
+  hook, SKILL.md and reference.md say to build helpers when they pay off,
+  to serve agents and task them in the same tick (one of M6's extra turns),
+  and when not to (one-off work is a `run`).
+
+**Tasks**
+- [x] `Universe.Directive`: `agent.services`, the `steer` op
+- [x] `Universe.Tick`: services checked at serve, implicit deps on batch services, `steer` delivery
+- [x] `Universe.SDK.Conn`: `services`, `preview`, `inbox` ops; `serve` takes `sigs`; agent allow-list on `call`
+- [x] `priv/sdk/agent_mcp.py`; `agent_bridge.py`: MCP config, allow rule, steering; `universe.py` sends signatures
+- [x] Tick description (2,033 chars), SKILL.md, reference.md, SessionStart hook; protocol.md, ARCHITECTURE.md
+- [x] Observer: `steer` events in Activity, an agent's services on its worker page and Now card
+
+**Done when**
+- ExUnit against `fake_claude`, which now acts as an MCP client and can be
+  steered: tool list and calls through `agent_mcp.py`, the allow-list,
+  implicit deps, steer delivery, idle and dropped steers.
+- Real run (haiku): one tick serves a `db` service and an agent with
+  `services: ["db"]`; the agent answers from the database and the rows
+  never reach the orchestrator. A steer redirects a busy agent.
+
+**Result (Oct 11, 2026)**
+- ExUnit: `test/universe/agent_tools_test.exs` (9 tests, stable over 5 runs)
+  and new validation cases in `agents_test.exs`; full suite 231 passed.
+- Real run (haiku, dev daemon on a scratch project, MCP driven directly so
+  no orchestrator tokens): one tick served `db` (SQLite) and an agent with
+  `services: ["db"]`; the task "how many orders, sum of the 3 largest"
+  came back right (50, 220.5) in 3 s. The agent made one `db.query` call
+  (logged under its ID, `via: sdk`); only its answer reached the
+  orchestrator.
+- Real steer: the agent was told to run 8 count queries one at a time; a
+  steer 3 s in ("skip the rest, report the average") landed after 4 of
+  them, and the same task answered with the right average (38.25).
+- Not covered: whether the orchestrating model builds helpers unprompted
+  (next item); `ask` as a tool; Elixir services send no signatures, so
+  their tools take loose arguments.
+
+**Next (not in M7)**
+- Acceptance: a task where helpers pay off, without telling the model to
+  build them; does it build, wire and steer them? Count orchestrator turns.
+- Benchmark only after that, on a task that needs a slow-to-build or
+  credentialed resource shared by agents; thresholds fixed first, the same
+  helper model in both setups (the M6 confound).
+- Saved tools (`.universe/tools/`), `ask` as a tool, agent-to-agent calls.
+- The manifest line for an agent doesn't list its `services`, so a new
+  session (SessionStart hook) can't see which agent has which tools.
+- A `steer` draws no Model → agent arrow in `/flow` and the tick diagrams
+  (a `reply` does).
+
 ---
+
+### Code review by Universe (Oct 11, 2026)
+
+Run with Universe on this repo: one code worker (file scan) and six sonnet
+reviewer agents (read-only, one area each), then the same agents verified
+the fixes. Fixed, with regressions in `test/universe/review_fixes_test.exs`
+and `agent_tools_test.exs`:
+- `inspect("#id")` showed run-dir output and code unredacted; previews
+  redacted after cutting; structs and the unencodable fallback skipped
+  redaction; an unreadable `.env` crashed `Secrets`.
+- A refused `serve` stayed in the service registry; only a serve directive
+  may serve now, under its own name.
+- Worker kills raised on a just-closed port (the tick then waited forever);
+  a kill between crash and restart, or racing a call's answer, didn't stick.
+- A steer turn that came after the bridge stopped waiting became the next
+  task's answer; replays given as content blocks now match too.
+- Bubblewrap left host sockets under `/run` reachable (resolver dirs are
+  re-bound for services with network).
+- macOS services with network couldn't resolve names (mDNSResponder socket).
+- Smaller: hosts with a trailing newline, a non-map hook `tool_input`, odd
+  table columns, the invalid-JSON path keeping steers, `put_file` blocking
+  its connection (now async, capped, reader times itself out), GC races,
+  malformed MCP cancels.
+- Left as is: abstract Unix sockets with `--share-net` on Linux, a ~200 ms
+  "stopping" window for a service killed mid-restart.
 
 ## 3b. Carry-forward notes (from the M1 review)
 
@@ -328,7 +447,11 @@ of the whole universe; the tick timeline moved to `/timeline`.
 - **Flow graph** (`/flow`): who talks to whom (`UniverseWeb.Topology`, the
   same message mapping), edges counting messages over a 1/5/30-minute
   window and animating for 2 s when traffic crosses them; at most 12 worker
-  nodes per column, live first.
+  nodes per column, live first. Redrawn minimal (Oct 11): a node is a dot in
+  its kind's colour with its name below, one hairline per pair (both
+  directions), lit in the message's colour with the message while traffic
+  crosses; a line is masked under nodes it doesn't connect; no panels or
+  legend.
 - **System** (`/system`): the live supervision tree with kinds,
   strategies, roles, who-talks-to-whom, queue/memory/activity, SDK
   connections and call tasks labelled with their workers, and each worker's

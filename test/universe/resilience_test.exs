@@ -326,6 +326,18 @@ defmodule Universe.ResilienceTest do
     assert SandboxExec.host_rule("db.example.com:5432") == "*:5432"
   end
 
+  test "a service that may reach outside hosts can also resolve their names" do
+    alias Universe.Isolation.SandboxExec
+    spec = %{root: Paths.project_root(), run_dir: Paths.project_root(), writable: []}
+    dns = "/private/var/run/mDNSResponder"
+
+    assert SandboxExec.profile(Map.put(spec, :network, {:hosts, ["registry.npmjs.org:443"]})) =~
+             dns
+
+    refute SandboxExec.profile(Map.put(spec, :network, {:hosts, ["localhost:5432"]})) =~ dns
+    refute SandboxExec.profile(Map.put(spec, :network, :none)) =~ dns
+  end
+
   test "events are flushed on shutdown and the event log survives" do
     marker = EventLog.append("test_flush", data: %{"x" => 1})
     :ok = EventLog.sync()

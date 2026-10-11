@@ -14,6 +14,8 @@ manifest=$(curl -s -m 2 -f -H "Authorization: Bearer $(cat "$token_file")" \
 cat <<MSG
 Universe is running for this project. All execution goes through
 mcp__universe__tick and mcp__universe__inspect (use the universe skill); Bash is redirected.
+Build the helpers a task needs: services for what you use more than once, agents
+for judgment work, given the services they need, steered while they work.
 
 $manifest
 MSG

@@ -69,13 +69,14 @@ defmodule UniverseWeb.TopologyTest do
     assert nodes["w:6"].status == "gone"
   end
 
-  test "paths leave the right side toward later columns and bend apart by direction" do
-    g = graph()
-    n = Map.new(g.nodes, &{&1.key, &1})
-    there = Topology.path(n["w:6"], n["w:5"])
-    back = Topology.path(n["w:5"], n["w:6"])
-    assert there =~ ~r/^M 674\.0 /
-    assert there != back
+  test "a pair's line runs dot to dot; columns are centred blocks" do
+    n = Map.new(graph().nodes, &{&1.key, &1})
+    there = Topology.curve(n["w:6"], n["w:5"])
+    assert there =~ ~r/^M 590 #{n["w:6"].y} C /
+    assert String.ends_with?(there, "850 #{n["w:5"].y}")
+    # One node per column here: all on one line.
+    assert n |> Map.values() |> Enum.map(& &1.y) |> Enum.uniq() |> length() == 1
+    assert Topology.midpoint(n["w:6"], n["w:5"]) == {720.0, n["w:6"].y}
   end
 
   test "a column keeps 12 workers, live first, then most recent; the rest fold into +N more" do

@@ -11,7 +11,7 @@ defmodule Universe.Isolation.SandboxExec do
       `.universe/`, even under a lease on `.` (the launcher relies on this:
       only this worker's profile may write its run directory)
     * network: denied, except the SDK socket and, for services, the ports
-      they declared
+      they declared (plus the system DNS socket when a host isn't local)
 
   Later rules override earlier ones, which is what the deny/allow layering
   relies on. Seatbelt can only name `localhost` or `*` as a remote host, so a
@@ -112,11 +112,20 @@ defmodule Universe.Isolation.SandboxExec do
   defp network(:none), do: ""
 
   defp network({:hosts, hosts}) do
-    hosts
-    |> Enum.map(&host_rule/1)
-    |> Enum.uniq()
-    |> Enum.map_join("\n", &~s{(allow network-outbound (remote ip "#{&1}"))})
+    rules = hosts |> Enum.map(&host_rule/1) |> Enum.uniq()
+
+    Enum.map_join(rules, "\n", &~s{(allow network-outbound (remote ip "#{&1}"))}) <>
+      dns(Enum.any?(rules, &String.starts_with?(&1, "*:")))
   end
+
+  # macOS resolves host names through mDNSResponder's Unix socket, which
+  # `(deny network*)` blocks: without it a service may reach port 443 but
+  # never learn an address for registry.npmjs.org.
+  @dns_socket "/private/var/run/mDNSResponder"
+  defp dns(true),
+    do: "\n" <> ~s{(allow network-outbound (remote unix-socket (path-literal "#{@dns_socket}")))}
+
+  defp dns(false), do: ""
 
   @doc "Seatbelt remote spec for a declared `host:port`."
   def host_rule(host_port) do

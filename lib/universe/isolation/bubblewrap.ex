@@ -57,6 +57,7 @@ defmodule Universe.Isolation.Bubblewrap do
       network,
       ro_bind("/"),
       ["--dev", "/dev", "--proc", "/proc", "--tmpfs", "/tmp"],
+      hide_runtime_sockets(spec.network),
       ["--tmpfs", home],
       Enum.map([root | reads], &ro_bind/1),
       Enum.map(writable, &bind/1),
@@ -66,6 +67,35 @@ defmodule Universe.Isolation.Bubblewrap do
       socket,
       ["--chdir", root]
     ])
+  end
+
+  # A read-only bind still lets a worker connect() to the host's Unix
+  # sockets (/run/docker.sock, the systemd user bus at /run/user/<uid>/bus),
+  # each a way out of the sandbox. Empty tmpfs over /run (and /var/run when
+  # it isn't just a link to it); a service with network gets the resolver's
+  # directory back so names still resolve.
+  @resolver "/run/systemd/resolve"
+  defp hide_runtime_sockets(network) do
+    var_run =
+      case File.lstat("/var/run") do
+        {:ok, %{type: :directory}} -> ["--tmpfs", "/var/run"]
+        _ -> []
+      end
+
+    resolver = if network != :none, do: Enum.flat_map(resolver_dirs(), &ro_bind/1), else: []
+    ["--tmpfs", "/run"] ++ var_run ++ resolver
+  end
+
+  # Where names are resolved from under /run: systemd-resolved's directory,
+  # and wherever /etc/resolv.conf really points (NetworkManager, resolvconf).
+  defp resolver_dirs do
+    conf =
+      case Isolation.realpath("/etc/resolv.conf") do
+        "/run/" <> _ = path -> [Path.dirname(path)]
+        _ -> []
+      end
+
+    Enum.filter(Enum.uniq([@resolver | conf]), &File.dir?/1)
   end
 
   defp ro_bind(path), do: ["--ro-bind", path, path]

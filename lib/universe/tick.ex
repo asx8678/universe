@@ -19,7 +19,11 @@ defmodule Universe.Tick do
   Kinds of ID: `run` snippets, `serve` services and `call`s to services.
   A queued ID starts when every `after` ID is `done` (or `serving`); if one
   ends any other way it fails without starting. A call also waits for its
-  service to be serving. A crashing service restarts, at most 3 times in 60 s.
+  service to be serving, and an agent for the services it was given. A
+  crashing service restarts, at most 3 times in 60 s.
+
+  `steer` hands an instruction to a busy agent's SDK connection, for the task
+  in hand; the agent's bridge fetches it from there.
 
   On boot the worker table is rebuilt from the event log; IDs that were live
   when Universe stopped are recorded as `killed` ("lost: Universe restarted").
@@ -204,6 +208,16 @@ defmodule Universe.Tick do
       not match?(%{status: s} when s in ["running", "asking"], state.workers[id]) ->
         {:reply, {:error, "worker ##{id} is not running"}, state}
 
+      # Only a serve directive's worker serves, and under its own name: a
+      # run serving would dodge the service cap, a renamed serve would
+      # leave its directive's name pointing at nothing.
+      state.workers[id].kind != "serve" ->
+        {:reply, {:error, "only a serve directive can serve; use op serve for #{name}"}, state}
+
+      state.workers[id].spec.service != name ->
+        {:reply, {:error, "this worker serves #{state.workers[id].spec.service}, not #{name}"},
+         state}
+
       holder && holder != id && status_of(state, holder) in @live ->
         {:reply, {:error, "service name #{name} is taken by ##{holder}"}, state}
 
@@ -250,8 +264,13 @@ defmodule Universe.Tick do
   def handle_info({:restart, id}, state) do
     state =
       case state.workers[id] do
-        %{status: "running"} = w -> if(stopping?(w), do: state, else: start_process(state, w))
-        _ -> state
+        # Killed between crash and restart: a kill that reached the dying
+        # process got no exit back, so it ends here.
+        %{status: "running"} = w ->
+          if stopping?(w), do: killed_now(state, id, w.kill_reason), else: start_process(state, w)
+
+        _ ->
+          state
       end
 
     {:noreply, check_waiters(state)}
@@ -261,7 +280,20 @@ defmodule Universe.Tick do
   def handle_info({ref, result}, state) when is_map_key(state.tasks, ref) do
     Process.demonitor(ref, [:flush])
     {{id, _pid}, tasks} = Map.pop(state.tasks, ref)
-    state = %{state | tasks: tasks} |> finish_call(id, result)
+    state = %{state | tasks: tasks}
+
+    # A kill raced the answer: the model was told it stopped, so it did.
+    state =
+      case state.workers[id] do
+        %{} = w when w.status in @live ->
+          if stopping?(w),
+            do: killed_now(state, id, w.kill_reason),
+            else: finish_call(state, id, result)
+
+        _ ->
+          finish_call(state, id, result)
+      end
+
     {:noreply, state |> schedule() |> check_waiters()}
   end
 
@@ -315,15 +347,27 @@ defmodule Universe.Tick do
   # Pass 1 gives every run, serve and call an ID (and holds leases) so `after`
   # can point at labels later in the batch; pass 2 resolves dependencies.
   defp apply_directives(state, tick, accepted) do
-    batch_services =
-      for %{op: "serve"} = d <- accepted,
+    # Names a call (or an agent's services) may use before they serve.
+    batch = %{
+      services:
+        for(
+          %{op: "serve"} = d <- accepted,
           name <- [d.service | List.wrap(d[:agent] && d.agent.pool)],
           into: MapSet.new(),
           do: name
+        ),
+      agents:
+        for(
+          %{op: "serve", agent: %{} = a} = d <- accepted,
+          name <- [d.service | List.wrap(a.pool)],
+          into: MapSet.new(),
+          do: name
+        )
+    }
 
     {state, placed, rejected} =
       Enum.reduce(accepted, {state, [], []}, fn d, {st, placed, rej} ->
-        case place(st, tick, d, batch_services) do
+        case place(st, tick, d, batch) do
           {:placed, st, id} -> {st, placed ++ [{id, d}], rej}
           {:ok, st} -> {st, placed, rej}
           {:error, reason} -> {st, placed, rej ++ [%{label: d.label, op: d.op, reason: reason}]}
@@ -347,16 +391,23 @@ defmodule Universe.Tick do
       Enum.reduce(placed, state, fn {id, d}, st ->
         deps = Enum.map(d.after, &dep_id.(st, &1))
 
-        if Enum.any?(deps, &is_nil/1) do
-          missing = Enum.find(d.after, &is_nil(dep_id.(st, &1)))
+        case {Enum.find(d.after, &is_nil(dep_id.(st, &1))), stopped_service(st, d)} do
+          {nil, nil} ->
+            deps = Enum.uniq(deps ++ service_deps(st, d))
+            queued_event(st.workers[id], deps, nil)
+            put_in(st.workers[id].deps, deps)
 
-          settle_with_event(st, id, %{
-            "status" => "failed",
-            "reason" => "dep #{missing} was rejected"
-          })
-        else
-          queued_event(st.workers[id], deps, nil)
-          put_in(st.workers[id].deps, deps)
+          {nil, name} ->
+            settle_with_event(st, id, %{
+              "status" => "failed",
+              "reason" => "service #{name} was rejected"
+            })
+
+          {missing, _} ->
+            settle_with_event(st, id, %{
+              "status" => "failed",
+              "reason" => "dep #{missing} was rejected"
+            })
         end
       end)
 
@@ -370,7 +421,7 @@ defmodule Universe.Tick do
     end
   end
 
-  defp place(state, tick, %{op: "serve"} = d, _batch_services) do
+  defp place(state, tick, %{op: "serve"} = d, batch) do
     holder = state.services[d.service]
 
     live_services =
@@ -384,7 +435,8 @@ defmodule Universe.Tick do
         {:error, "at most #{@max_services} live services; kill one first"}
 
       true ->
-        with {:ok, hold?} <- lease_plan(state, d) do
+        with :ok <- agent_services(state, d, batch),
+             {:ok, hold?} <- lease_plan(state, d) do
           id = Ids.next_worker()
           state = add_worker(state, id, tick, "serve", d, hold?)
           {:placed, %{state | services: Map.put(state.services, d.service, id)}, id}
@@ -392,11 +444,11 @@ defmodule Universe.Tick do
     end
   end
 
-  defp place(state, tick, %{op: "call"} = d, batch_services) do
+  defp place(state, tick, %{op: "call"} = d, batch) do
     holder = state.services[d.service]
 
     live? =
-      MapSet.member?(batch_services, d.service) or
+      MapSet.member?(batch.services, d.service) or
         (holder != nil and status_of(state, holder) in @live) or
         pool_members(state, d.service) != []
 
@@ -444,6 +496,112 @@ defmodule Universe.Tick do
       :error -> {:error, "no worker #{target}"}
       _ -> {:error, "#{target} is not asking"}
     end
+  end
+
+  defp place(state, _tick, %{op: "steer", target: target} = d, _) do
+    with {:ok, id} <- resolve_or_error(state, target),
+         {:ok, agent} <- steer_target(state, state.workers[id], target),
+         {:ok, %{conn: conn}} <- steer_conn(agent, target) do
+      EventLog.append("steer",
+        tick: agent.tick,
+        id: agent.id,
+        data: %{"text" => String.slice(d.text, 0, 2000), "interrupt" => d.interrupt}
+      )
+
+      send(conn, {:steer, %{"text" => d.text, "interrupt" => d.interrupt}})
+      {:ok, state}
+    end
+  end
+
+  # An agent's services: code services that serve now or start in this
+  # batch. Agents and pools can't be listed (no agent-to-agent calls).
+  defp agent_services(state, %{agent: %{services: [_ | _] = names}}, batch) do
+    Enum.find_value(names, :ok, fn name ->
+      holder = state.services[name]
+      live = holder && status_of(state, holder) in @live && state.workers[holder]
+
+      cond do
+        MapSet.member?(batch.agents, name) or pool_members(state, name) != [] or
+            (live && live.spec[:agent] != nil) ->
+          {:error, "agent services: #{name} is an agent; list code services"}
+
+        MapSet.member?(batch.services, name) or live ->
+          nil
+
+        true ->
+          {:error, "agent services: no live service #{name}; serve it first or in the same tick"}
+      end
+    end)
+  end
+
+  defp agent_services(_state, _d, _batch), do: :ok
+
+  # An agent starts once its services serve, so its tool list is complete:
+  # live ones already do, this batch's have their new IDs by now.
+  defp service_deps(state, %{op: "serve", agent: %{services: names}}),
+    do: for(name <- names, id <- List.wrap(state.services[name]), do: id)
+
+  defp service_deps(_state, _d), do: []
+
+  # One of an agent's services that was meant to start in this batch but
+  # was rejected, so it has no live holder.
+  defp stopped_service(state, %{op: "serve", agent: %{services: names}}) do
+    Enum.find(names, fn name ->
+      holder = state.services[name]
+      holder == nil or status_of(state, holder) not in @live
+    end)
+  end
+
+  defp stopped_service(_state, _d), do: nil
+
+  defp resolve_or_error(state, target) do
+    case resolve(state, target) do
+      {:ok, id} -> {:ok, id}
+      :error -> {:error, "no worker #{target}"}
+    end
+  end
+
+  # A steer goes to an agent busy with a task, named directly or through
+  # the task it works on.
+  defp steer_target(_state, %{kind: "call", status: s}, target) when s != "running",
+    do: {:error, "#{target} is #{s}"}
+
+  defp steer_target(state, w, target) do
+    agent =
+      case w do
+        %{kind: "call", spec: %{service: service}} -> state.workers[state.services[service]]
+        _ -> w
+      end
+
+    cond do
+      not match?(%{kind: "serve", spec: %{agent: %{}}}, agent) ->
+        {:error, "#{target} is not an agent or an agent's task"}
+
+      agent.status == "asking" ->
+        {:error, "#{target} is asking: answer it with reply"}
+
+      agent.status != "serving" ->
+        {:error, "#{target} is #{agent.status}"}
+
+      not busy?(state, agent.service) ->
+        {:error, "#{target} is idle: give it a task with call"}
+
+      true ->
+        {:ok, agent}
+    end
+  end
+
+  defp steer_conn(agent, target) do
+    case Services.lookup(agent.service) do
+      {:ok, info} -> {:ok, info}
+      :error -> {:error, "#{target} is restarting; steer again in a moment"}
+    end
+  end
+
+  defp busy?(state, service) do
+    Enum.any?(state.workers, fn {_, w} ->
+      w.kind == "call" and w.status == "running" and w.spec.service == service
+    end)
   end
 
   # Who answers a reply aimed at `w`: `w` itself when it asks, or the agent
@@ -1313,12 +1471,17 @@ defmodule Universe.Tick do
         events -> List.last(events)["data"]["text"]
       end
 
+    dropped =
+      Enum.any?(recent, &(&1["type"] == "steer_dropped")) &&
+        "a steer came after its task ended, so it was not delivered"
+
     join([
       "agent #{w.service}",
       agent.pool && "pool #{agent.pool}",
       agent.model,
       progress,
-      restarted && "restarted"
+      restarted && "restarted",
+      dropped
     ])
   end
 

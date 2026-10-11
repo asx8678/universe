@@ -9,8 +9,7 @@ defmodule Universe.Secrets do
 
   @doc "Environment pairs for service `name`."
   def env(name) do
-    path = Path.join(Paths.secrets_dir(), name <> ".env")
-    if File.exists?(path), do: parse(File.read!(path)), else: []
+    Paths.secrets_dir() |> Path.join(name <> ".env") |> read() |> parse()
   end
 
   @doc "Every secret as `{\"service.KEY\", value}`, for redaction."
@@ -19,8 +18,17 @@ defmodule Universe.Secrets do
     |> Path.wildcard()
     |> Enum.flat_map(fn path ->
       service = Path.basename(path, ".env")
-      path |> File.read!() |> parse() |> Enum.map(fn {k, v} -> {"#{service}.#{k}", v} end)
+      path |> read() |> parse() |> Enum.map(fn {k, v} -> {"#{service}.#{k}", v} end)
     end)
+  end
+
+  # An unreadable entry (a directory named x.env, bad permissions) holds no
+  # secrets: redaction, previews and service starts must not crash on it.
+  defp read(path) do
+    case File.read(path) do
+      {:ok, text} -> text
+      {:error, _} -> ""
+    end
   end
 
   @doc "Hands every current secret value to the event log for redaction."

@@ -167,7 +167,7 @@ defmodule UniverseWeb.TickComponents do
 
   @doc "A tick's wait as a sentence."
   def wait_text(wait) when is_map(wait) do
-    ids = List.wrap(wait["ids"])
+    ids = wait["ids"] |> List.wrap() |> Enum.map(&text/1)
     quantifier = if wait["until"] == "any", do: "any", else: "all"
 
     what =
@@ -206,9 +206,11 @@ defmodule UniverseWeb.TickComponents do
   defp meta(d) when is_map(d) do
     [
       d["lang"],
-      is_binary(d["service"]) && "#{d["service"]}.#{d["fn"]}",
-      (is_list(d["after"]) and d["after"] != []) && "after #{Enum.join(d["after"], ", ")}",
-      (is_list(d["leases"]) and d["leases"] != []) && "leases #{Enum.join(d["leases"], ", ")}",
+      is_binary(d["service"]) && "#{d["service"]}.#{text(d["fn"])}",
+      (is_list(d["after"]) and d["after"] != []) &&
+        "after #{Enum.map_join(d["after"], ", ", &text/1)}",
+      (is_list(d["leases"]) and d["leases"] != []) &&
+        "leases #{Enum.map_join(d["leases"], ", ", &text/1)}",
       (is_list(d["then"]) and d["then"] != []) && "then #{length(d["then"])}"
     ]
     |> Enum.filter(&is_binary/1)
@@ -216,4 +218,12 @@ defmodule UniverseWeb.TickComponents do
   end
 
   defp meta(_), do: ""
+
+  # A logged value as text. `tick_in` keeps directives (and, in older logs,
+  # waits) as the model sent them, before validation, so they may hold any
+  # JSON value: a map where a label belongs must not crash the page.
+  defp text(v) when is_binary(v), do: v
+  defp text(nil), do: ""
+  defp text(v) when is_number(v) or is_boolean(v), do: to_string(v)
+  defp text(v), do: Jason.encode!(v)
 end

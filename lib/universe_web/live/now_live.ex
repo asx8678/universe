@@ -178,6 +178,7 @@ defmodule UniverseWeb.NowLive do
       name: w.service || w.spec[:service],
       model: w.spec.agent.model || "default model",
       pool: w.spec.agent.pool,
+      services: Map.get(w.spec.agent, :services, []),
       purpose: w.spec.agent.purpose,
       state:
         cond do
@@ -462,6 +463,9 @@ defmodule UniverseWeb.NowLive do
           <div class="mt-0.5 truncate text-xs text-muted">
             {@agent.model}<span :if={@agent.pool}> · pool {@agent.pool}</span>
             · <span class="font-mono">#{@agent.id}</span>
+            <span :if={@agent.services != []}>
+              · uses <span class="font-mono">{Enum.join(@agent.services, ", ")}</span>
+            </span>
           </div>
         </div>
         <.badge status={@agent.state} />

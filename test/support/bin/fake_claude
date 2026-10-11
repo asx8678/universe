@@ -8,8 +8,16 @@ like a lost session. Message content steers it:
   ASK    -> "QUESTION: which file?"; the next message is echoed as the answer
   SLOW   -> waits 1.5 s first
   SLEEP  -> works for 30 s unless interrupted (control_request interrupt)
+  WORK   -> works for up to 5 s; a message that arrives meanwhile is taken in
+            at once (like a real session at its next tool step) and the
+            result is "steered: <that message>"; an interrupt stops it
+  DEAF   -> works 1.5 s without reading, then "deaf done": a message sent
+            meanwhile starts a turn of its own afterwards
+  LAZY   -> answers "lazy done", then waits 7 s before reading on: a steer
+            sent meanwhile starts its turn after the bridge stopped waiting
   CRASH  -> exits 7
   else   -> "done #<n>: <content>" (n counts the session's messages)
+With --replay-user-messages each message is echoed (isReplay) when taken in.
 """
 import json, os, queue, sys, threading, time
 
@@ -19,6 +27,8 @@ with open(os.path.join(os.environ.get("TMPDIR", "/tmp"), "fake_claude_args.json"
 
 def opt(name):
     return args[args.index(name) + 1] if name in args else None
+
+replay = "--replay-user-messages" in args
 
 store = ".fake_sessions"
 sid = opt("--resume") or opt("--session-id") or "none"
@@ -36,6 +46,11 @@ def emit(*events):
     for e in events:
         print(json.dumps(e), flush=True)
 
+def taken(text):
+    if replay:
+        emit({"type": "user", "isReplay": True, "session_id": sid,
+              "message": {"role": "user", "content": text}})
+
 def result(text, error=False, subtype="success"):
     usage = {"input_tokens": 100 * n, "cache_read_input_tokens": 2900, "output_tokens": 5}
     emit({"type": "system", "subtype": "init", "model": "fake", "session_id": sid},
@@ -51,6 +66,7 @@ while True:
         emit({"type": "control_response", "response": {"subtype": "success", "request_id": msg["request_id"]}})
         continue
     text = msg["message"]["content"]
+    taken(text)
     n += 1
     os.makedirs(store, exist_ok=True)
     open(path, "w").write(str(n))
@@ -71,6 +87,40 @@ while True:
         if stopped:
             result(None, error=True, subtype="error_during_execution")
             continue
+    if "WORK" in text:
+        end, outcome = time.time() + 5, "worked"
+        while time.time() < end:
+            try:
+                m = lines.get(timeout=0.1)
+            except queue.Empty:
+                continue
+            if m is None:
+                sys.exit(0)
+            if m.get("type") == "control_request":
+                emit({"type": "control_response", "response": {"subtype": "success", "request_id": m["request_id"]}})
+                if m["request"]["subtype"] == "interrupt":
+                    outcome = None
+                    break
+                continue
+            steer = m["message"]["content"]
+            taken(steer)
+            n += 1
+            open(path, "w").write(str(n))
+            outcome = "steered: " + steer
+            break
+        if outcome is None:
+            result(None, error=True, subtype="error_during_execution")
+        else:
+            result(outcome)
+        continue
+    if "LAZY" in text:
+        result("lazy done")
+        time.sleep(7)
+        continue
+    if "DEAF" in text:
+        time.sleep(1.5)
+        result("deaf done")
+        continue
     if text.startswith("Answer from the orchestrator:"):
         result("got " + text.split(":", 1)[1].strip())
     elif "ASK" in text:

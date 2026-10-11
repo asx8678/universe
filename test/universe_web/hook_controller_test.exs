@@ -32,6 +32,15 @@ defmodule UniverseWeb.HookControllerTest do
            )
   end
 
+  test "POST /hooks/redirect takes a tool_input that isn't an object", %{conn: conn} do
+    for input <- ["ls", [1], 5] do
+      conn
+      |> put_req_header("content-type", "application/json")
+      |> post("/hooks/redirect", Jason.encode!(%{"tool_input" => input}))
+      |> text_response(200)
+    end
+  end
+
   test "POST /hooks/redirect bounds the tool name", %{conn: conn} do
     payload = %{
       "tool_name" => String.duplicate("T", 10_000),

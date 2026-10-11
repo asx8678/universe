@@ -176,6 +176,13 @@ defmodule UniverseWeb.WorkerLive do
                 tools: {Enum.join(@agent["tools"], ", ")}
               </span>
               <span
+                :if={(@agent["services"] || []) != []}
+                id="agent-services"
+                class="rounded-md bg-base-200 px-2 py-0.5 font-mono"
+              >
+                services: {Enum.join(@agent["services"], ", ")}
+              </span>
+              <span
                 :if={(@agent["leases"] || []) != []}
                 class="rounded-md bg-base-200 px-2 py-0.5 font-mono"
               >

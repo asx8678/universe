@@ -16,7 +16,7 @@ defmodule UniverseWeb.Topology do
   alias UniverseWeb.Flow
 
   @width 1120
-  @node_w 168
+  # A node is a dot with two lines of text below it.
   @node_h 44
   @gap 16
   @top 30
@@ -27,7 +27,6 @@ defmodule UniverseWeb.Topology do
   @max_per_col 12
 
   def width, do: @width
-  def node_size, do: {@node_w, @node_h}
 
   @doc """
   The graph for `events`, adding `live` workers (`%{id => worker}` from
@@ -160,18 +159,20 @@ defmodule UniverseWeb.Topology do
   defp order(%{key: "w:" <> id}), do: {0, String.to_integer(id)}
   defp order(%{key: key}), do: {1, key}
 
-  # Single-node columns (model, Universe, handles) sit at mid height.
+  # Every column sits centred as a block, so a short one lines up with the
+  # model and Universe instead of hanging from the top.
   defp center(nodes) do
     h = height(nodes)
+    counts = Enum.frequencies_by(nodes, & &1.col)
 
     Enum.map(nodes, fn n ->
-      if n.kind in [:model, :universe, :handles], do: %{n | y: h / 2}, else: n
+      %{n | y: n.y + (h - (counts[n.col] * (@node_h + @gap) + @top * 2)) / 2}
     end)
   end
 
   defp height(nodes) do
     rows = nodes |> Enum.frequencies_by(& &1.col) |> Map.values() |> Enum.max(fn -> 1 end)
-    max(rows * (@node_h + @gap) + @top * 2, 260)
+    max(rows * (@node_h + @gap) + @top * 2, 180)
   end
 
   defp status("more:" <> _, _live), do: nil
@@ -188,33 +189,23 @@ defmodule UniverseWeb.Topology do
   ## Geometry for the view
 
   @doc """
-  An SVG path for an edge between two laid-out nodes. Edges in opposite
-  directions between the same pair bend apart so both stay visible.
+  An SVG curve from node `a`'s dot to node `b`'s: a horizontal S between
+  columns, a loop out to the right within one. Both directions between a
+  pair share it; `curve(b, a)` is the same line run backwards.
   """
-  def path(from, to) do
-    {x1, x2} =
-      cond do
-        to.x > from.x -> {from.x + @node_w / 2, to.x - @node_w / 2}
-        to.x < from.x -> {from.x - @node_w / 2, to.x + @node_w / 2}
-        true -> {from.x + @node_w / 2, to.x + @node_w / 2}
-      end
-
-    # Requests bend one way, answers the other.
-    bend = if from.col <= to.col, do: -7, else: 7
-    y1 = from.y + bend
-    y2 = to.y + bend
-
-    if from.col == to.col do
-      # Same column: loop out to the right.
-      "M #{x1} #{y1} C #{x1 + 70} #{y1}, #{x2 + 70} #{y2}, #{x2} #{y2}"
+  def curve(a, b) do
+    if a.col == b.col do
+      "M #{a.x} #{a.y} C #{a.x + 70} #{a.y}, #{b.x + 70} #{b.y}, #{b.x} #{b.y}"
     else
-      dx = (x2 - x1) * 0.45
-      "M #{x1} #{y1} C #{x1 + dx} #{y1}, #{x2 - dx} #{y2}, #{x2} #{y2}"
+      dx = (b.x - a.x) * 0.5
+      "M #{a.x} #{a.y} C #{a.x + dx} #{a.y}, #{b.x - dx} #{b.y}, #{b.x} #{b.y}"
     end
   end
 
-  @doc "The midpoint of an edge, for its count badge."
-  def midpoint(from, to) do
-    {(from.x + to.x) / 2, (from.y + to.y) / 2 + if(from.col <= to.col, do: -7, else: 7)}
+  @doc "The middle of `curve(a, b)`, where a lit line shows its message."
+  def midpoint(a, b) do
+    if a.col == b.col,
+      do: {a.x + 52, (a.y + b.y) / 2},
+      else: {(a.x + b.x) / 2, (a.y + b.y) / 2}
   end
 end

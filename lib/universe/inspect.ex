@@ -42,7 +42,9 @@ defmodule Universe.Inspect do
         other -> "unknown target #{inspect(other)}: use manifest, #<id>, t<n> or h:<id>/<name>"
       end
 
-    %{text: cap(text), structured: %{"target" => target}}
+    # Event data is redacted when logged; the run directory's files and
+    # anything built from them are not, so the reply is scrubbed as a whole.
+    %{text: text |> scrub() |> cap(), structured: %{"target" => target}}
   end
 
   ## manifest
@@ -214,7 +216,7 @@ defmodule Universe.Inspect do
 
     case File.read(Path.join(dir, file)) do
       {:ok, text} ->
-        lines = String.split(text, "\n")
+        lines = text |> scrub() |> String.split("\n")
         shown = Enum.take(lines, @code_lines)
         more = length(lines) - length(shown)
 
@@ -238,7 +240,8 @@ defmodule Universe.Inspect do
         {:ok, text} ->
           page(
             "--- #{stream}",
-            text |> Worker.utf8() |> String.split("\n") |> drop_last_empty(),
+            # Scrubbed before paging and grep cut lines: a cut secret wouldn't match.
+            text |> Worker.utf8() |> scrub() |> String.split("\n") |> drop_last_empty(),
             opts
           )
 
@@ -247,6 +250,8 @@ defmodule Universe.Inspect do
       end
     end
   end
+
+  defp scrub(text), do: Universe.Redact.scrub(text, Universe.Secrets.all())
 
   ## t<n>
 

@@ -8,9 +8,9 @@ defmodule UniverseWeb.Activity do
   alias Universe.{Digest, EventLog}
 
   @groups %{
-    "model" => ~w(tick_in tick_out rejected reply redirect),
+    "model" => ~w(tick_in tick_out rejected reply steer redirect),
     "lifecycle" => ~w(queued spawn serve exit restart budget_hit gc stop_all lease),
-    "agents" => ~w(call call_done ask progress put get),
+    "agents" => ~w(call call_done ask progress put get steer_dropped),
     "output" => ~w(stdout stderr)
   }
 
@@ -182,6 +182,11 @@ defmodule UniverseWeb.Activity do
 
   defp line("rejected", d), do: {:bad, "rejected #{d["label"] || d["op"]}: #{d["reason"]}"}
   defp line("reply", d), do: {:model, "model replied: #{d["text"]}"}
+
+  defp line("steer", d),
+    do: {:model, "model steered#{if d["interrupt"], do: " (interrupting)"}: #{d["text"]}"}
+
+  defp line("steer_dropped", d), do: {:warn, "steer not delivered, #{d["reason"]}: #{d["text"]}"}
   defp line("redirect", d), do: {:warn, "Bash call redirected to Universe: #{d["command"]}"}
   defp line("queued", d), do: {:muted, "queued #{d["label"]}#{after_text(d)}"}
 
@@ -220,7 +225,10 @@ defmodule UniverseWeb.Activity do
      "← #{d["service"]}.#{d["fn"]} #{if d["ok"], do: "answered", else: "failed"}#{took}"}
   end
 
-  defp line("get", d), do: {:muted, "read #{d["handle"]}#{if d["ok"] == false, do: " (missing)"}"}
+  defp line("get", d) do
+    verb = if d["preview"], do: "previewed", else: "read"
+    {:muted, "#{verb} #{d["handle"]}#{if d["ok"] == false, do: " (missing)"}"}
+  end
 
   defp line("ask", d), do: {:warn, "asks the model: #{d["question"]}"}
   defp line("progress", d), do: {:muted, d["text"]}

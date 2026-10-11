@@ -74,7 +74,8 @@ defmodule Universe.InspectTest do
 
   test "manifest, handles and unknown targets" do
     assert inspect_target("manifest") =~ "live workers:"
-    assert inspect_target("h:1/x") =~ "no handle h:1/x"
+    # Not h:1/x: another test's first worker may have stored "x".
+    assert inspect_target("h:999999/x") =~ "no handle h:999999/x"
     assert inspect_target("h:bad") =~ "not a handle"
     assert inspect_target("#999999") =~ "no such worker"
     assert inspect_target("bogus") =~ "unknown target"

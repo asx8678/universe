@@ -55,8 +55,9 @@ flowchart TD
     Code["python3 · bash · elixir<br/>the worker's code with U preloaded"]
     Bridge["python3 agent_bridge.py<br/>agent workers only"]
     Claude["claude -p --restricted<br/>one session per agent"]
+    Tools["python3 agent_mcp.py<br/>the agent's services as MCP tools"]
     Launcher --> Sandbox --> Code
-    Launcher --> Bridge --> Claude
+    Launcher --> Bridge --> Claude --> Tools
   end
 
   Worker -->|"Erlang port · packet 4"| Launcher
@@ -79,7 +80,11 @@ Why the shape:
 - **Agent workers** run the bridge instead of the Seatbelt sandbox, because
   `claude` needs your login and the Claude API. The bridge runs
   `claude --restricted`: no code-running tools, file tools confined to the
-  project, writes only to leased paths, `.universe/` denied.
+  project, writes only to leased paths, `.universe/` denied. The code
+  services in an agent's `services` list reach it as MCP tools through
+  `agent_mcp.py`, which claude starts and which connects to the SDK socket
+  as the agent's own worker ID; the agent's token lets it call only those
+  services.
 
 ## 2. A tick, end to end
 
@@ -171,6 +176,8 @@ sequenceDiagram
   participant C as Conn of agent 9
   participant B as agent_bridge.py
   participant CL as claude session
+  participant X2 as agent_mcp.py
+  participant S as service db
 
   M->>T: serve {agent: {purpose, model, tools, pool}}
   T->>B: start worker (bridge, no Seatbelt)
@@ -181,6 +188,19 @@ sequenceDiagram
   C->>B: invoke line
   B->>CL: user message
   CL-->>B: result
+  opt the agent was given services
+    CL->>X2: tools/call db__query (agent_mcp.py, own SDK connection as 9)
+    X2->>S: call db.query (allowed: in agent.services)
+    S-->>X2: rows, or a handle and its preview if large
+    X2-->>CL: tool result
+  end
+  opt the model steers the busy agent
+    M->>T: steer {target: 9 or its task, text}
+    T->>C: {:steer, text} into the inbox
+    B->>C: inbox (every 0.5 s while a task runs)
+    B->>CL: Message from the orchestrator ...
+    Note over CL: taken in at its next tool step (isReplay)
+  end
   alt the answer starts with QUESTION:
     B->>T: U.ask(question) → worker shows as asking
     M->>T: reply {target: 9, text}
@@ -230,6 +250,8 @@ flowchart LR
 | `Worker` | `Tick` | message `{:worker_exit, ...}` | summary when the process ends |
 | worker code | `Listener` → `Conn` | Unix socket, JSON lines | `put`, `get`, `progress`, `ask`, `call`, `serve` |
 | `Conn` | `Tick` | `GenServer.call` | `ask` (blocks for the model's reply), `service_ready` |
+| `Tick` | agent's `Conn` | message `{:steer, ...}` | a steer for the task in hand; the bridge fetches it with `inbox` |
+| `agent_mcp.py` | `Listener` → `Conn` | Unix socket, as the agent's ID | `services`, `call`, `put`, `preview` for the agent's tools |
 | `Conn`, call `Task` | `Services` → service `Conn` | `GenServer.call {:invoke, ...}` | a service function call |
 | `GC` | `Tick`, `Worker` | casts | stop idle services, kill over-budget groups |
 | everyone | `EventLog` | `append` | one event per step |
@@ -241,7 +263,8 @@ flowchart LR
 .universe/
   port, token            how the CLI reaches this daemon (token mode 0600)
   log/events.jsonl       every event, append-only (redacted)
-  runs/<id>/             a worker's code, stdout, stderr (64 MB cap each), token
+  runs/<id>/             a worker's code, stdout, stderr (64 MB cap each), token,
+                         mcp.json for an agent with services (no secrets)
   sandbox/<id>.sb        a worker's Seatbelt profile (outside the run dir: workers can't edit it)
   handles/<id>/          stored values: <name>.json + <name>.meta.json
   agents/<name>.json     an agent's saved session ID (+ .usage.jsonl)

@@ -156,6 +156,7 @@ defmodule Universe.Handles do
   @doc "A short, bounded text preview: schema and first rows, keys, or head."
   def preview(handle) do
     with {:ok, meta} <- meta(handle) do
+      secrets = Universe.Secrets.all()
       head = "#{handle} · #{meta["kind"]} · #{meta["summary"]} · #{human_bytes(meta["bytes"])}"
 
       body =
@@ -164,15 +165,17 @@ defmodule Universe.Handles do
             ["source file: #{meta["source"]}", "read it in code with U.get(\"#{handle}\")"]
 
           _ ->
+            # Redacted before it is cut to preview size: a secret cut in
+            # half would no longer match.
             case get(handle) do
-              {:ok, value} -> preview_body(meta["kind"], value)
+              {:ok, value} -> preview_body(meta["kind"], Universe.Redact.scrub(value, secrets))
               {:error, reason} -> [reason]
             end
         end
 
       # A value may contain a secret its worker could read (a service's own
       # key): previews go to the model and the observer, so redact them.
-      {:ok, Universe.Redact.scrub(Enum.join([head | body], "\n"), Universe.Secrets.all())}
+      {:ok, Universe.Redact.scrub(Enum.join([head | body], "\n"), secrets)}
     end
   end
 
@@ -221,7 +224,12 @@ defmodule Universe.Handles do
   defp infer(value), do: if(table?(value), do: "table", else: "json")
 
   defp table?([_ | _] = rows), do: Enum.all?(rows, &(is_map(&1) and map_size(&1) > 0))
-  defp table?(%{"columns" => cols, "rows" => rows}) when is_list(cols) and is_list(rows), do: true
+
+  defp table?(%{"columns" => cols, "rows" => rows}) when is_list(cols) and is_list(rows),
+    do:
+      Enum.all?(cols, &(is_binary(&1) or is_number(&1))) and
+        Enum.all?(rows, &(is_list(&1) or is_map(&1)))
+
   defp table?(_), do: false
 
   defp meta(id, name, kind, value, bytes) do

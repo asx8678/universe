@@ -17,16 +17,19 @@ Service functions receive the call's ``args``: an object becomes keyword
 arguments, a list becomes positional arguments, null means no arguments.
 Return values must be JSON-serialisable (anything else is passed through
 ``str``). Large results belong in handles: ``return U.put("rows", rows)``.
+``U.serve`` also sends each function's parameters and the first paragraph
+of its docstring: an agent given the service gets them as its tool schema.
 """
 
 import base64
+import inspect as _inspect
 import json
 import time
 import os
 import socket
 import traceback
 
-__all__ = ["call", "put", "put_file", "get", "progress", "ask", "serve", "UniverseError"]
+__all__ = ["call", "put", "put_file", "get", "progress", "ask", "serve", "inbox", "UniverseError"]
 
 
 class UniverseError(Exception):
@@ -135,6 +138,13 @@ def ask(question):
     return _request("ask", question=str(question))
 
 
+def inbox():
+    """Inside a service function: the model's steers for this call, if any.
+
+    Each is ``{"text": ..., "interrupt": bool}`` and is returned once."""
+    return _request("inbox") or []
+
+
 _deadline = None
 
 
@@ -143,11 +153,32 @@ def time_left():
     return None if _deadline is None else max(0.0, _deadline - time.monotonic())
 
 
+def _signature(fn):
+    """A service function's keyword parameters and docstring, or None."""
+    try:
+        sig = _inspect.signature(fn)
+    except (TypeError, ValueError):
+        return None
+    params, required, extra = [], [], False
+    for p in sig.parameters.values():
+        if p.kind is p.POSITIONAL_ONLY:
+            return None  # can't be passed by name, so no schema
+        if p.kind is p.VAR_KEYWORD:
+            extra = True
+        elif p.kind is not p.VAR_POSITIONAL:
+            params.append(p.name)
+            if p.default is p.empty:
+                required.append(p.name)
+    doc = (_inspect.getdoc(fn) or "").split("\n\n")[0].strip()
+    return {"params": params, "required": required, "doc": doc[:500], "extra": extra}
+
+
 def serve(name, fns, describe=""):
     """Turn this process into the named service. Never returns."""
     if not isinstance(fns, dict) or not fns:
         raise UniverseError("serve needs a dict of function name -> callable")
-    _request("serve", name=name, fns=sorted(fns), describe=describe)
+    sigs = {fn: sig for fn, sig in ((fn, _signature(f)) for fn, f in fns.items()) if sig}
+    _request("serve", name=name, fns=sorted(fns), describe=describe, sigs=sigs)
     while True:
         msg = _pending_invokes.pop(0) if _pending_invokes else _read()
         if msg.get("op") != "invoke":

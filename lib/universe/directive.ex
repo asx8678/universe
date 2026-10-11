@@ -13,8 +13,9 @@ defmodule Universe.Directive do
         network: ["db.internal:5432"], ttl_idle_s: 900, after: [], then: [], quiet: false}
 
       %{op: "serve", label: "reviewer", service: "reviewer", lang: "agent",
-        agent: %{purpose: "...", model: "haiku", tools: ["Read", "Grep"], pool: "reviewers"},
-        code: "<agent config JSON>", ...}
+        agent: %{purpose: "...", model: "haiku", tools: ["Read", "Grep"], pool: "reviewers",
+                 services: ["db"], resume: true},
+        code: nil, ...}
 
       %{op: "call", label: "count", service: "pg", fn: "query", args: %{...},
         timeout_s: 60, after: [], then: [], quiet: false}
@@ -25,6 +26,9 @@ defmodule Universe.Directive do
 
       %{op: "kill", label: nil | "stop-pg", target: "#5" | "pg"}
       %{op: "reply", label: nil, target: "#9" | "ui-build", text: "use the new file"}
+      %{op: "steer", label: nil, target: "rev" | "#12", text: "skip the tests", interrupt: false}
+
+  An agent's `services` are the code services it may call as tools.
 
   Rules:
     * labels are 1-40 chars of letters, digits, `_ . -` and unique across the
@@ -43,15 +47,17 @@ defmodule Universe.Directive do
   @run_fields ~w(op label lang code budget leases after then quiet)
   @serve_fields ~w(op label name lang code agent budget leases network ttl_idle_s after quiet)
   @call_fields ~w(op label service fn args prompt timeout_s after quiet)
-  @agent_fields ~w(purpose model tools pool resume)
+  @agent_fields ~w(purpose model tools pool resume services)
   # Built-in tools an agent may get. Code-running tools never: an agent runs
   # code through Universe workers, which are sandboxed.
   @agent_tools ~w(Read Grep Glob Edit Write NotebookEdit WebSearch WebFetch TodoWrite)
   @agent_write_tools ~w(Edit Write NotebookEdit)
   @default_agent_tools ~w(Read Grep Glob)
   @max_purpose_bytes 16 * 1024
+  @max_agent_services 16
   @kill_fields ~w(op label target)
   @reply_fields ~w(op label target text)
+  @steer_fields ~w(op label target text interrupt)
   @budget_fields ~w(wall_s out_kb mem_mb)
 
   @run_defaults %{wall_s: 120, out_kb: 256, mem_mb: 2048}
@@ -205,6 +211,7 @@ defmodule Universe.Directive do
         "call" -> call(d)
         "kill" -> kill(d)
         "reply" -> reply(d)
+        "steer" -> steer(d)
         nil -> {:error, "missing op"}
         other -> {:error, "unknown op #{inspect(other)}"}
       end
@@ -324,12 +331,22 @@ defmodule Universe.Directive do
          {:ok, model} <- model(a["model"]),
          {:ok, tools} <- agent_tools(a["tools"], leases),
          {:ok, pool} <- pool(a["pool"]),
-         {:ok, resume} <- resume(a["resume"]) do
-      {:ok, %{purpose: purpose, model: model, tools: tools, pool: pool, resume: resume}}
+         {:ok, resume} <- resume(a["resume"]),
+         {:ok, services} <- agent_services(a["services"]) do
+      {:ok,
+       %{
+         purpose: purpose,
+         model: model,
+         tools: tools,
+         pool: pool,
+         resume: resume,
+         services: services
+       }}
     end
   end
 
-  defp agent(_, _), do: {:error, "agent must be an object: {purpose, model, tools, pool, resume}"}
+  defp agent(_, _),
+    do: {:error, "agent must be an object: {purpose, model, tools, pool, resume, services}"}
 
   defp purpose(p) when is_binary(p) do
     cond do
@@ -385,6 +402,24 @@ defmodule Universe.Directive do
 
   defp pool(_), do: {:error, "agent pool must be a string"}
 
+  # Whether each name is a live code service is the kernel's call.
+  defp agent_services(nil), do: {:ok, []}
+
+  defp agent_services(names) when is_list(names) do
+    cond do
+      not Enum.all?(names, &(is_binary(&1) and Regex.match?(@label_re, &1))) ->
+        {:error, "agent services must be service names (1-40 chars of letters, digits, _ . -)"}
+
+      length(Enum.uniq(names)) > @max_agent_services ->
+        {:error, "an agent may get at most #{@max_agent_services} services"}
+
+      true ->
+        {:ok, Enum.uniq(names)}
+    end
+  end
+
+  defp agent_services(_), do: {:error, "agent services must be a list of service names"}
+
   defp call_target(%{"prompt" => prompt} = d) do
     cond do
       Map.has_key?(d, "fn") or Map.has_key?(d, "args") ->
@@ -409,6 +444,16 @@ defmodule Universe.Directive do
     end
   end
 
+  defp steer(d) do
+    with :ok <- known_fields(d, @steer_fields),
+         {:ok, label} <- label(d["label"], false),
+         {:ok, target} <- target(d["target"]),
+         {:ok, text} <- steer_text(d["text"]),
+         {:ok, interrupt} <- interrupt(d["interrupt"]) do
+      {:ok, %{op: "steer", label: label, target: target, text: text, interrupt: interrupt}}
+    end
+  end
+
   defp service_name(name) when is_binary(name) do
     if Regex.match?(@label_re, name),
       do: {:ok, name},
@@ -427,6 +472,20 @@ defmodule Universe.Directive do
 
   defp reply_text(_), do: {:error, "reply needs text"}
 
+  defp steer_text(t) when is_binary(t) do
+    cond do
+      String.trim(t) == "" -> {:error, "steer needs text"}
+      byte_size(t) > 64 * 1024 -> {:error, "steer text is over 64 KB"}
+      true -> {:ok, t}
+    end
+  end
+
+  defp steer_text(_), do: {:error, "steer needs text"}
+
+  defp interrupt(nil), do: {:ok, false}
+  defp interrupt(b) when is_boolean(b), do: {:ok, b}
+  defp interrupt(_), do: {:error, "interrupt must be true or false"}
+
   defp network(nil), do: {:ok, []}
 
   defp network(list) when is_list(list) do
@@ -438,7 +497,9 @@ defmodule Universe.Directive do
   defp network(_), do: {:error, "network must be a list of \"host:port\""}
 
   defp host_port?(hp) when is_binary(hp) do
-    case Regex.run(~r/^(\[[0-9a-fA-F:]+\]|[A-Za-z0-9.-]+):(\d{1,5})$/, hp) do
+    # \z, not $: "$" also matches before a trailing newline, which would then
+    # reach the sandbox profile.
+    case Regex.run(~r/^(\[[0-9a-fA-F:]+\]|[A-Za-z0-9.-]+):(\d{1,5})\z/, hp) do
       [_, _host, port] -> String.to_integer(port) in 1..65_535
       nil -> false
     end
@@ -620,10 +681,12 @@ defmodule Universe.Directive do
   end
 
   defp check_after_refs(ok, resolve, gone) do
-    # Only run/serve/call become workers you can wait on. kill and reply take
-    # effect at once and have no ID to settle.
+    # Only run/serve/call become workers you can wait on. kill, reply and
+    # steer take effect at once and have no ID to settle.
     top = for(d <- ok, d.op in ["run", "serve", "call"], d.label, into: MapSet.new(), do: d.label)
-    control = for(d <- ok, d.op in ["kill", "reply"], d.label, into: MapSet.new(), do: d.label)
+
+    control =
+      for(d <- ok, d.op in ["kill", "reply", "steer"], d.label, into: MapSet.new(), do: d.label)
 
     nested =
       ok

@@ -39,7 +39,19 @@ Each request carries a `rid`, which the reply echoes:
 | `progress` | `text` | `null`; sets the worker's digest line |
 | `ask` | `question` | the model's answer (blocks until a `reply` directive) |
 | `call` | `service`, `fn`, `args`, optional `timeout_s` (default 60, max 1800) | the function's return value |
-| `serve` | `name`, `fns` (list of names), `describe` | `null`; the connection is now the service |
+| `serve` | `name`, `fns` (list of names), `describe`, optional `sigs` | `null`; the connection is now the service |
+| `services` | `names` | per name `{name, live, fns, describe, sigs}` (`{name, live: false}` when it isn't running) |
+| `preview` | `handle` | the handle's bounded text preview (what `inspect` shows) |
+| `inbox` | | the model's steers for the call in progress, `[{text, interrupt}]`, each returned once |
+
+`sigs` describes the functions for agents' tool schemas:
+`{"query": {"params": ["sql", "limit"], "required": ["sql"], "doc": "Run SQL",
+"extra": false}}` (`extra`: it takes `**kwargs`). The Python client sends it
+from each function's signature and docstring.
+
+An agent worker's connections may `call` (and list with `services`) only the
+code services in its `agent.services`; the error names the ones it may call.
+Other workers may call any service.
 
 ## Invocations (daemon → service)
 
@@ -51,7 +63,9 @@ After `serve`, the daemon sends calls to the service one at a time:
 
 `timeout_ms` is what is left of the caller's timeout (the Python client
 exposes it as `U.time_left()`); an invocation whose caller gave up while it
-was queued is never sent.
+was queued is never sent. A `steer` directive aimed at an agent while it
+works on an invocation waits for an `inbox` request; one not fetched before
+the invocation's `result` is dropped (event `steer_dropped`).
 
 The service answers with
 `{"op":"result","cid":9,"ok":true,"value":...}` or

@@ -29,6 +29,10 @@ defmodule Universe.Redact do
   defp walk(map, secrets) when is_map(map) and not is_struct(map),
     do: Map.new(map, fn {k, v} -> {walk(k, secrets), walk(v, secrets)} end)
 
+  # A struct (a URI, an exception) can carry a secret in its fields too.
+  defp walk(%module{} = struct, secrets),
+    do: struct |> Map.from_struct() |> walk(secrets) |> Map.put(:__struct__, module)
+
   defp walk(list, secrets) when is_list(list), do: Enum.map(list, &walk(&1, secrets))
   defp walk(other, _secrets), do: other
 end

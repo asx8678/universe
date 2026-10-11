@@ -16,7 +16,9 @@ defmodule Universe.Worker do
   `claude` CLI needs your login (under `$HOME`) and the Claude API, so an
   agent is not wrapped in the Seatbelt profile; it runs `claude --restricted`
   instead: no code-running tools, file tools confined to the project, writes
-  only to its leases (permission rules), and `.universe/` denied.
+  only to its leases (permission rules), and `.universe/` denied. The code
+  services in its `services` list reach it as MCP tools (`agent_mcp.py`), and
+  its SDK token lets it call only those.
 
   Files in `.universe/runs/<id>/`: the code file, `stdout`, `stderr`, `token`
   (the sandbox profile is in `.universe/sandbox/<id>.sb`, where the worker
@@ -84,6 +86,7 @@ defmodule Universe.Worker do
       "purpose" => agent.purpose,
       "model" => agent.model,
       "tools" => agent.tools,
+      "services" => Map.get(agent, :services, []),
       "leases" => state.leases,
       "resume" => Map.get(agent, :resume, true),
       "session_file" => Path.join([Paths.universe_dir(), "agents", "#{state.service}.json"]),
@@ -93,6 +96,10 @@ defmodule Universe.Worker do
   end
 
   defp code_text(state, _root), do: state.code
+
+  # What the worker's SDK connections may call: an agent only its services.
+  defp allowed_calls(%{lang: "agent", agent: agent}), do: Map.get(agent, :services, [])
+  defp allowed_calls(_state), do: :any
 
   @doc "The claude CLI agents run: `config :universe, claude_bin` or the one on PATH."
   def claude_bin do
@@ -162,7 +169,7 @@ defmodule Universe.Worker do
     token_path = Path.join(state.run_dir, "token")
     File.write!(token_path, state.token)
     File.chmod!(token_path, 0o600)
-    Services.put_token(state.token, state.id, state.tick)
+    Services.put_token(state.token, state.id, state.tick, allowed_calls(state))
 
     files =
       Map.new([:stdout, :stderr], fn stream ->
@@ -247,7 +254,7 @@ defmodule Universe.Worker do
     if why == :mem,
       do: event(state, "budget_hit", %{"budget" => "mem_mb", "limit" => state.mem_mb})
 
-    Port.command(port, "K")
+    safe_command(port, "K")
 
     {:noreply,
      %{
@@ -295,7 +302,7 @@ defmodule Universe.Worker do
   def handle_info(:wall_budget, %{done: false, killed_by: nil, port: port} = state)
       when port != nil do
     event(state, "budget_hit", %{"budget" => "wall_s", "limit" => state.wall_s})
-    Port.command(port, "K")
+    safe_command(port, "K")
     {:noreply, %{state | killed_by: :budget}}
   end
 
@@ -591,6 +598,15 @@ defmodule Universe.Worker do
 
   defp shorten(line, prefixes),
     do: Enum.reduce(prefixes, line, fn {from, to}, acc -> String.replace(acc, from, to) end)
+
+  # The launcher may have exited a moment ago with its exit still in the
+  # mailbox: a kill then has nothing to do, and must not crash the worker
+  # before that exit is reported.
+  defp safe_command(port, data) do
+    Port.command(port, data)
+  rescue
+    ArgumentError -> false
+  end
 
   defp safe_close(port) do
     Port.close(port)

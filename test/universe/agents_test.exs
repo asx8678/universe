@@ -68,8 +68,12 @@ defmodule Universe.AgentsTest do
                model: "haiku",
                tools: ["Read", "Grep", "Glob"],
                pool: "reviewers",
-               resume: true
+               resume: true,
+               services: []
              }
+
+      {[s], []} = check(agent("rev", %{"services" => ["db", "search", "db"]}))
+      assert s.agent.services == ["db", "search"]
 
       {[c], []} = check(task("t1", "rev", "look at lib/"))
       assert {c.fn, c.args} == {"task", %{"prompt" => "look at lib/"}}
@@ -99,6 +103,57 @@ defmodule Universe.AgentsTest do
                ["a call takes prompt (an agent task) or fn/args, not both"]
 
       {[_], []} = check(agent("a", %{"tools" => ["Read", "Edit"]}, %{"leases" => ["docs"]}))
+
+      assert reasons.(agent("a", %{"services" => "db"})) == [
+               "agent services must be a list of service names"
+             ]
+
+      assert reasons.(agent("a", %{"services" => ["db", "no spaces"]})) |> hd() =~
+               "agent services must be service names"
+
+      many = for i <- 1..17, do: "s#{i}"
+
+      assert reasons.(agent("a", %{"services" => many})) == [
+               "an agent may get at most 16 services"
+             ]
+    end
+
+    test "steer takes a target and text, and can't be waited on" do
+      reasons = fn d -> check(d) |> elem(1) |> Enum.map(& &1.reason) end
+      steer = %{"op" => "steer", "target" => "rev", "text" => "skip the tests"}
+
+      {[s], []} = check(steer)
+
+      assert s == %{
+               op: "steer",
+               label: nil,
+               target: "rev",
+               text: "skip the tests",
+               interrupt: false
+             }
+
+      {[s], []} = check(Map.put(steer, "interrupt", true))
+      assert s.interrupt
+
+      assert reasons.(Map.delete(steer, "text")) == ["steer needs text"]
+      assert reasons.(Map.put(steer, "text", "  ")) == ["steer needs text"]
+      assert reasons.(Map.delete(steer, "target")) == ["needs a target (#id or label)"]
+      assert reasons.(Map.put(steer, "interrupt", "yes")) == ["interrupt must be true or false"]
+      assert reasons.(Map.put(steer, "when", "now")) == ["unknown field when"]
+
+      {_, [r]} =
+        Directive.validate([
+          Map.put(steer, "label", "nudge"),
+          %{
+            "op" => "run",
+            "label" => "r",
+            "lang" => "bash",
+            "code" => "true",
+            "after" => ["nudge"]
+          }
+        ])
+
+      assert r.reason == "after nudge: steer takes effect at once; wait on its target instead"
     end
   end
 

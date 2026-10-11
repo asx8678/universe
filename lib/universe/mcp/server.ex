@@ -25,39 +25,43 @@ defmodule Universe.MCP.Server do
   alias Anubis.Server.Response
 
   @tick_description """
-  Send a batch of directives to Universe and wait for results. Every job runs \
-  as a worker with an ID (#1, #2, ...); independent jobs in one batch run in \
-  parallel. Returns one compact digest line per worker that changed, failed \
-  first. Bad directives come back as rejected lines, never as errors. An empty \
-  directives list just waits and reports. Workers run in the project root, \
-  which is read-only except their leased paths, with no network: only a \
-  serve with "network" can reach the hosts it lists. A lease another worker \
-  holds rejects the directive, unless it has "after": then it waits for it.
+  Send directives to Universe and wait for results. Each job is a worker \
+  with an ID (#1, #2, ...); jobs in one batch run in parallel. Returns a \
+  digest line per changed worker, failed first; bad directives come back \
+  rejected; no directives just waits. Workers run in the project root, \
+  read-only except their leases, with no network unless a serve lists \
+  "network" hosts. A held lease rejects a directive unless it has "after" \
+  (then it waits).
+
+  Build helpers that pay off: services for what you use more than once (DB, \
+  API, index), agents for judgment work with the services they need; serve \
+  and task them in one tick.
 
   Ops (each needs a unique "label"):
   run: one-shot code. {"op":"run","label":"l","lang":"python|bash|elixir", \
   "code":"...","budget":{"wall_s":120,"out_kb":256,"mem_mb":2048}, \
   "leases":["paths/it/writes"],"after":["label or #id"], \
-  "then":[run directives started when it exits 0],"quiet":true}.
+  "then":[runs started when it exits 0],"quiet":true}.
   serve: a long-lived service; its code calls U.serve(name,{fn: callable},desc). \
   {"op":"serve","label":"pg","lang":"python","code":"...", \
   "network":["host:port"],"ttl_idle_s":900}.
-  call: call a service function. {"op":"call","label":"q","service":"pg", \
-  "fn":"query","args":{...},"timeout_s":60}. Small results inline, large ones \
-  become a handle.
-  agent: a serve with "agent" instead of code is a helper Claude session \
-  that stays up and takes tasks: {"op":"serve","label":"rev","agent": \
-  {"purpose":"system prompt","model":"haiku","tools":["Read","Grep"], \
-  "pool":"reviewers"}}; give it a task with {"op":"call","label":"r1", \
-  "service":"rev or a pool","prompt":"..."}. It can't run code.
+  call: {"op":"call","label":"q","service":"pg","fn":"query","args":{...}, \
+  "timeout_s":60}. Large results become a handle.
+  agent: a serve with "agent" instead of code, a Claude session that takes \
+  tasks: {"op":"serve","label":"rev","agent":{"purpose":"system prompt", \
+  "model":"haiku","tools":["Read","Grep"],"services":["pg"], \
+  "pool":"reviewers"}}; task it: {"op":"call","label":"r1","service": \
+  "rev or a pool","prompt":"..."}. It can't run code; its services are its tools.
+  steer: add to a busy agent's task. {"op":"steer","target":"rev or r1", \
+  "text":"...","interrupt":false}.
   kill: {"op":"kill","target":"#5 or label"}.
-  reply: answer a worker that is asking, or the task an asking agent works on. \
+  reply: answer an asking worker, or the task of an asking agent. \
   {"op":"reply","target":"#9","text":"..."}.
 
-  In code, U is preloaded (python, elixir): U.put(name,value)->handle, \
-  U.get(handle), U.call(service,fn,args), U.progress(text), U.ask(question). \
-  Never put big data in directives or digests; store it with U.put and pass \
-  the handle. wait: {"until":"all|any","ids":["#5","label"],"timeout_s":60} (max 90).
+  In code U is preloaded (python, elixir): U.put(name,value)->handle, \
+  U.get(h), U.call(service,fn,args), U.progress(text), U.ask(q). Pass big \
+  data as handles. wait: {"until":"all|any","ids":["#5","label"], \
+  "timeout_s":60} (max 90).
   """
 
   @inspect_description """

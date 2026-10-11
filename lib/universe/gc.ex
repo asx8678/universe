@@ -22,7 +22,13 @@ defmodule Universe.GC do
   def start_link(opts \\ []), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)
 
   @doc "Registers a worker's process group for memory checks."
-  def watch_memory(id, pgid, mem_mb), do: :ets.insert(@mem_table, {id, pgid, mem_mb * 1024})
+  # While GC restarts its table is gone; the new GC asks live workers to
+  # register again (see init/1), so a miss here is not lost.
+  def watch_memory(id, pgid, mem_mb) do
+    :ets.insert(@mem_table, {id, pgid, mem_mb * 1024})
+  rescue
+    ArgumentError -> true
+  end
 
   # Workers call this from terminate/2. On shutdown GC (and its table) may
   # already be gone, which must not turn a clean stop into a crash.
@@ -33,7 +39,8 @@ defmodule Universe.GC do
   end
 
   @doc "Runs the idle/run-dir sweep now (tests, and the observer)."
-  def sweep_now, do: GenServer.call(__MODULE__, :sweep)
+  # Pruning large run dirs can take a while.
+  def sweep_now, do: GenServer.call(__MODULE__, :sweep, 60_000)
 
   @impl true
   def init(_opts) do

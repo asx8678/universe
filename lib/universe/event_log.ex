@@ -155,7 +155,8 @@ defmodule Universe.EventLog do
           {event, line}
 
         {:error, _} ->
-          event = %{event | "data" => %{"unencodable" => inspect(event["data"], limit: 50)}}
+          text = Universe.Redact.scrub(inspect(event["data"], limit: 50), state.secrets)
+          event = %{event | "data" => %{"unencodable" => text}}
           {event, Jason.encode_to_iodata!(event)}
       end
 
