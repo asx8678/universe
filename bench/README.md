@@ -319,6 +319,15 @@ stdout of ≤ 20 lines / 1,500 chars shows whole in the digest (≤ 3,000
 chars a tick). Earlier, from the pilots (e7d5937): tasks for a busy agent
 wait in the Tick (timeout starts with the task), `memory: "task"`.
 
+**Reference arm (plain Claude Code, Opus 5.5, its own `Agent` tool, no
+plugin; unscored):** 3/3 PASS. Runs 1 and 2 read every ticket in their own
+context (39 and 43 turns, 3.5 M and 3.6 M tokens, ~$6.80 each, 427 s and
+468 s); run 3 used 13 subagents (48 turns, 7.1 M tokens with 5.3 M in
+subagents, $10.43, 1,411 s). The accept runs' orchestrators cost $3.16–4.07
+(helper agents are separate processes, not in that figure; their tokens are
+in the table) with similar turn counts (35–42). `total_cost_usd` in
+stream-json results is cumulative per session: take the last one, don't sum.
+
 # M7.1 acceptance (pre-registered Oct 11, 2026, before any run)
 
 Same task, fixture, prompt, mid-run message, setups and criteria as M7,
@@ -339,3 +348,32 @@ UNIVERSE_BENCH_OUT=bench/out71 UNIVERSE_BENCH_WORK=/tmp/universe-bench-m71 \
   python3 bench/run.py --tasks triage --setups accept --runs 3 --budget 25 --go
 python3 bench/accept.py bench/out71/triage.accept.*.jsonl
 ```
+
+## M7.1 result (Oct 11, 2026): NOT ACCEPTED
+
+Three Opus 5.5 runs on 4260748, `bench/out71/`:
+
+| run | grade | built | wired (agent U.calls) | turns | orchestrator tokens | helper tokens | cost (orch.) | wall s |
+|---|---|---|---|---|---|---|---|---|
+| 1 | PASS | no: agents read exported files | 0 | 28 | 1.11 M | 0.31 M | $2.37 | 320 |
+| 2 | PASS | yes (db) | 18 | 35 | 1.49 M | 2.04 M | $2.18 | 365 |
+| 3 | PASS | yes (tix) | 120 | 32 | 1.58 M | 3.82 M | $2.87 | 471 |
+
+0 of 3 within 25 turns: not accepted, as pre-registered. Correct 3/3,
+built 2/3, wired 2/3 (as in M7); no steers (reported, not gated).
+
+Against M7 the fixes did what they were for: turns 42/35/41 → 28/35/32,
+orchestrator cost $3.16–4.07 → $2.18–2.87, wall 437–589 s → 320–471 s,
+kills 19–35 → 7–19, `inspect #id` 9–10 → 5–11 (the remaining ones grep or
+page outputs over 20 lines). No agent asked how to read a result, and no
+call went to a dying agent. The orchestrators still spend turns on their
+own verification passes (second-opinion pools, diffs, spot checks) and on
+separate kill ticks, and one run delegated without wiring a service.
+
+Against plain Claude Code (reference arm above, 39–48 turns, $6.75–10.43
+orchestrator): fewer turns and a third of the orchestrator cost, plus
+0.3–3.8 M helper tokens (sonnet, some opus) outside that figure.
+
+Per the pre-registration this was the last round; next is the benchmark,
+on a task where agents must look things up while they judge (so wiring is
+needed), with helper cost counted in dollars.

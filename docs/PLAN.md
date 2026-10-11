@@ -371,9 +371,25 @@ service, and `reply` reached only an agent that was asking.
   (next item); `ask` as a tool; Elixir services send no signatures, so
   their tools take loose arguments.
 
+**Acceptance (Oct 11, 2026): not accepted, twice** (details and data in
+`bench/README.md`, M7 and M7.1). Task: triage 600 LLM-written support
+tickets in SQLite (fixture gated against regex and history shortcuts), a
+rule change sent mid-run, prompt silent about helpers. Opus built helpers
+unprompted in 5 of 6 runs and wired a service in 4, every run correct, but
+no run finished within the pre-registered 25 turns (M7 35–42, M7.1 28–35).
+Steering was never used; on this task re-dispatching was the right answer,
+so it is untested here. Fixed on the way: tasks for a busy agent wait in
+the Tick (timeout starts with the task), `memory: "task"`, `handle_read`
+for agents, pool routing skips agents being killed, a clear error for
+`leases` inside `agent`, small run outputs inline in the digest; the bench
+harness now allows `Skill` (M4–M6 ran with it denied).
+
 **Next (not in M7)**
-- Acceptance: a task where helpers pay off, without telling the model to
-  build them; does it build, wire and steer them? Count orchestrator turns.
+- ~~Acceptance: a task where helpers pay off, without telling the model to
+  build them; does it build, wire and steer them? Count orchestrator turns.~~
+  Done, not accepted (above). Candidates for the turn gap: fewer verification
+  passes, kills folded into the final tick, `"count"` for pool members.
+- Steer acceptance: a long single task whose direction changes mid-way.
 - Benchmark only after that, on a task that needs a slow-to-build or
   credentialed resource shared by agents; thresholds fixed first, the same
   helper model in both setups (the M6 confound).
