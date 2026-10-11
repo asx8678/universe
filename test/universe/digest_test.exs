@@ -67,6 +67,16 @@ defmodule Universe.DigestTest do
     refute text =~ ~r/#3\s+killed/
   end
 
+  test "many workers done alike fold into one line; different ones stay" do
+    alike = for i <- 0..19, do: %{id: 152 + i, label: "job-#{i}", status: "done", detail: "3s"}
+    other = %{id: 200, label: "report", status: "done", detail: "3s · 42 rows"}
+    text = Digest.build(info(alike ++ [other]))
+
+    assert text =~ "+20 done · 3s (#152–#171: job-0, job-1, job-2, …, job-19)"
+    assert text =~ ~r/#200\s+done\s+report\s+3s · 42 rows/
+    refute text =~ ~r/#153\s+done/
+  end
+
   test "rejected rows have no ID" do
     text =
       Digest.build(info([%{id: nil, label: "bad", status: "rejected", detail: "unknown op"}]))

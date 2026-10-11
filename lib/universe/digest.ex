@@ -33,12 +33,16 @@ defmodule Universe.Digest do
   def build(info) do
     {acked, rows} = Enum.split_with(info.rows, &(&1[:quiet] && &1.status == "done"))
     {restarted, rows} = Enum.split_with(rows, &restart_kill?/1)
+    {alike, rows} = alike_done(rows)
     rows = Enum.sort_by(rows, &{rank(&1.status), &1.id || 0})
 
     header = header(info, length(info.rows))
     width = rows |> Enum.map(&String.length(&1.label || "")) |> Enum.max(fn -> 0 end) |> min(24)
     footer = footer(info.tick, acked)
-    rows_lines = Enum.map(rows, &line(&1, width)) ++ restarted_line(restarted)
+
+    rows_lines =
+      Enum.map(rows, &line(&1, width)) ++
+        Enum.map(alike, &alike_line/1) ++ restarted_line(restarted)
 
     {lines, dropped} =
       fit(rows_lines, String.length(header) + String.length(footer) + 2)
@@ -72,6 +76,41 @@ defmodule Universe.Digest do
     do:
       row.status == "killed" and
         Enum.any?(@restart_reasons, &String.starts_with?(row[:detail] || "", &1))
+
+  # @alike_min or more workers that finished `done` with the same detail
+  # (typically just a duration) say one thing: fold them into one line.
+  @alike_min 5
+
+  defp alike_done(rows) do
+    groups =
+      rows
+      |> Enum.filter(&(&1.status == "done" and &1.id))
+      |> Enum.group_by(&(&1[:detail] || ""))
+      |> Enum.filter(fn {_detail, rs} -> length(rs) >= @alike_min end)
+
+    folded = groups |> Enum.flat_map(&elem(&1, 1)) |> MapSet.new(& &1.id)
+
+    {Enum.map(groups, fn {detail, rs} -> {detail, Enum.sort_by(rs, & &1.id)} end),
+     Enum.reject(rows, &MapSet.member?(folded, &1.id))}
+  end
+
+  defp alike_line({detail, rows}) do
+    ids = Enum.map(rows, & &1.id)
+    labels = Enum.map(rows, & &1.label)
+
+    range =
+      if ids == Enum.to_list(List.first(ids)..List.last(ids)),
+        do: "##{List.first(ids)}–##{List.last(ids)}: ",
+        else: ""
+
+    names =
+      if length(labels) > 4,
+        do: Enum.join(Enum.take(labels, 3), ", ") <> ", …, " <> List.last(labels),
+        else: Enum.join(labels, ", ")
+
+    detail = if detail == "", do: "", else: " · #{detail}"
+    "+#{length(rows)} done#{detail} (#{range}#{names})"
+  end
 
   defp restarted_line([]), do: []
 
