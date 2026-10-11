@@ -14,7 +14,7 @@ defmodule Universe.Directive do
 
       %{op: "serve", label: "reviewer", service: "reviewer", lang: "agent",
         agent: %{purpose: "...", model: "haiku", tools: ["Read", "Grep"], pool: "reviewers",
-                 services: ["db"], resume: true},
+                 services: ["db"], resume: true, memory: "session"},
         code: nil, ...}
 
       %{op: "call", label: "count", service: "pg", fn: "query", args: %{...},
@@ -47,7 +47,7 @@ defmodule Universe.Directive do
   @run_fields ~w(op label lang code budget leases after then quiet)
   @serve_fields ~w(op label name lang code agent budget leases network ttl_idle_s after quiet)
   @call_fields ~w(op label service fn args prompt timeout_s after quiet)
-  @agent_fields ~w(purpose model tools pool resume services)
+  @agent_fields ~w(purpose model tools pool resume services memory)
   # Built-in tools an agent may get. Code-running tools never: an agent runs
   # code through Universe workers, which are sandboxed.
   @agent_tools ~w(Read Grep Glob Edit Write NotebookEdit WebSearch WebFetch TodoWrite)
@@ -332,6 +332,7 @@ defmodule Universe.Directive do
          {:ok, tools} <- agent_tools(a["tools"], leases),
          {:ok, pool} <- pool(a["pool"]),
          {:ok, resume} <- resume(a["resume"]),
+         {:ok, memory} <- memory(a["memory"]),
          {:ok, services} <- agent_services(a["services"]) do
       {:ok,
        %{
@@ -340,13 +341,15 @@ defmodule Universe.Directive do
          tools: tools,
          pool: pool,
          resume: resume,
+         memory: memory,
          services: services
        }}
     end
   end
 
   defp agent(_, _),
-    do: {:error, "agent must be an object: {purpose, model, tools, pool, resume, services}"}
+    do:
+      {:error, "agent must be an object: {purpose, model, tools, pool, resume, services, memory}"}
 
   defp purpose(p) when is_binary(p) do
     cond do
@@ -387,6 +390,12 @@ defmodule Universe.Directive do
   end
 
   defp agent_tools(_, _), do: {:error, "agent tools must be a list of tool names"}
+
+  # "session": one conversation across tasks (follow-ups work); "task": a
+  # fresh session per task, so independent tasks don't pile up context.
+  defp memory(nil), do: {:ok, "session"}
+  defp memory(m) when m in ["session", "task"], do: {:ok, m}
+  defp memory(_), do: {:error, ~s(agent memory must be "session" or "task")}
 
   defp resume(nil), do: {:ok, true}
   defp resume(b) when is_boolean(b), do: {:ok, b}

@@ -153,9 +153,14 @@ services it may call as tools, named `<service>__<function>`; each must be
 live or served in the same tick, and the agent starts once they serve; no
 agents or pools), `pool`, `resume` (default true: serving the same agent
 again, after a kill or a daemon restart, resumes its conversation; a changed
-purpose, model, tools, leases or services starts a new one). A task past its
-call's `timeout_s` (default 60, max 1800) is interrupted and the agent is
-free again; if its session crashes, the next task resumes it.
+purpose, model, tools, leases or services starts a new one), `memory`
+(`"session"`, the default: one conversation across tasks, so follow-ups know
+earlier answers; `"task"`: a fresh session per task, for independent tasks,
+whose context would otherwise grow with every task). An agent runs one task
+at a time: a task for a busy agent waits in `queued` ("waits behind N
+tasks"), and its `timeout_s` starts when it does. A task past its call's
+`timeout_s` (default 60, max 1800) is interrupted and the agent is free
+again; if its session crashes, the next task resumes it.
 
 A service result over 8,000 characters reaches the agent as a handle and its
 preview (`handle_preview` shows it again); it can pass the handle to another

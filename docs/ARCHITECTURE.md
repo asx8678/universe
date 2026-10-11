@@ -214,8 +214,12 @@ sequenceDiagram
 
 The session ID is saved in `.universe/agents/<name>.json`, so serving the
 same agent again (after a kill, a crash or a daemon restart) resumes its
-conversation. A task past its call's deadline is interrupted with a
-stream-json `interrupt` control request.
+conversation. With `"memory": "task"` the bridge ends the session after each
+task and starts the next one while idle, so independent tasks don't carry
+each other's context. A task past its call's deadline is interrupted with a
+stream-json `interrupt` control request. An agent runs one task at a time;
+the Tick holds a task for a busy agent in `queued`, so its deadline starts
+when it does.
 
 ## 5. Events and the observer
 

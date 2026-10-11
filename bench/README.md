@@ -195,6 +195,32 @@ Grader (`graders/triage.py`, answers outside the fixture): every open ticket
 exactly once, every priority right (chargeback rule included), ≥ 95 % of
 categories right.
 
+**Pilot 2, Oct 11, 2026 (sonnet orchestrator, this fixture).** Grader PASS
+(600/600, 600/600), 228 s, 17 turns, orchestrator 0.70 M tokens, helpers
+3.9 M. It exported the tickets to 20 files, served one sonnet agent (`Read`
+only, `"pool"` set) and sent it 20 tasks in one tick; it computed priority
+itself in SQL, so agents had nothing to look up (no code service: built and
+wired both no, by task design: every priority rule is plain SQL). Two
+Universe defects, fixed before pilot 3:
+
+- An agent runs one task at a time, but a direct call to a busy agent was
+  started at once and queued on its connection, so the 60 s call timeout
+  counted queue time: 13 of 20 tasks failed. Now the Tick holds such a task
+  in `queued` ("waits behind N tasks on cls"), and its timeout starts when
+  it does.
+- One session kept all 22 tasks: 188.9 k tokens of context re-read on every
+  model call. New agent option `"memory": "task"` (a fresh session per
+  task); the default stays `"session"`, and an agent's idle line now says
+  so past 100 k tokens.
+
+The mid-run rule arrived with tasks in flight (window: yes); it was not
+steered (agents owned categories, not priorities): the orchestrator found
+the chargebacks itself and got all 52 right.
+
+**Stopping rule:** after these fixes and one more sonnet pilot, the Opus runs
+go ahead whatever pilot 3 shows, unless the harness itself breaks.
+Otherwise the acceptance turns into development.
+
 ## Setups
 
 - **accept** (scored): plugin + daemon, `Agent`/`Task` disallowed, Opus 5.5

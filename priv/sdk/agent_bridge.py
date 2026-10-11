@@ -158,6 +158,7 @@ def save_session_id(sid):
 
 state = {"tasks": 0, "ctx": 0, "crashes": [], "calls": {}}
 session = {}
+MEMORY = cfg.get("memory") or "session"
 # How long a resumed session gets to fail at boot ("No conversation found"
 # comes within a second) before the agent says it is ready.
 RESUME_CHECK_S = 2.5
@@ -386,12 +387,32 @@ def _until_result(expect, stopping):
             return e
 
 
+# Past this much context, a session that keeps every task tells the model.
+BIG_CONTEXT = 100_000
+
+
 def idle_line():
     note = state.get("note")
     if not state["tasks"]:
         return "idle · " + (note or "ready")
     line = f"idle · {state['tasks']} tasks done · context {state['ctx'] / 1000:.1f}k tokens"
+    if MEMORY == "session" and state["ctx"] > BIG_CONTEXT:
+        line += ' · every task re-reads this; independent tasks: serve with "memory": "task"'
     return line + (f" · {note}" if note else "")
+
+
+def renew_session():
+    """memory: "task" - ends this task's session and starts the next one now,
+    while the agent is idle, so each task starts from the purpose alone."""
+    old = session.get("proc")
+    if old and old.poll() is None:
+        try:
+            old.stdin.close()
+            old.wait(timeout=5)
+        except Exception:
+            old.kill()
+    start_session(resume=False)
+    state["ctx"] = 0
 
 
 def log_usage(n, started, ok):
@@ -442,10 +463,14 @@ def task(prompt=None):
             return text
     finally:
         log_usage(n, started, ok)
-        U.progress(idle_line())
+        line = idle_line()
+        if MEMORY == "task":
+            renew_session()
+        U.progress(line)
 
 
-session["id"] = saved_session_id()
+# A fresh session per task has nothing worth resuming.
+session["id"] = saved_session_id() if MEMORY == "session" else None
 start_session(resume=session["id"] is not None)
 if session["resumed"]:
     try:

@@ -864,7 +864,9 @@ defmodule Universe.Tick do
         sid = state.services[w.spec.service]
 
         case status_of(state, sid) do
-          "serving" -> :ready
+          # An agent runs one task at a time: a task for a busy agent waits
+          # here, so its timeout starts when the task does, not in a queue.
+          "serving" -> if agent_on_call?(state, sid), do: :wait, else: :ready
           s when s in @terminal -> {:fail, "service #{w.spec.service} is #{s}"}
           nil -> {:fail, "no service #{w.spec.service}"}
           _ -> :wait
@@ -881,6 +883,18 @@ defmodule Universe.Tick do
 
       true ->
         :ready
+    end
+  end
+
+  defp agent_on_call?(state, sid) do
+    case state.workers[sid] do
+      %{spec: %{agent: %{}}, service: name} ->
+        Enum.any?(state.workers, fn {_, c} ->
+          c.kind == "call" and c.status == "running" and c.spec.service == name
+        end)
+
+      _ ->
+        false
     end
   end
 
@@ -1481,7 +1495,8 @@ defmodule Universe.Tick do
   end
 
   defp row(state, w, recent) do
-    row = %{id: w.id, label: w.label, status: w.status, quiet: w.quiet, detail: detail(w, recent)}
+    detail = queue_note(state, w) || detail(w, recent)
+    row = %{id: w.id, label: w.label, status: w.status, quiet: w.quiet, detail: detail}
 
     # A call whose agent stops to ask shows the question on its own line.
     case asking_handler(state, w) do
@@ -1489,6 +1504,37 @@ defmodule Universe.Tick do
       h -> %{row | detail: "#{h.label} asks: #{h.question} · reply to #{w.label} or #{h.label}"}
     end
   end
+
+  # A task waiting for an agent (or a pool) says how many are ahead of it.
+  defp queue_note(state, %{status: "queued", kind: "call", deps: []} = w) do
+    name = w.spec.service
+
+    ahead =
+      Enum.count(state.workers, fn {_, c} ->
+        c.kind == "call" and
+          ((c.status == "running" and (c.spec.service == name or c.spec[:pool] == name)) or
+             (c.status == "queued" and c.spec.service == name and c.id < w.id))
+      end)
+
+    target = state.workers[state.services[name]]
+
+    cond do
+      w[:lease_note] || ahead == 0 ->
+        nil
+
+      match?(%{spec: %{agent: %{}}}, target) ->
+        "waits behind #{ahead} task#{if ahead == 1, do: "", else: "s"} on #{name} " <>
+          "(an agent runs one task at a time)"
+
+      target == nil ->
+        "waits for a free agent of pool #{name} (#{ahead} ahead)"
+
+      true ->
+        nil
+    end
+  end
+
+  defp queue_note(_state, _w), do: nil
 
   defp detail(%{status: "queued"} = w, _recent) do
     cond do

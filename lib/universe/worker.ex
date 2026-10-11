@@ -89,6 +89,7 @@ defmodule Universe.Worker do
       "services" => Map.get(agent, :services, []),
       "leases" => state.leases,
       "resume" => Map.get(agent, :resume, true),
+      "memory" => Map.get(agent, :memory, "session"),
       "session_file" => Path.join([Paths.universe_dir(), "agents", "#{state.service}.json"]),
       "root" => root,
       "claude" => claude_bin(),

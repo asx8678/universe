@@ -69,6 +69,7 @@ defmodule Universe.AgentsTest do
                tools: ["Read", "Grep", "Glob"],
                pool: "reviewers",
                resume: true,
+               memory: "session",
                services: []
              }
 
@@ -242,6 +243,42 @@ defmodule Universe.AgentsTest do
     assert status(second, t) == "done"
     assert second.text =~ "got lib/b.ex"
     kill(name)
+  end
+
+  test "tasks for a busy agent wait their turn; the timeout starts when the task does" do
+    name = uniq("serial")
+    tasks = for i <- 1..3, do: "#{name}-t#{i}"
+    tick([agent(name)], %{"ids" => [name], "timeout_s" => 15})
+
+    # Each SLOW task takes 1.5 s; queued behind two others, the third would
+    # have used up a 3 s timeout before it started.
+    calls = Enum.map(tasks, &Map.put(task(&1, name, "SLOW #{&1}"), "timeout_s", 3))
+    first = tick(calls, %{"timeout_s" => 0})
+    assert first.text =~ ~r/waits behind 2 tasks on #{name} \(an agent runs one task at a time\)/
+
+    result = tick([], %{"ids" => tasks, "timeout_s" => 30})
+    for t <- tasks, do: assert(status(result, t) == "done")
+    kill(name)
+  end
+
+  test ~s(memory "task" starts each task in a fresh session) do
+    [fresh, kept] = [uniq("fresh"), uniq("kept")]
+
+    result =
+      tick([
+        agent(fresh, %{"memory" => "task"}),
+        agent(kept),
+        task("a-#{fresh}", fresh, "one"),
+        task("a-#{kept}", kept, "one")
+      ])
+
+    assert result.text =~ "done #1: one"
+    again = tick([task("b-#{fresh}", fresh, "two"), task("b-#{kept}", kept, "two")])
+    # The fake claude counts the messages of its session.
+    assert again.text =~ ~r/b-#{fresh}.*done #1: two/
+    assert again.text =~ ~r/b-#{kept}.*done #2: two/
+    kill(fresh)
+    kill(kept)
   end
 
   test "a pool hands each task to a free agent" do

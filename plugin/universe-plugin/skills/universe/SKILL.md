@@ -53,10 +53,13 @@ you can finish with a few reads needs no agent.
   (`mcp__services__db__query`): the agent queries the data itself and the rows
   never pass through you. Each listed service must be live or served in the
   same tick (the agent starts once it serves). Give several agents the same
-  `"pool":"reviewers"` and call the pool: each task goes to a free agent. An
+  `"pool":"reviewers"` and call the pool: each task goes to a free agent (an
+  agent runs one task at a time; serve one per task you want in parallel). An
   agent with a question shows as `asking`; answer with `reply`. Serving the
   same agent again resumes its conversation (`"resume": false` starts fresh).
-  Give long tasks a `timeout_s`.
+  For independent tasks (batches of tickets, files to summarise) add
+  `"memory":"task"`: each task starts a fresh session instead of re-reading
+  every earlier task. Give long tasks a `timeout_s`.
 - `steer`: add to a busy agent's task while it works:
   `{"op":"steer","target":"r1","text":"only lib/, skip the tests"}` (the agent
   or its task). It lands at the agent's next tool step; `"interrupt": true`
