@@ -41,7 +41,8 @@ defmodule UniverseWeb.Layouts do
         <span class="text-xs opacity-60 truncate font-mono">{Universe.Paths.project_root()}</span>
       </div>
       <div class="flex-none flex items-center gap-2">
-        <.link navigate="/" class="btn btn-ghost btn-sm">Timeline</.link>
+        <.link navigate="/" class="btn btn-ghost btn-sm">Now</.link>
+        <.link navigate="/timeline" class="btn btn-ghost btn-sm">Timeline</.link>
         <.link navigate="/workers" class="btn btn-ghost btn-sm">Workers</.link>
         <.link navigate="/handles" class="btn btn-ghost btn-sm">Handles</.link>
         <.link navigate="/replay" class="btn btn-ghost btn-sm">Replay</.link>

@@ -38,7 +38,8 @@ defmodule UniverseWeb.Router do
   scope "/", UniverseWeb do
     pipe_through :browser
 
-    live "/", TimelineLive
+    live "/", NowLive
+    live "/timeline", TimelineLive
     live "/workers", WorkersLive
     live "/workers/:id", WorkerLive
     live "/handles", HandlesLive

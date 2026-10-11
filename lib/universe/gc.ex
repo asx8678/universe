@@ -24,7 +24,13 @@ defmodule Universe.GC do
   @doc "Registers a worker's process group for memory checks."
   def watch_memory(id, pgid, mem_mb), do: :ets.insert(@mem_table, {id, pgid, mem_mb * 1024})
 
-  def unwatch_memory(id), do: :ets.delete(@mem_table, id)
+  # Workers call this from terminate/2. On shutdown GC (and its table) may
+  # already be gone, which must not turn a clean stop into a crash.
+  def unwatch_memory(id) do
+    :ets.delete(@mem_table, id)
+  rescue
+    ArgumentError -> true
+  end
 
   @doc "Runs the idle/run-dir sweep now (tests, and the observer)."
   def sweep_now, do: GenServer.call(__MODULE__, :sweep)

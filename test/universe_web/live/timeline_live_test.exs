@@ -8,7 +8,7 @@ defmodule UniverseWeb.TimelineLiveTest do
     run = %{"op" => "run", "label" => label, "lang" => "bash", "code" => "echo from-timeline"}
     first = Universe.API.tick(%{"directives" => [run]})
 
-    {:ok, view, html} = live(conn, ~p"/")
+    {:ok, view, html} = live(conn, ~p"/timeline")
     assert html =~ "Tick timeline"
     assert html =~ "t#{first.structured["tick"]}"
     assert html =~ label

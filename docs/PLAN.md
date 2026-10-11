@@ -298,6 +298,27 @@ the default. Details in `bench/README.md` and `bench/RESULTS-M6.md`.
 - [x] Unknown `wait.ids` now come back as `rejected` lines (they used to shrink the watch silently and return at once).
 - [x] The redaction test flushes the log (`EventLog.sync/0`) before checking the file.
 
+## 3b2. Observer: the Now page (Oct 11, 2026)
+
+Phoenix 1.8.15 / LiveView 1.2.12 (latest). `/` is now **Now**, a live view
+of the whole universe; the tick timeline moved to `/timeline`.
+
+- Counters (live, running, services, agents idle/busy, waiting on the
+  model, ticks), and a banner for workers waiting on a `reply`.
+- One card per agent (model, pool, idle/busy/asking, the task in hand with
+  a live clock, last answer, context size) and per code service.
+- Running now: runs and calls in flight with live clocks.
+- Activity: every event as a readable line (`UniverseWeb.Activity`),
+  newest first, filters (model / agents / lifecycle / output), pause with a
+  count of missed events; progress is one row per worker, replaced in place.
+- The worker page of an agent shows its purpose, tools and every task:
+  prompt, answer, time, status. `call` events now carry the full prompt
+  (to 4000 chars) for this.
+- Found while testing it: on shutdown, workers crashed in `terminate/2`
+  (memory-watch table already gone) and a clean stop was logged as "worker
+  crashed: :shutdown". Both fixed: a shutdown is now `killed · Universe shut
+  down`.
+
 ## 3c. Linux adapter (Oct 11, 2026: written, not yet run on Linux)
 
 - `Universe.Isolation.Bubblewrap`, picked by default on Linux: `--unshare-all`

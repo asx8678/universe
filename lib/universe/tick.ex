@@ -282,10 +282,7 @@ defmodule Universe.Tick do
       case id && state.workers[id] do
         %{status: s, kind: kind} when s in ["running", "serving", "asking"] and kind != "call" ->
           state
-          |> settle_with_event(id, %{
-            "status" => "failed",
-            "reason" => "worker crashed: #{inspect(reason)}"
-          })
+          |> settle_with_event(id, down_summary(reason))
           |> schedule()
           |> check_waiters()
 
@@ -657,6 +654,7 @@ defmodule Universe.Tick do
       data:
         %{"service" => service, "fn" => fun, "args" => clip_json(args, 500)}
         |> then(&if(w.spec[:pool], do: Map.put(&1, "pool", w.spec.pool), else: &1))
+        |> then(&if(prompt = agent_prompt(args), do: Map.put(&1, "prompt", prompt), else: &1))
     )
 
     task =
@@ -1308,7 +1306,19 @@ defmodule Universe.Tick do
     if String.length(text) > max, do: String.slice(text, 0, max) <> "…", else: text
   end
 
+  # An agent task's prompt, kept whole (to 4000 chars) for the observer.
+  defp agent_prompt(%{"prompt" => p}) when is_binary(p), do: String.slice(p, 0, 4000)
+  defp agent_prompt(_), do: nil
+
   defp stringify(map), do: Map.new(map, fn {k, v} -> {to_string(k), v} end)
 
   defp now, do: System.monotonic_time(:millisecond)
+
+  # A worker stopped by its supervisor (Universe shutting down) was killed,
+  # not crashed; anything else is a crash.
+  defp down_summary(reason) when reason == :shutdown or elem(reason, 0) == :shutdown,
+    do: %{"status" => "killed", "reason" => "Universe shut down"}
+
+  defp down_summary(reason),
+    do: %{"status" => "failed", "reason" => "worker crashed: #{inspect(reason)}"}
 end
