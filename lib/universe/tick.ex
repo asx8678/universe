@@ -1278,7 +1278,8 @@ defmodule Universe.Tick do
         "done" -> join([took, last])
         "failed" -> join([s["reason"] || "exit #{s["code"]}", err, network_hint(w, err)])
         "budget" -> join([s["reason"] || "budget hit", err])
-        "killed" -> join([s["reason"] || "killed after #{took}", last])
+        # Its last output line is not why it ended.
+        "killed" -> s["reason"] || "killed after #{took}"
         other -> join([other, last])
       end
 
