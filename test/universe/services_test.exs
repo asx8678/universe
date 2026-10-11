@@ -317,14 +317,20 @@ defmodule Universe.ServicesTest do
 
     assert result.text =~ "pw None"
 
-    stdout =
+    # Output reaches the log in batches (up to 200 ms late).
+    stdout = fn ->
       EventLog.since(0)
       |> Enum.filter(&(&1["type"] == "stdout"))
       |> Enum.map(& &1["data"]["text"])
       |> Enum.join()
+    end
 
-    refute stdout =~ "s3cr3t-#{name}"
-    assert stdout =~ "«redacted:#{name}.DB_PASSWORD»"
+    assert Enum.any?(1..20, fn _ ->
+             Process.sleep(50)
+             stdout.() =~ "«redacted:#{name}.DB_PASSWORD»"
+           end)
+
+    refute stdout.() =~ "s3cr3t-#{name}"
     kill(name)
   end
 
