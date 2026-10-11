@@ -132,6 +132,30 @@ defmodule Universe.TickTest do
     tick([%{"op" => "kill", "target" => holder}], %{"timeout_s" => 5})
   end
 
+  test "a clashing lease waits when the directive waits anyway (after)" do
+    [holder, waiter] = Enum.map(~w(lholder lwaiter), &uniq/1)
+
+    tick(
+      [
+        run(holder, "mkdir -p leasewait && sleep 1 && echo a > leasewait/a", %{
+          "leases" => ["leasewait"]
+        })
+      ],
+      %{"timeout_s" => 0}
+    )
+
+    queued =
+      tick(
+        [run(waiter, "echo b > leasewait/b", %{"leases" => ["leasewait"], "after" => [holder]})],
+        %{"timeout_s" => 0}
+      )
+
+    refute queued.text =~ "rejected"
+
+    result = tick([], %{"ids" => [waiter], "timeout_s" => 15})
+    assert status_of(result, waiter) == "done"
+  end
+
   test "an empty tick reports changes since the cursor, then nothing" do
     noisy = uniq("noisy")
     tick([run(noisy, "true")])

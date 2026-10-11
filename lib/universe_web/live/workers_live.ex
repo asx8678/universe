@@ -228,6 +228,7 @@ defmodule UniverseWeb.WorkersLive do
   # was stopped. Finished, healthy workers need no detail.
   defp detail(%{status: "serving"} = w), do: "serves #{w.service}: #{Enum.join(w.fns, ", ")}"
   defp detail(%{status: "asking"} = w), do: w.question
+  defp detail(%{status: "queued", lease_note: note}) when is_binary(note), do: note
 
   defp detail(%{kind: "call", spec: spec}) when is_map_key(spec, :service),
     do: "#{spec[:service]}.#{spec[:fn]}"

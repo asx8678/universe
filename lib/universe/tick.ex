@@ -359,9 +359,9 @@ defmodule Universe.Tick do
   end
 
   defp place(state, tick, %{op: "run"} = d, _batch_services) do
-    with :ok <- lease_free(state, d.leases) do
+    with {:ok, hold?} <- lease_plan(state, d) do
       id = Ids.next_worker()
-      {:placed, add_worker(state, id, tick, "run", d), id}
+      {:placed, add_worker(state, id, tick, "run", d, hold?), id}
     end
   end
 
@@ -379,9 +379,9 @@ defmodule Universe.Tick do
         {:error, "at most #{@max_services} live services; kill one first"}
 
       true ->
-        with :ok <- lease_free(state, d.leases) do
+        with {:ok, hold?} <- lease_plan(state, d) do
           id = Ids.next_worker()
-          state = add_worker(state, id, tick, "serve", d)
+          state = add_worker(state, id, tick, "serve", d, hold?)
           {:placed, %{state | services: Map.put(state.services, d.service, id)}, id}
         end
     end
@@ -441,14 +441,39 @@ defmodule Universe.Tick do
     end
   end
 
-  defp lease_free(state, leases) do
-    case Leases.conflict(state.leases, leases) do
-      nil -> :ok
+  # A lease clash is rejected at once, unless the directive waits for other
+  # workers anyway (`after`): then it is placed without the lease and takes
+  # it when it is about to start (see `take_leases/2`).
+  defp lease_plan(state, d) do
+    case Leases.conflict(state.leases, d.leases) do
+      nil -> {:ok, true}
+      _ when d.after != [] -> {:ok, false}
       {path, holder, _} -> {:error, "lease #{path} held by ##{holder}"}
     end
   end
 
-  defp add_worker(state, id, tick, kind, d) do
+  # Takes a waiting worker's leases if they are free now.
+  defp take_leases(state, %{lease_wait: true} = w) do
+    case Leases.conflict(state.leases, w.spec.leases) do
+      nil ->
+        state = hold_leases(state, w.tick, w.id, w.spec.leases)
+        {:ok, put_in(state.workers[w.id].lease_wait, false)}
+
+      {path, holder, _} ->
+        {:wait, "waits for lease #{path} held by ##{holder}"}
+    end
+  end
+
+  defp take_leases(state, _w), do: {:ok, state}
+
+  defp hold_leases(state, _tick, _id, []), do: state
+
+  defp hold_leases(state, tick, id, leases) do
+    EventLog.append("lease", tick: tick, id: id, data: %{"action" => "hold", "paths" => leases})
+    %{state | leases: Map.put(state.leases, id, leases)}
+  end
+
+  defp add_worker(state, id, tick, kind, d, hold? \\ true) do
     worker = %{
       id: id,
       label: d.label,
@@ -473,25 +498,18 @@ defmodule Universe.Tick do
       question: nil,
       prior_status: nil,
       restarts: [],
-      kill_reason: nil
+      kill_reason: nil,
+      lease_wait: not hold? and Map.get(d, :leases, []) != [],
+      lease_note: nil
     }
 
-    leases = Map.get(d, :leases, [])
-
-    if leases != [],
-      do:
-        EventLog.append("lease",
-          tick: tick,
-          id: id,
-          data: %{"action" => "hold", "paths" => leases}
-        )
-
-    %{
+    state = %{
       state
       | workers: Map.put(state.workers, id, worker),
-        labels: Map.put(state.labels, d.label, id),
-        leases: if(leases == [], do: state.leases, else: Map.put(state.leases, id, leases))
+        labels: Map.put(state.labels, d.label, id)
     }
+
+    if hold?, do: hold_leases(state, tick, id, Map.get(d, :leases, [])), else: state
   end
 
   defp queued_event(w, deps, then_of) do
@@ -573,7 +591,13 @@ defmodule Universe.Tick do
 
         case readiness(st, w, dep_states) do
           :ready ->
-            {start(st, st.workers[w.id]), true}
+            case take_leases(st, w) do
+              {:ok, st} ->
+                {start(st, st.workers[w.id]), true}
+
+              {:wait, note} ->
+                {put_in(st.workers[w.id].lease_note, note), changed?}
+            end
 
           {:fail, reason} ->
             {settle_with_event(st, w.id, %{"status" => "failed", "reason" => reason}), true}
@@ -857,24 +881,11 @@ defmodule Universe.Tick do
     {state, ids} =
       Enum.reduce(parent.spec.then, {state, []}, fn d, {st, ids} ->
         id = Ids.next_worker()
-
-        case Leases.conflict(st.leases, d.leases) do
-          nil ->
-            st = add_worker(st, id, parent.tick, "run", d)
-            queued_event(st.workers[id], [], parent.id)
-            {st, ids ++ [id]}
-
-          {path, holder, _} ->
-            st = add_worker(st, id, parent.tick, "run", %{d | leases: []})
-
-            st =
-              settle_with_event(st, id, %{
-                "status" => "failed",
-                "reason" => "lease #{path} held by ##{holder}"
-              })
-
-            {st, ids ++ [id]}
-        end
+        # A busy lease makes the step wait for it rather than fail.
+        hold? = Leases.conflict(st.leases, d.leases) == nil
+        st = add_worker(st, id, parent.tick, "run", d, hold?)
+        queued_event(st.workers[id], [], parent.id)
+        {st, ids ++ [id]}
       end)
 
     state = put_in(state.workers[parent.id].then_ids, ids)
@@ -1024,7 +1035,9 @@ defmodule Universe.Tick do
         question: nil,
         prior_status: nil,
         restarts: [],
-        kill_reason: nil
+        kill_reason: nil,
+        lease_wait: false,
+        lease_note: nil
       }
 
       state = put_worker(state, w)
@@ -1182,6 +1195,7 @@ defmodule Universe.Tick do
 
   defp detail(%{status: "queued"} = w, _recent) do
     cond do
+      w[:lease_note] -> w.lease_note
       w.deps != [] -> "after " <> Enum.map_join(w.deps, ", ", &"##{&1}")
       w.kind == "call" -> "waiting for #{w.spec.service}"
       true -> "waiting for a slot"
