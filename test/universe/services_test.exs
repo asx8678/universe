@@ -208,10 +208,16 @@ defmodule Universe.ServicesTest do
     {:ok, sock} =
       :gen_tcp.connect({:local, Universe.SDK.Listener.socket_path()}, 0, [:binary, active: false])
 
-    :ok = :gen_tcp.send(sock, :binary.copy("x", 100_000))
-    assert {:ok, reply} = :gen_tcp.recv(sock, 0, 5_000)
-    assert reply =~ "connection closed"
-    assert {:error, :closed} = :gen_tcp.recv(sock, 0, 5_000)
+    # The server answers and closes; closing with our unread bytes may reset
+    # the socket before the answer arrives, so only the close is certain.
+    _ = :gen_tcp.send(sock, :binary.copy("x", 100_000))
+
+    assert Enum.reduce_while(1..5, nil, fn _, _ ->
+             case :gen_tcp.recv(sock, 0, 5_000) do
+               {:ok, _reply} -> {:cont, nil}
+               {:error, _closed} -> {:halt, :closed}
+             end
+           end) == :closed
   end
 
   test "U.put stores rows as a handle; the digest shows only its summary" do

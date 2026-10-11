@@ -631,6 +631,16 @@ defmodule Universe.Tick do
                 {start(st, st.workers[w.id]), true}
 
               {:wait, note} ->
+                # Logged once per holder: the event says why it waits, and
+                # makes the worker show up in the next digest.
+                if w[:lease_note] != note do
+                  EventLog.append("lease",
+                    tick: w.tick,
+                    id: w.id,
+                    data: %{"action" => "wait", "paths" => w.spec.leases, "note" => note}
+                  )
+                end
+
                 {put_in(st.workers[w.id].lease_note, note), changed?}
             end
 

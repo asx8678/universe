@@ -184,6 +184,22 @@ defmodule Universe.TickTest do
     assert status_of(result, b) == "done"
   end
 
+  test "a worker ready to start but blocked on a lease says so in the digest" do
+    [holder, dep, waiter] = Enum.map(~w(lh ldep lw), &uniq/1)
+    tick([run(holder, "sleep 4", %{"leases" => ["leasenote"]})], %{"timeout_s" => 0})
+
+    # Placed in one tick, reported by a later one: the wait must still show.
+    tick(
+      [run(dep, "true"), run(waiter, "true", %{"leases" => ["leasenote"], "after" => [dep]})],
+      %{"timeout_s" => 0}
+    )
+
+    result = tick([], %{"ids" => [waiter], "timeout_s" => 2})
+    assert result.text =~ ~r/#{waiter}\s+waits for lease leasenote held by #\d+/
+    done = tick([], %{"ids" => [waiter], "timeout_s" => 10})
+    assert status_of(done, waiter) == "done"
+  end
+
   test "a malformed wait is rejected and the kernel keeps running" do
     live = uniq("alive")
     tick([run(live, "sleep 30")], %{"timeout_s" => 0})

@@ -264,6 +264,8 @@ defmodule UniverseWeb.Activity do
   defp line("gc", d), do: {:muted, "gc: #{d["action"]}"}
   defp line("stop_all", d), do: {:warn, "stop all: #{Enum.join(List.wrap(d["ids"]), ", ")}"}
 
+  defp line("lease", %{"action" => "wait", "note" => note}), do: {:warn, note}
+
   defp line("lease", d),
     do: {:muted, "lease #{d["action"]}: #{Enum.join(List.wrap(d["paths"]), ", ")}"}
 
