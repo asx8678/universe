@@ -32,6 +32,9 @@ defmodule Universe.Isolation do
       {:unix, :darwin} ->
         Universe.Isolation.SandboxExec
 
+      {:unix, :linux} ->
+        Universe.Isolation.Bubblewrap
+
       os ->
         raise """
         no isolation adapter for #{inspect(os)}. Universe never runs agent code \

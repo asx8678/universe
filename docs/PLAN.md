@@ -294,9 +294,25 @@ the default. Details in `bench/README.md` and `bench/RESULTS-M6.md`.
 
 - [x] **Memory growth:** `Universe.Tick` keeps every worker ever created, including `directive.code` and the `then` steps. M3 GC: drop the code on settle, and prune settled workers past a cap (the event log and run dirs keep the history).
 - [x] **Escape matrix (M3):** add "a snippet that calls `setsid` outlives its kill" as a known-failing case so it is measured, not forgotten. Also narrow `(allow mach-lookup)`.
-- [ ] `c_src/universe_run.c` is built with `-Werror` and has only been tested on macOS. Build and test it on Linux before the Linux adapter.
+- [ ] `c_src/universe_run.c` is built with `-Werror` and has only been tested on macOS. Build and test it on Linux before the Linux adapter. (Oct 11: portable harness `c_src/test/launcher_test.py` — exit codes, signals, framing, group kill on K and on EOF, grace, RLIMIT_FSIZE — passes 12/12 on macOS. The Linux run was skipped: no Linux VM yet.)
 - [x] Unknown `wait.ids` now come back as `rejected` lines (they used to shrink the watch silently and return at once).
 - [x] The redaction test flushes the log (`EventLog.sync/0`) before checking the file.
+
+## 3c. Linux adapter (Oct 11, 2026: written, not yet run on Linux)
+
+- `Universe.Isolation.Bubblewrap`, picked by default on Linux: `--unshare-all`
+  (own network namespace unless a service declares hosts, then
+  `--share-net`), `/` read-only, `$HOME` hidden by a tmpfs, project and SDK
+  re-exposed read-only, leases bound writable, then `.universe/` hidden
+  again (so a lease on `.` can't write it), the run dir and SDK socket bound
+  last. `--die-with-parent` plus the PID namespace should also close the
+  macOS `setsid` gap. Leases that don't exist yet are created first.
+- Coarser than macOS: a service with network gets all hosts, not just its
+  ports.
+- Verified so far: the argv layering (`test/isolation/bubblewrap_test.exs`).
+- [ ] Run on Linux: `c_src/test/launcher_test.py` (with gcc and clang) and
+  the escape matrix `c_src/test/linux_escape.sh` (args files are generated
+  from the adapter), then the full suite.
 
 ## 4. Blocked or deferred
 
