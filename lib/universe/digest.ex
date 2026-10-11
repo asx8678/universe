@@ -65,7 +65,16 @@ defmodule Universe.Digest do
         count(info.running, "running") ++
         count(info.queued, "queued") ++
         ["cursor #{info.cursor}"] ++
-        if(info.wake == "timeout", do: ["woke on timeout"], else: [])
+        case info.wake do
+          "timeout" ->
+            ["woke on timeout"]
+
+          "helpers" ->
+            ["back early: helpers still working (steer them if plans changed, else wait again)"]
+
+          _ ->
+            []
+        end
 
     Enum.join(parts, " · ")
   end

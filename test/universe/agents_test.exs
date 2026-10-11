@@ -319,6 +319,18 @@ defmodule Universe.AgentsTest do
     kill(new)
   end
 
+  test "while an agent works, a tick comes back early so the model can steer it" do
+    Application.put_env(:universe, :helper_wait_s, 2)
+    on_exit(fn -> Application.delete_env(:universe, :helper_wait_s) end)
+    name = uniq("busy")
+    t = "t-#{name}"
+    started = System.monotonic_time(:millisecond)
+    result = tick([agent(name), task(t, name, "SLEEP")], %{"ids" => [t], "timeout_s" => 30})
+    assert System.monotonic_time(:millisecond) - started < 15_000
+    assert result.text =~ "back early: helpers still working"
+    kill(name)
+  end
+
   test "kill with a pool name stops every member" do
     pool = uniq("kp")
     [a, b] = [uniq("ka"), uniq("kb")]

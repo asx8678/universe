@@ -69,6 +69,9 @@ you can finish with a few reads needs no agent.
   For independent tasks (batches of tickets, files to summarise) add
   `"memory":"task"`: each task starts a fresh session instead of re-reading
   every earlier task. Give long tasks a `timeout_s`.
+- While an agent has a task, a tick comes back within 20 s ("back early:
+  helpers still working"): if your user changed the plan, `steer` the agent
+  now; otherwise just tick again with the same wait.
 - `steer`: add to a busy agent's task while it works:
   `{"op":"steer","target":"r1","text":"only lib/, skip the tests"}` (the agent
   or its task). It lands at the agent's next tool step; `"interrupt": true`

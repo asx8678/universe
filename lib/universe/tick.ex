@@ -169,7 +169,8 @@ defmodule Universe.Tick do
       # A malformed wait answers at once, so the model sees what was wrong.
       watch:
         if(wait_rejected == [], do: watch_set(state, args["wait"], new_ids), else: MapSet.new()),
-      deadline_ms: now() + timeout_s(args["wait"]) * 1000
+      deadline_ms: now() + wait_ms(state, args["wait"]),
+      helpers_busy: helpers_busy?(state)
     }
 
     state = %{state | waiters: Map.put(state.waiters, make_ref(), waiter)}
@@ -1510,9 +1511,26 @@ defmodule Universe.Tick do
       waiter.until == "all" and Enum.all?(statuses, &(&1 in @settled)) -> "settled"
       waiter.until == "any" and Enum.any?(statuses, &(&1 in @settled)) -> "settled"
       attention?(state, waiter, t) -> "attention"
+      t >= waiter.deadline_ms and waiter[:helpers_busy] and helpers_busy?(state) -> "helpers"
       t >= waiter.deadline_ms -> "timeout"
       true -> nil
     end
+  end
+
+  # While an agent works on a task, a tick waits at most @helper_wait_s: the
+  # model reads new instructions from its user only between tool calls, and
+  # a steer helps only while the agent's task still runs.
+  defp wait_ms(state, wait) do
+    s = timeout_s(wait)
+    cap = Application.get_env(:universe, :helper_wait_s, 20)
+    if helpers_busy?(state), do: min(s, cap) * 1000, else: s * 1000
+  end
+
+  defp helpers_busy?(state) do
+    Enum.any?(state.workers, fn {_, w} ->
+      w.kind == "call" and w.status in ["queued", "running"] and is_map(w.spec[:args]) and
+        is_binary(w.spec.args["prompt"])
+    end)
   end
 
   defp attention?(state, waiter, t) do
