@@ -47,7 +47,7 @@ defmodule Universe.Directive do
   @run_fields ~w(op label lang code budget leases after then quiet)
   @serve_fields ~w(op label name lang code agent budget leases network ttl_idle_s after quiet save tool)
   @call_fields ~w(op label service fn args prompt timeout_s after quiet)
-  @agent_fields ~w(purpose model tools pool resume services memory)
+  @agent_fields ~w(purpose model tools pool resume services memory budget_usd)
   # Built-in tools an agent may get. Code-running tools never: an agent runs
   # code through Universe workers, which are sandboxed.
   @agent_tools ~w(Read Grep Glob Edit Write NotebookEdit WebSearch WebFetch TodoWrite)
@@ -381,6 +381,7 @@ defmodule Universe.Directive do
          {:ok, pool} <- pool(a["pool"]),
          {:ok, resume} <- resume(a["resume"]),
          {:ok, memory} <- memory(a["memory"]),
+         {:ok, budget_usd} <- budget_usd(a["budget_usd"]),
          {:ok, services} <- agent_services(a["services"]) do
       {:ok,
        %{
@@ -390,6 +391,7 @@ defmodule Universe.Directive do
          pool: pool,
          resume: resume,
          memory: memory,
+         budget_usd: budget_usd,
          services: services
        }}
     end
@@ -441,6 +443,11 @@ defmodule Universe.Directive do
 
   # "session": one conversation across tasks (follow-ups work); "task": a
   # fresh session per task, so independent tasks don't pile up context.
+  # A cap on what the agent's claude session may spend, in dollars.
+  defp budget_usd(nil), do: {:ok, nil}
+  defp budget_usd(b) when is_number(b) and b > 0 and b <= 1000, do: {:ok, b}
+  defp budget_usd(_), do: {:error, "agent budget_usd must be a number of dollars, 0-1000"}
+
   defp memory(nil), do: {:ok, "session"}
   defp memory(m) when m in ["session", "task"], do: {:ok, m}
   defp memory(_), do: {:error, ~s(agent memory must be "session" or "task")}

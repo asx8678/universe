@@ -70,8 +70,14 @@ defmodule Universe.AgentsTest do
                pool: "reviewers",
                resume: true,
                memory: "session",
+               budget_usd: nil,
                services: []
              }
+
+      {[b], []} = check(agent("rev", %{"budget_usd" => 2.5}))
+      assert b.agent.budget_usd == 2.5
+      {[], [nb]} = check(agent("rev", %{"budget_usd" => -1}))
+      assert nb.reason =~ "budget_usd"
 
       {[], [saved]} = check(agent("rev", %{}, %{"save" => true}))
       assert saved.reason == "save keeps a code service's code; agents can't be saved"
@@ -329,6 +335,31 @@ defmodule Universe.AgentsTest do
     assert System.monotonic_time(:millisecond) - started < 15_000
     assert result.text =~ "back early: helpers still working"
     kill(name)
+  end
+
+  test "a lease an agent holds: the clash says how to free it, and kill-then-run works" do
+    name = uniq("writer")
+
+    tick([agent(name, %{"tools" => ["Read", "Edit"]}, %{"leases" => ["out-#{name}.md"]})], %{
+      "ids" => [name],
+      "timeout_s" => 15
+    })
+
+    run = %{
+      "op" => "run",
+      "label" => uniq("w"),
+      "lang" => "bash",
+      "code" => "true",
+      "leases" => ["out-#{name}.md"]
+    }
+
+    clash = tick([run], %{"timeout_s" => 0})
+
+    assert clash.text =~
+             "keeps its leases while it serves: put a kill of it before this directive"
+
+    freed = tick([%{"op" => "kill", "target" => name}, Map.put(run, "label", uniq("w2"))])
+    refute freed.text =~ "held by"
   end
 
   test "kill with a pool name stops every member" do

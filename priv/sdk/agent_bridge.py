@@ -123,6 +123,9 @@ def command():
     ]
     if cfg.get("model"):
         args += ["--model", cfg["model"]]
+    if cfg.get("budget_usd"):
+        # Claude stops the session's turn once it has spent this much.
+        args += ["--max-budget-usd", str(cfg["budget_usd"])]
     return args
 
 

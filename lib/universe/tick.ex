@@ -760,8 +760,26 @@ defmodule Universe.Tick do
 
   defp lease_plan(state, d) do
     case Leases.conflict(state.leases, d.leases) do
-      nil -> {:ok, true}
-      {path, holder, _} -> {:error, "lease #{path} held by ##{holder}"}
+      nil ->
+        {:ok, true}
+
+      {path, holder, _} ->
+        # A holder that is being stopped frees it soon: wait for it.
+        if state.workers[holder] && stopping?(state.workers[holder]),
+          do: {:ok, false},
+          else: {:error, "lease #{path} held by ##{holder}" <> holder_hint(state, holder)}
+    end
+  end
+
+  # An agent keeps its leases while it serves, idle or not.
+  defp holder_hint(state, holder) do
+    case state.workers[holder] do
+      %{spec: %{agent: %{}}} = w ->
+        " (agent #{w.label} keeps its leases while it serves: put a kill of it " <>
+          "before this directive in the same tick)"
+
+      _ ->
+        ""
     end
   end
 

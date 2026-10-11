@@ -160,7 +160,8 @@ also name agents, by name, that list no agents themselves: their tool
 `<agent>__task` hands them a task, which takes the caller's time left, at most
 8 at once; pools can't be listed), `pool`, `resume` (default true: serving the same agent
 again, after a kill or a daemon restart, resumes its conversation; a changed
-purpose, model, tools, leases or services starts a new one), `memory`
+purpose, model, tools, leases or services starts a new one), `budget_usd` (a cap on what its
+Claude session may spend, in dollars), `memory`
 (`"session"`, the default: one conversation across tasks, so follow-ups know
 earlier answers; `"task"`: a fresh session per task, for independent tasks,
 whose context would otherwise grow with every task). An agent runs one task
