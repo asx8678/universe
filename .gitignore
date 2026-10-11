@@ -43,7 +43,7 @@ npm-debug.log
 /priv/bin/
 
 # Benchmark run transcripts.
-/bench/out/
+/bench/out*/
 
 # Digested/compressed copies made by `mix assets.deploy` (release builds).
 /priv/static/**/*.gz

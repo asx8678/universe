@@ -110,3 +110,26 @@ helpers.
 python3 bench/run.py --tasks modules,qa --setups subagents,agents --runs 3 --go
 python3 bench/collect.py bench/out6/*.jsonl > bench/RESULTS-M6.md
 ```
+
+## M6 result
+
+Ran Oct 11, 2026: **NO-GO** (agents won 1 of 2 tasks; go needed both). See
+`RESULTS-M6.md`.
+
+- **qa:** agents used 42 % of the subagents' total tokens and 59 % of the
+  wall time, same main context, all runs passed → win.
+- **modules:** agents used 213 % of the tokens and 130 % of the time → no
+  win. The orchestrator itself cost more: 13 turns vs 7 (skill load,
+  `inspect` round-trips, spawning agents in one tick and tasking them in the
+  next), and each turn re-sends ~35 k of context.
+- **Confound, recorded after the runs:** Claude Code's subagents ran on the
+  orchestrator's model (Opus 5.5) in every run; the orchestrator gave Universe
+  agents haiku or sonnet. The rule counts tokens, not price, so per-token cost
+  favours agents further than the table shows; the qa win is partly Opus
+  subagents doing more calls (1.0 M helper tokens vs 0.2 M).
+- `qa.*.1` was the smoke run, kept as run 1 (same setup). Wall time comes
+  from `.wall` files (real elapsed time), after the duration bug fix.
+
+Per the rule: keep agent workers as an option; subagents stay the default
+way to delegate. The cheapest lever on the losing task is orchestrator
+turns, not helper tokens.

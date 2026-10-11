@@ -281,8 +281,12 @@ keeps, not on tick batching.
   queued are dropped. Verified with haiku: a 5 s task stopped at ~4 s, the
   next task ran at once.
 
-**Open**
-- Not benchmarked against Claude Code's own subagents.
+**M6 benchmark (Oct 11, 2026): NO-GO under the pre-registered rule.**
+Agent pools vs Claude Code subagents, 2 tasks × 3 runs, all 12 passed. qa:
+agents 42 % of tokens, 59 % of time (win). modules: 213 % of tokens, 130 % of
+time (no win), driven by orchestrator turns (13 vs 7). Confound: subagents
+ran Opus, agents haiku/sonnet. Agent workers stay an option; subagents stay
+the default. Details in `bench/README.md` and `bench/RESULTS-M6.md`.
 
 ---
 
