@@ -158,7 +158,9 @@ def save_session_id(sid):
     os.replace(path + ".tmp", path)
 
 
-state = {"tasks": 0, "ctx": 0, "crashes": [], "calls": {}}
+# "cost": the session's total_cost_usd as claude last reported it (it is
+# cumulative per session); a task's cost is how much it grew.
+state = {"tasks": 0, "ctx": 0, "crashes": [], "calls": {}, "cost": 0.0, "cost_at_start": 0.0}
 session = {}
 MEMORY = cfg.get("memory") or "session"
 # How long a resumed session gets to fail at boot ("No conversation found"
@@ -370,6 +372,8 @@ def _until_result(expect, stopping):
                 state["ctx"] = ctx
         elif e.get("type") == "result":
             session["confirmed"] = True
+            if isinstance(e.get("total_cost_usd"), (int, float)):
+                state["cost"] = float(e["total_cost_usd"])
             if expect is not None:
                 continue  # an earlier task's steer turn
             if interrupted_at:
@@ -415,6 +419,7 @@ def renew_session():
             old.kill()
     start_session(resume=False)
     state["ctx"] = 0
+    state["cost"] = 0.0
 
 
 def log_usage(n, started, ok):
@@ -422,7 +427,10 @@ def log_usage(n, started, ok):
     path = cfg.get("session_file")
     if not path:
         return
+    # A new session (memory: "task", a restart) starts its total at 0.
+    cost = state["cost"] - state["cost_at_start"] if state["cost"] >= state["cost_at_start"] else state["cost"]
     line = {"task": n, "ok": ok, "tokens": sum(state["calls"].values()), "calls": len(state["calls"]),
+            "cost_usd": round(cost, 6),
             "wall_s": round(time.time() - started, 1), "model": cfg.get("model")}
     with open(path.removesuffix(".json") + ".usage.jsonl", "a") as f:
         f.write(json.dumps(line) + "\n")
@@ -450,6 +458,7 @@ def task(prompt=None):
         raise ValueError("task needs a prompt")
     note_deadline()
     state["calls"] = {}
+    state["cost_at_start"] = state["cost"]
     ok = False
     state["tasks"] += 1
     n, started = state["tasks"], time.time()

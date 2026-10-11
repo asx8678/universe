@@ -416,3 +416,23 @@ UNIVERSE_BENCH_OUT=bench/outsteer UNIVERSE_BENCH_WORK=/tmp/universe-bench-steer-
   python3 bench/run.py --tasks review --setups steer --runs 3 --budget 25 --go
 python3 bench/accept.py bench/outsteer/review.steer.*.jsonl
 ```
+
+## Steer acceptance result (Oct 11, 2026): NOT ACCEPTED (1 of 3), steering itself 3 of 3
+
+Three Opus 5.5 runs, `bench/outsteer/`:
+
+| run | steer delivered | task killed | docstring defects | web/ findings | grade | turns | orch. cost | wall s |
+|---|---|---|---|---|---|---|---|---|
+| 1 | yes | no | 45/53 (85 %) | 0 | PASS | 23 | $1.25 | 443 |
+| 2 | yes | no | 41/53 (77 %) | 5 | FAIL | 14 | $1.04 | 364 |
+| 3 | yes | no | 9/53 (17 %) | 19 | FAIL | 17 | $0.61 | 187 |
+
+The model did what the test is about in every run: it steered the running
+review with the change and never killed or restarted it. Two runs failed on
+the grader because the steer landed late: in each run it reached the
+reviewer 95 s after its task started, when the orchestrator's 90 s tick came
+back (the model reads a user message only between tool calls). Run 3's
+reviewer was fast and had passed most files by then (finished 35 s after the
+steer). **Finding for Universe:** a model told something mid-tick can't act
+until its `wait` returns; a shorter wait while helpers run (or waking the
+model on a user message) would cut that delay. Not changed here; recorded.

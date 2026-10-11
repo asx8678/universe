@@ -283,6 +283,15 @@ defmodule Universe.AgentsTest do
     # The fake claude counts the messages of its session.
     assert again.text =~ ~r/b-#{fresh}.*done #1: two/
     assert again.text =~ ~r/b-#{kept}.*done #2: two/
+
+    # Each task's cost: what the session's cumulative total grew by.
+    usage =
+      Path.join(Universe.Paths.universe_dir(), "agents/#{kept}.usage.jsonl")
+      |> File.read!()
+      |> String.split("\n", trim: true)
+      |> Enum.map(&Jason.decode!/1)
+
+    assert Enum.map(usage, & &1["cost_usd"]) == [0.01, 0.01]
     kill(fresh)
     kill(kept)
   end

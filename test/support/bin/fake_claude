@@ -58,7 +58,7 @@ def result(text, error=False, subtype="success"):
     emit({"type": "system", "subtype": "init", "model": "fake", "session_id": sid},
          {"type": "assistant", "message": {"id": f"m{n}", "usage": usage, "content": []}},
          {"type": "result", "subtype": subtype, "is_error": error, "num_turns": 1,
-          "result": text, "session_id": sid})
+          "result": text, "session_id": sid, "total_cost_usd": 0.01 * n})
 
 while True:
     msg = lines.get()
