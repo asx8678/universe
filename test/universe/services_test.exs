@@ -125,7 +125,28 @@ defmodule Universe.ServicesTest do
 
     assert status(result, user) == "done"
     assert result.text =~ "got 42"
+
+    # The observer can draw worker → service and back.
+    events = EventLog.for_id(id_of(result, user))
+    call = Enum.find(events, &(&1["type"] == "call"))
+    done = Enum.find(events, &(&1["type"] == "call_done"))
+    assert %{"service" => ^name, "fn" => "add", "via" => "sdk"} = call["data"]
+    assert %{"service" => ^name, "ok" => true} = done["data"]
+    assert done["seq"] > call["seq"]
     kill(name)
+  end
+
+  test "handle reads are logged as get events" do
+    label = uniq("reader")
+
+    code =
+      "h = U.put('nums', [1, 2, 3])\nprint(U.get(h))\nU.get('h:999999/none') if False else None"
+
+    result = tick([py(label, code)])
+    assert status(result, label) == "done"
+
+    gets = EventLog.for_id(id_of(result, label)) |> Enum.filter(&(&1["type"] == "get"))
+    assert [%{"data" => %{"ok" => true, "handle" => "h:" <> _}}] = gets
   end
 
   test "Elixir snippets have U too" do

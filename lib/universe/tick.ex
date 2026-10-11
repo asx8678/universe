@@ -652,7 +652,7 @@ defmodule Universe.Tick do
       tick: w.tick,
       id: w.id,
       data:
-        %{"service" => service, "fn" => fun, "args" => clip_json(args, 500)}
+        %{"service" => service, "fn" => fun, "args" => clip_json(args, 500), "via" => "tick"}
         |> then(&if(w.spec[:pool], do: Map.put(&1, "pool", w.spec.pool), else: &1))
         |> then(&if(prompt = agent_prompt(args), do: Map.put(&1, "prompt", prompt), else: &1))
     )

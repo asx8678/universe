@@ -19,6 +19,10 @@ defmodule Universe.SDK.Conn do
       {"rid":1,"ok":true,"result":"h:5/orders"}  |  {"rid":1,"ok":false,"error":"..."}
       {"op":"invoke","cid":9,"fn":"query","args":{...},"timeout_ms":59000}   services only
 
+  Events: `get` (handle reads), `call` with `"via" => "sdk"` and a matching
+  `call_done` when the answer comes back, `put`, `progress`; `ask` and
+  `serve` are logged by the Tick.
+
   Invocations of a service are handed to it one at a time. `timeout_ms` is
   what is left of the caller's timeout; an invocation whose caller has
   already given up while it waited in the queue is dropped, not sent.
@@ -150,7 +154,10 @@ defmodule Universe.SDK.Conn do
   end
 
   defp handle_msg(%{"op" => "get", "handle" => handle} = msg, state) do
-    reply(state, msg["rid"], Handles.get(handle))
+    result = Handles.get(handle)
+    # Logged so the observer can draw handle → reader.
+    event(state, "get", %{"handle" => to_string(handle), "ok" => match?({:ok, _}, result)})
+    reply(state, msg["rid"], result)
     state
   end
 
@@ -169,8 +176,27 @@ defmodule Universe.SDK.Conn do
     timeout = call_timeout(msg["timeout_s"])
 
     async(state, msg["rid"], fn ->
-      event(state, "call", %{"service" => service, "fn" => fun})
-      Services.invoke(service, fun, msg["args"], timeout * 1000)
+      # "via sdk": a worker's own U.call, as opposed to a call directive.
+      data = %{"service" => service, "fn" => fun, "via" => "sdk"}
+
+      data =
+        case msg["args"] do
+          %{"prompt" => p} when is_binary(p) -> Map.put(data, "prompt", String.slice(p, 0, 4000))
+          _ -> data
+        end
+
+      event(state, "call", data)
+      started = System.monotonic_time(:millisecond)
+      result = Services.invoke(service, fun, msg["args"], timeout * 1000)
+
+      event(state, "call_done", %{
+        "service" => service,
+        "fn" => fun,
+        "ok" => match?({:ok, _}, result),
+        "wall_ms" => System.monotonic_time(:millisecond) - started
+      })
+
+      result
     end)
   end
 

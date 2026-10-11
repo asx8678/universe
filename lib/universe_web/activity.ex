@@ -10,7 +10,7 @@ defmodule UniverseWeb.Activity do
   @groups %{
     "model" => ~w(tick_in tick_out rejected reply redirect),
     "lifecycle" => ~w(queued spawn serve exit restart budget_hit gc stop_all lease),
-    "agents" => ~w(call ask progress put),
+    "agents" => ~w(call call_done ask progress put get),
     "output" => ~w(stdout stderr)
   }
 
@@ -73,11 +73,22 @@ defmodule UniverseWeb.Activity do
   defp line("call", d) do
     target = if d["pool"], do: "#{d["service"]} (pool #{d["pool"]})", else: d["service"]
 
+    by = if d["via"] == "sdk", do: "U.call ", else: ""
+
     case d["prompt"] do
-      prompt when is_binary(prompt) -> {:info, "task → #{target}: #{prompt}"}
-      _ -> {:info, "call → #{target}.#{d["fn"]} #{d["args"]}"}
+      prompt when is_binary(prompt) -> {:info, "#{by}task → #{target}: #{prompt}"}
+      _ -> {:info, String.trim("#{by}call → #{target}.#{d["fn"]} #{d["args"]}")}
     end
   end
+
+  defp line("call_done", d) do
+    took = d["wall_ms"] && " · #{Digest.duration(d["wall_ms"])}"
+
+    {if(d["ok"], do: :muted, else: :bad),
+     "← #{d["service"]}.#{d["fn"]} #{if d["ok"], do: "answered", else: "failed"}#{took}"}
+  end
+
+  defp line("get", d), do: {:muted, "read #{d["handle"]}#{if d["ok"] == false, do: " (missing)"}"}
 
   defp line("ask", d), do: {:warn, "asks the model: #{d["question"]}"}
   defp line("progress", d), do: {:muted, d["text"]}
