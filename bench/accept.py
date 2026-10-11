@@ -62,6 +62,9 @@ def score(path):
 
     spawns = {e["id"]: e["data"] for e in events if e["type"] == "spawn"}
     agent_ids = {i for i, d in spawns.items() if d.get("lang") == "agent"}
+    # Only agents that actually started count (a rejected serve never spawns).
+    started = {spawns[i].get("label") for i in agent_ids}
+    agents_given = {a: s for a, s in agents_given.items() if a in started}
     code_services = {e["data"].get("name") for e in events
                      if e["type"] == "serve" and e["id"] not in agent_ids}
     wired_agents = {a for a, svcs in agents_given.items() if set(svcs) & code_services}
@@ -141,7 +144,7 @@ def verdict(r):
 
 
 def main():
-    rows = [score(p) for p in sys.argv[1:]]
+    rows = [score(p) for p in sys.argv[1:] if not p.endswith(".events.jsonl")]
     print("| run | grade | built | wired calls | serve+task 1 tick | mid-run | window | steers | tasks | turns | orch tok | helper tok | wall s |")
     print("|---|---|---|---|---|---|---|---|---|---|---|---|---|")
     for r in rows:

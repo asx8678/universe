@@ -40,6 +40,29 @@ defmodule Universe.DigestTest do
            """
   end
 
+  test "a small run output shows under its row, within the tick's output budget" do
+    big = for i <- 1..20, do: String.duplicate("x", 140) <> " #{i}"
+
+    rows = [
+      %{
+        id: 3,
+        label: "count",
+        status: "done",
+        detail: "1s · 600",
+        output: ["open 600", "pending 85"]
+      },
+      %{id: 4, label: "dump", status: "done", detail: "1s · last", output: big},
+      %{id: 5, label: "more", status: "done", detail: "1s · 7", output: big}
+    ]
+
+    text = Digest.build(info(rows))
+    assert text =~ "#3   done     count 1s · 600\n    open 600\n    pending 85\n"
+    # 20 lines of ~145 chars fit once in the 3,000-char budget, not twice.
+    assert text =~ "    " <> List.last(big)
+    assert length(String.split(text, List.last(big))) == 2
+    assert text =~ "#5   done     more  1s · 7"
+  end
+
   test "orders failed, budget, rejected, asking, killed, done, running, queued" do
     statuses = ~w(queued running done killed asking rejected budget failed)
 

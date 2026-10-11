@@ -13,8 +13,10 @@ digest. Bash is off in this project; read and edit files with your own tools.
 ## Loop
 1. Plan the next batch. Independent jobs become separate directives.
 2. Call `mcp__universe__tick` once with all of them and a `wait`.
-3. Read the digest. Act on `failed` and `asking` lines first.
-4. Call `mcp__universe__inspect` only when a line isn't enough (`#5` for code
+3. Read the digest. Act on `failed` and `asking` lines first. A finished run's
+   output of up to 20 lines is shown in full under its line, so print what you
+   need (counts, a summary) rather than everything.
+4. Call `mcp__universe__inspect` only when that isn't enough (`#5` for code
    and output, `t12` for every event of a tick, `h:5/rows` for a handle).
 
 ## Plan your helpers

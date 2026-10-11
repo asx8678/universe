@@ -860,6 +860,10 @@ defmodule Universe.Tick do
       not Enum.all?(dep_states, fn {_, s} -> s in ["done", "serving"] end) ->
         :wait
 
+      w.kind == "call" and Map.has_key?(state.services, w.spec.service) and
+          stopping?(state.workers[state.services[w.spec.service]]) ->
+        {:fail, "service #{w.spec.service} is being stopped"}
+
       w.kind == "call" and Map.has_key?(state.services, w.spec.service) ->
         sid = state.services[w.spec.service]
 
@@ -901,10 +905,11 @@ defmodule Universe.Tick do
   defp running_count(state),
     do: Enum.count(state.workers, fn {_, w} -> w.kind == "run" and w.status == "running" end)
 
-  # Live agents of a pool (queued and starting ones too, so a call can wait).
+  # Live agents of a pool (queued and starting ones too, so a call can wait);
+  # one being killed is not, even before its process is gone.
   defp pool_members(state, pool) do
     for {_, %{kind: "serve", status: s, spec: %{agent: %{pool: ^pool}}} = w} <- state.workers,
-        s in @live,
+        s in @live and not stopping?(w),
         do: w
   end
 
@@ -1496,7 +1501,15 @@ defmodule Universe.Tick do
 
   defp row(state, w, recent) do
     detail = queue_note(state, w) || detail(w, recent)
-    row = %{id: w.id, label: w.label, status: w.status, quiet: w.quiet, detail: detail}
+
+    row = %{
+      id: w.id,
+      label: w.label,
+      status: w.status,
+      quiet: w.quiet,
+      detail: detail,
+      output: run_output(w, recent)
+    }
 
     # A call whose agent stops to ask shows the question on its own line.
     case asking_handler(state, w) do
@@ -1504,6 +1517,32 @@ defmodule Universe.Tick do
       h -> %{row | detail: "#{h.label} asks: #{h.question} · reply to #{w.label} or #{h.label}"}
     end
   end
+
+  # A finished run's whole stdout when it is small, so reading it needs no
+  # inspect; Digest caps how much of it a tick shows. A run that stored
+  # handles answers with them instead.
+  @output_lines 20
+  @output_chars 1_500
+
+  defp run_output(%{kind: "run", status: s, quiet: false} = w, recent)
+       when s in ["done", "failed"] do
+    path = Path.join(Worker.run_dir(w.id), "stdout")
+
+    with false <- Enum.any?(recent, &(&1["type"] == "put")),
+         {:ok, %File.Stat{size: size}} when size > 0 and size <= @output_chars * 4 <-
+           File.stat(path),
+         {:ok, text} <- File.read(path),
+         text = String.trim_trailing(text),
+         true <- String.valid?(text) and String.length(text) <= @output_chars,
+         lines = String.split(text, "\n"),
+         true <- length(lines) <= @output_lines do
+      lines
+    else
+      _ -> nil
+    end
+  end
+
+  defp run_output(_w, _recent), do: nil
 
   # A task waiting for an agent (or a pool) says how many are ahead of it.
   defp queue_note(state, %{status: "queued", kind: "call", deps: []} = w) do

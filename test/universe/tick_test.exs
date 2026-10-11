@@ -31,6 +31,21 @@ defmodule Universe.TickTest do
     assert result.text =~ ~r/^t\d+ · 5 changed/
   end
 
+  test "a small output comes back whole in the digest; a big one stays one line" do
+    [small, big] = [uniq("small"), uniq("big")]
+
+    result =
+      tick([
+        run(small, "echo 'open 600'; echo 'pending 85'; echo 'closed 6025'"),
+        run(big, "seq 1 500")
+      ])
+
+    assert result.text =~
+             ~r/#{small} +\S+ · closed 6025\n    open 600\n    pending 85\n    closed 6025/
+
+    refute result.text =~ "    250"
+  end
+
   test "then steps run on success without waking the model; skipped on failure" do
     [p, c, bad, never] = Enum.map(~w(p c bad never), &uniq/1)
 

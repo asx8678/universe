@@ -4,7 +4,8 @@ The agent bridge lists this server in its claude session's ``--mcp-config``.
 It connects to the Universe SDK socket as the agent's own worker ID (with the
 agent's token file) and offers one tool per function of each service named in
 ``UNIVERSE_AGENT_SERVICES``, called ``<service>__<function>``, plus
-``handle_preview``. The kernel refuses calls to any other service, so this
+``handle_preview`` and ``handle_read`` (a handle's full value, a page at a
+time). The kernel refuses calls to any other service, so this
 server is a convenience, not the boundary.
 
 Each tool call opens its own SDK connection, so parallel calls never share a
@@ -35,7 +36,8 @@ INSTRUCTIONS = (
     "These tools are services the orchestrator started for your work, named "
     "<service>__<function>. Small results come back inline. A large result comes "
     "back as a handle (h:<id>/<name>) with a preview: pass the handle to a service "
-    "function that takes one, or look again with handle_preview. A failed call "
+    "function that takes one, look again with handle_preview, or read it a page at a "
+    "time with handle_read (offset/limit). A failed call "
     "returns the error as its result; fix the arguments and try again."
 )
 
@@ -50,6 +52,46 @@ PREVIEW_TOOL = {
     },
     "_meta": ALWAYS_LOAD,
 }
+
+
+READ_TOOL = {
+    "name": "handle_read",
+    "description": f"Read a Universe handle's full value a page at a time (at most {MAX_INLINE:,} "
+    "characters a page): a list from item `offset` (default 0), up to `limit` items; "
+    "text or other values from character `offset`. Each page says where the next starts.",
+    "inputSchema": {
+        "type": "object",
+        "properties": {
+            "handle": {"type": "string", "description": "h:<id>/<name>"},
+            "offset": {"type": "integer", "minimum": 0, "description": "first item (list) or character"},
+            "limit": {"type": "integer", "minimum": 1, "description": "items at most (lists)"},
+        },
+        "required": ["handle"],
+    },
+    "_meta": ALWAYS_LOAD,
+}
+
+
+def read_page(value, offset=0, limit=None):
+    """One page of a handle's value, under MAX_INLINE characters."""
+    offset = max(int(offset or 0), 0)
+    if isinstance(value, list):
+        end = len(value) if limit is None else min(len(value), offset + max(int(limit), 1))
+        items, size, i = [], 2, offset
+        while i < end:
+            item = json.dumps(value[i], ensure_ascii=False)
+            if items and size + len(item) + 2 > MAX_INLINE:
+                break
+            items.append(item)
+            size += len(item) + 2
+            i += 1
+        more = f"; next offset {i}" if i < len(value) else "; that is the end"
+        return f"items {offset}-{i - 1} of {len(value)}{more}\n[" + ",\n".join(items) + "]"
+    text = value if isinstance(value, str) else json.dumps(value, ensure_ascii=False)
+    page = text[offset:offset + MAX_INLINE]
+    end = offset + len(page)
+    more = f"; next offset {end}" if end < len(text) else "; that is the end"
+    return f"characters {offset}-{end} of {len(text)}{more}\n{page}"
 
 
 class SdkError(Exception):
@@ -157,12 +199,15 @@ def build_tools():
     with routes_lock:
         routes.clear()
         routes.update(new_routes)
-    return tools + [PREVIEW_TOOL]
+    return tools + [PREVIEW_TOOL, READ_TOOL]
 
 
 def call_tool(name, args):
     if name == PREVIEW_TOOL["name"]:
         return sdk("preview", handle=str(args.get("handle", "")))
+    if name == READ_TOOL["name"]:
+        value = sdk("get", handle=str(args.get("handle", "")))
+        return read_page(value, args.get("offset"), args.get("limit"))
     with routes_lock:
         route = routes.get(name)
     if route is None:

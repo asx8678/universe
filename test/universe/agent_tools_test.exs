@@ -185,7 +185,7 @@ defmodule Universe.AgentToolsTest do
       tools = Map.new(rpc(port, 2, "tools/list")["result"]["tools"], &{&1["name"], &1})
 
       assert Enum.sort(Map.keys(tools)) ==
-               Enum.sort(["#{svc}__add", "#{svc}__rows", "handle_preview"])
+               Enum.sort(["#{svc}__add", "#{svc}__rows", "handle_preview", "handle_read"])
 
       add = tools["#{svc}__add"]
       assert add["description"] =~ "add of the #{svc} service: Adds two numbers."
@@ -216,6 +216,25 @@ defmodule Universe.AgentToolsTest do
         })
 
       assert text_of(look) =~ "h:#{agent_id}/rows-1 · table"
+
+      # The whole value, a page at a time.
+      page =
+        rpc(port, 9, "tools/call", %{
+          "name" => "handle_read",
+          "arguments" => %{"handle" => "h:#{agent_id}/rows-1", "offset" => 1990}
+        })
+
+      assert text_of(page) =~ "items 1990-1999 of 2000; that is the end"
+      assert text_of(page) =~ ~s({"i": 1999, "sq": 3996001})
+
+      first =
+        rpc(port, 10, "tools/call", %{
+          "name" => "handle_read",
+          "arguments" => %{"handle" => "h:#{agent_id}/rows-1"}
+        })
+
+      assert [_, next] = Regex.run(~r/; next offset (\d+)/, text_of(first))
+      assert byte_size(text_of(first)) <= 8100 and String.to_integer(next) > 100
 
       bad = rpc(port, 6, "tools/call", %{"name" => "#{svc}__add", "arguments" => %{"a" => 1}})
       assert bad["result"]["isError"]

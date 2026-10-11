@@ -73,6 +73,9 @@ defmodule Universe.AgentsTest do
                services: []
              }
 
+      {[], [r]} = check(agent("rev", %{"leases" => ["docs"]}))
+      assert r.reason == ~s(leases go on the serve, next to "agent", not inside it)
+
       {[s], []} = check(agent("rev", %{"services" => ["db", "search", "db"]}))
       assert s.agent.services == ["db", "search"]
 
@@ -279,6 +282,29 @@ defmodule Universe.AgentsTest do
     assert again.text =~ ~r/b-#{kept}.*done #2: two/
     kill(fresh)
     kill(kept)
+  end
+
+  test "a pool member being killed takes no new task, even in the same tick" do
+    pool = uniq("kpool")
+    [old, new] = [uniq("old"), uniq("new")]
+    tick([agent(old, %{"pool" => pool})], %{"ids" => [old], "timeout_s" => 15})
+
+    t = "#{pool}-t"
+
+    result =
+      tick(
+        [
+          %{"op" => "kill", "target" => old},
+          agent(new, %{"pool" => pool}),
+          task(t, pool, "hello")
+        ],
+        %{"ids" => [t], "timeout_s" => 20}
+      )
+
+    assert status(result, t) == "done"
+    call = Universe.EventLog.for_id(id_of(result, t)) |> Enum.find(&(&1["type"] == "call"))
+    assert call["data"]["service"] == new
+    kill(new)
   end
 
   test "a pool hands each task to a free agent" do

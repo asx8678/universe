@@ -47,6 +47,11 @@ t12 · 4 changed · 1 running · cursor 812
 Statuses: queued, running, serving, asking, done, failed, budget (a budget
 killed it), killed, rejected (never ran; the line gives the reason).
 
+A run that finished (`done` or `failed`) with at most 20 lines and 1,500
+characters of stdout shows all of it, indented, under its line (up to
+3,000 characters of such output a tick, worst news first); a longer output
+shows its last line, and a run that stored handles shows the handles.
+
 ## inspect
 
 `{"target": "manifest" | "#5" | "h:5/orders" | "t12", "offset": 0, "limit": 200, "grep": ""}`.
@@ -163,8 +168,9 @@ tasks"), and its `timeout_s` starts when it does. A task past its call's
 again; if its session crashes, the next task resumes it.
 
 A service result over 8,000 characters reaches the agent as a handle and its
-preview (`handle_preview` shows it again); it can pass the handle to another
-service function. The kernel lets an agent call only its listed services.
+preview (`handle_preview` shows it again); the agent can read the whole value
+a page at a time with `handle_read` (items of a list, or characters), or pass
+the handle to another service function. The kernel lets an agent call only its listed services.
 
 `steer` adds an instruction to a busy agent's current task; the session takes
 it in at its next tool step, and the task's answer comes after it. With

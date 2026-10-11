@@ -18,6 +18,8 @@ defmodule Universe.Digest do
   # ~2,000 tokens at the chars/4 estimate used everywhere in Universe.
   @max_chars 8_000
   @detail_max 160
+  # Small run outputs shown in full under their row, at most this much a tick.
+  @output_max 3_000
 
   @order ~w(failed budget rejected asking killed done running queued)
 
@@ -41,7 +43,7 @@ defmodule Universe.Digest do
     footer = footer(info.tick, acked)
 
     rows_lines =
-      Enum.map(rows, &line(&1, width)) ++
+      with_outputs(rows, width) ++
         Enum.map(alike, &alike_line/1) ++ restarted_line(restarted)
 
     {lines, dropped} =
@@ -84,7 +86,7 @@ defmodule Universe.Digest do
   defp alike_done(rows) do
     groups =
       rows
-      |> Enum.filter(&(&1.status == "done" and &1.id))
+      |> Enum.filter(&(&1.status == "done" and &1.id != nil and &1[:output] == nil))
       |> Enum.group_by(&(&1[:detail] || ""))
       |> Enum.filter(fn {_detail, rs} -> length(rs) >= @alike_min end)
 
@@ -129,6 +131,22 @@ defmodule Universe.Digest do
     names = acked |> Enum.map(& &1.label) |> Enum.take(6) |> Enum.join(", ")
     more = if length(acked) > 6, do: ", …", else: ""
     "+#{length(acked)} auto-acked (#{names}#{more}) · inspect(\"t#{tick}\") for all events"
+  end
+
+  # Each row's line, plus its run output (indented) while the tick's output
+  # budget lasts; the first rows (worst news first) get it.
+  defp with_outputs(rows, width) do
+    {lines, _left} =
+      Enum.map_reduce(rows, @output_max, fn row, left ->
+        out = row[:output]
+        size = if out, do: Enum.reduce(out, 0, &(String.length(&1) + 5 + &2)), else: 0
+
+        if out && size <= left,
+          do: {Enum.join([line(row, width) | Enum.map(out, &("    " <> &1))], "\n"), left - size},
+          else: {line(row, width), left}
+      end)
+
+    lines
   end
 
   defp line(row, width) do

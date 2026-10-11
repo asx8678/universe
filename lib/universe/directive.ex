@@ -325,6 +325,9 @@ defmodule Universe.Directive do
          do: {:ok, lang, code, nil}
   end
 
+  defp agent(%{"leases" => _}, _),
+    do: {:error, ~s(leases go on the serve, next to "agent", not inside it)}
+
   defp agent(a, leases) when is_map(a) do
     with :ok <- known_fields(a, @agent_fields),
          {:ok, purpose} <- purpose(a["purpose"]),
