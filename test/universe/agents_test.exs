@@ -170,6 +170,25 @@ defmodule Universe.AgentsTest do
     kill(name)
   end
 
+  test "a reply aimed at the task reaches the agent that asked" do
+    name = uniq("askcall")
+    t = "qc-#{name}"
+
+    first =
+      tick([agent(name), task(t, name, "ASK me")], %{
+        "ids" => [t],
+        "until" => "any",
+        "timeout_s" => 30
+      })
+
+    assert first.text =~ ~r/#{t}\s.*#{name} asks: which file\? · reply to #{t} or #{name}/
+
+    second = tick([%{"op" => "reply", "target" => t, "text" => "lib/b.ex"}], %{"ids" => [t]})
+    assert status(second, t) == "done"
+    assert second.text =~ "got lib/b.ex"
+    kill(name)
+  end
+
   test "a pool hands each task to a free agent" do
     pool = uniq("pool")
     [a, b] = [uniq("pa"), uniq("pb")]

@@ -51,7 +51,8 @@ defmodule Universe.MCP.Server do
   "pool":"reviewers"}}; give it a task with {"op":"call","label":"r1", \
   "service":"rev or a pool","prompt":"..."}. It can't run code.
   kill: {"op":"kill","target":"#5 or label"}.
-  reply: answer a worker that is asking. {"op":"reply","target":"#9","text":"..."}.
+  reply: answer a worker that is asking, or the task an asking agent works on. \
+  {"op":"reply","target":"#9","text":"..."}.
 
   In code, U is preloaded (python, elixir): U.put(name,value)->handle, \
   U.get(handle), U.call(service,fn,args), U.progress(text), U.ask(question). \

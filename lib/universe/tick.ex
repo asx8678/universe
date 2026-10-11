@@ -418,7 +418,7 @@ defmodule Universe.Tick do
 
   defp place(state, _tick, %{op: "reply", target: target, text: text}, _) do
     with {:ok, id} <- resolve(state, target),
-         %{status: "asking"} = w <- state.workers[id] do
+         %{status: "asking"} = w <- asker(state, state.workers[id]) do
       EventLog.append("reply",
         tick: w.tick,
         id: id,
@@ -440,6 +440,22 @@ defmodule Universe.Tick do
       _ -> {:error, "#{target} is not asking"}
     end
   end
+
+  # Who answers a reply aimed at `w`: `w` itself when it asks, or the agent
+  # (or service) handling `w` when `w` is a running call whose handler asks;
+  # a question during an agent task belongs to the agent, but the task is
+  # what the model is watching.
+  defp asker(_state, %{status: "asking"} = w), do: w
+  defp asker(state, w), do: asking_handler(state, w) || w
+
+  defp asking_handler(state, %{kind: "call", status: "running", spec: %{service: service}}) do
+    case state.workers[state.services[service]] do
+      %{status: "asking"} = handler -> handler
+      _ -> nil
+    end
+  end
+
+  defp asking_handler(_state, _w), do: nil
 
   # A lease clash is rejected at once, unless the directive waits for other
   # workers anyway (`after`): then it is placed without the lease and takes
@@ -1142,7 +1158,7 @@ defmodule Universe.Tick do
     by_id = Enum.group_by(events, & &1["id"])
 
     rows =
-      Enum.map(changed, &row(state.workers[&1], Map.get(by_id, &1, []))) ++
+      Enum.map(changed, &row(state, state.workers[&1], Map.get(by_id, &1, []))) ++
         Enum.map(
           waiter.rejected,
           &%{id: nil, label: &1.label || &1.op || "?", status: "rejected", detail: &1.reason}
@@ -1189,8 +1205,14 @@ defmodule Universe.Tick do
     prune(%{state | cursor: max(state.cursor, cursor)})
   end
 
-  defp row(w, recent) do
-    %{id: w.id, label: w.label, status: w.status, quiet: w.quiet, detail: detail(w, recent)}
+  defp row(state, w, recent) do
+    row = %{id: w.id, label: w.label, status: w.status, quiet: w.quiet, detail: detail(w, recent)}
+
+    # A call whose agent stops to ask shows the question on its own line.
+    case asking_handler(state, w) do
+      nil -> row
+      h -> %{row | detail: "#{h.label} asks: #{h.question} · reply to #{w.label} or #{h.label}"}
+    end
   end
 
   defp detail(%{status: "queued"} = w, _recent) do
