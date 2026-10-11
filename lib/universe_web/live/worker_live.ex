@@ -11,13 +11,22 @@ defmodule UniverseWeb.WorkerLive do
   alias UniverseWeb.Activity
 
   @tail_lines 200
+  # Only the end of an output file is read for its tail.
+  @tail_bytes 256 * 1024
+  # Reloads are throttled: a chatty worker would otherwise re-read its files
+  # for every output event, in every open tab.
+  @refresh_ms 300
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
     case Integer.parse(id) do
       {id, ""} ->
         if connected?(socket), do: Phoenix.PubSub.subscribe(Universe.PubSub, EventLog.topic())
-        {:ok, socket |> assign(:id, id) |> assign(:page_title, "##{id}") |> load()}
+
+        {:ok,
+         socket
+         |> assign(id: id, page_title: "##{id}", pending: false)
+         |> load()}
 
       _ ->
         {:ok, socket |> put_flash(:error, "No such worker") |> push_navigate(to: ~p"/workers")}
@@ -26,14 +35,23 @@ defmodule UniverseWeb.WorkerLive do
 
   @impl true
   def handle_info({:event, %{"id" => id}}, %{assigns: %{id: id}} = socket),
-    do: {:noreply, load(socket)}
+    do: {:noreply, later(socket)}
 
   # An agent's tasks are other IDs' calls: follow those too.
   def handle_info({:event, %{"type" => t}}, %{assigns: %{agent: %{}}} = socket)
       when t in ["call", "exit"],
-      do: {:noreply, load(socket)}
+      do: {:noreply, later(socket)}
 
   def handle_info({:event, _}, socket), do: {:noreply, socket}
+
+  def handle_info(:refresh, socket), do: {:noreply, socket |> assign(:pending, false) |> load()}
+
+  defp later(%{assigns: %{pending: true}} = socket), do: socket
+
+  defp later(socket) do
+    Process.send_after(self(), :refresh, @refresh_ms)
+    assign(socket, :pending, true)
+  end
 
   defp load(socket) do
     id = socket.assigns.id
@@ -86,12 +104,18 @@ defmodule UniverseWeb.WorkerLive do
   end
 
   defp tail(path) do
-    case File.read(path) do
-      {:ok, text} ->
-        text |> Worker.utf8() |> String.split("\n") |> Enum.take(-@tail_lines) |> Enum.join("\n")
+    with {:ok, %File.Stat{size: size}} <- File.stat(path),
+         {:ok, io} <- File.open(path, [:read, :binary, :raw]) do
+      from = max(size - @tail_bytes, 0)
+      data = if size == 0, do: "", else: elem(:file.pread(io, from, size - from), 1)
+      File.close(io)
 
-      _ ->
-        ""
+      lines = data |> Worker.utf8() |> String.split("\n")
+      # Starting mid-file, the first line is probably cut: drop it.
+      lines = if from > 0, do: tl(lines), else: lines
+      lines |> Enum.take(-@tail_lines) |> Enum.join("\n")
+    else
+      _ -> ""
     end
   end
 

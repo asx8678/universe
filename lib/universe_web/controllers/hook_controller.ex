@@ -18,9 +18,13 @@ defmodule UniverseWeb.HookController do
     command = get_in(params, ["tool_input", "command"])
     command = if is_binary(command), do: String.slice(command, 0, 500), else: nil
 
-    Universe.EventLog.append("redirect",
-      data: %{"tool" => params["tool_name"] || "Bash", "command" => command}
-    )
+    tool =
+      case params["tool_name"] do
+        t when is_binary(t) -> String.slice(t, 0, 64)
+        _ -> "Bash"
+      end
+
+    Universe.EventLog.append("redirect", data: %{"tool" => tool, "command" => command})
 
     text(conn, "ok")
   end

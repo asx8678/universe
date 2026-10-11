@@ -32,6 +32,21 @@ defmodule UniverseWeb.HookControllerTest do
            )
   end
 
+  test "POST /hooks/redirect bounds the tool name", %{conn: conn} do
+    payload = %{
+      "tool_name" => String.duplicate("T", 10_000),
+      "tool_input" => %{"command" => "ls"}
+    }
+
+    conn
+    |> put_req_header("content-type", "application/json")
+    |> post("/hooks/redirect", Jason.encode!(payload))
+    |> text_response(200)
+
+    event = Universe.EventLog.by_types(["redirect"]) |> List.last()
+    assert String.length(event["data"]["tool"]) == 64
+  end
+
   test "hooks need the token" do
     conn = %{build_conn() | host: "127.0.0.1"} |> get("/hooks/manifest")
     assert conn.status == 401

@@ -19,6 +19,9 @@ defmodule Universe.Inspect do
   @default_limit 200
   @max_limit 2_000
   @code_lines 80
+  @grep_max_pattern 200
+  @grep_line_chars 2_000
+  @grep_ms 1_000
 
   def run(args) do
     opts = %{
@@ -295,7 +298,7 @@ defmodule Universe.Inspect do
 
   # Tail by default; `offset` (0-based line) switches to a forward page.
   defp page(title, lines, opts) do
-    lines = if opts.grep, do: Enum.filter(lines, opts.grep), else: lines
+    lines = if opts.grep, do: grep(lines, opts.grep), else: lines
     total = length(lines)
 
     {from, shown} =
@@ -320,13 +323,35 @@ defmodule Universe.Inspect do
   defp matcher(""), do: nil
 
   defp matcher(pattern) when is_binary(pattern) do
-    case Regex.compile(pattern) do
-      {:ok, re} -> &Regex.match?(re, &1)
-      {:error, _} -> &String.contains?(&1, pattern)
+    if String.length(pattern) > @grep_max_pattern do
+      {:substring, pattern}
+    else
+      case Regex.compile(pattern) do
+        {:ok, re} -> {:regex, re, pattern}
+        {:error, _} -> {:substring, pattern}
+      end
     end
   end
 
   defp matcher(_), do: nil
+
+  # A pattern comes from the model or an agent; one like (a+)+$ can take
+  # minutes on a long line. Regexes run in a task with a time limit (and see
+  # at most @grep_line_chars of each line); past it the pattern is matched
+  # as plain text.
+  defp grep(lines, {:substring, pattern}), do: Enum.filter(lines, &String.contains?(&1, pattern))
+
+  defp grep(lines, {:regex, re, pattern}) do
+    task =
+      Task.async(fn ->
+        Enum.filter(lines, &Regex.match?(re, String.slice(&1, 0, @grep_line_chars)))
+      end)
+
+    case Task.yield(task, @grep_ms) || Task.shutdown(task, :brutal_kill) do
+      {:ok, matched} -> matched
+      _ -> grep(lines, {:substring, pattern})
+    end
+  end
 
   defp cap(text) do
     if String.length(text) > @max_chars do

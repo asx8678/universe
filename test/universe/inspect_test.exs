@@ -41,6 +41,29 @@ defmodule Universe.InspectTest do
     assert inspect_target("##{id}", %{"grep" => "line 4\\d"}) =~ "(lines 1-10 of 10 matching)"
   end
 
+  test "a catastrophic grep pattern can't stall inspect" do
+    label = "redos-#{System.unique_integer([:positive])}"
+    line = String.duplicate("a", 40) <> "!"
+
+    result =
+      API.tick(%{
+        "directives" => [
+          %{
+            "op" => "run",
+            "label" => label,
+            "lang" => "bash",
+            "code" => "for i in $(seq 1 60); do echo #{line}; done; echo plain"
+          }
+        ]
+      })
+
+    [{"#" <> id, _}] = Map.to_list(result.structured["ids"])
+    # Unguarded this costs ~0.1 s per line (PCRE's backtracking limit): 6 s.
+    {us, text} = :timer.tc(fn -> inspect_target("##{id}", %{"grep" => "(a+)+$"}) end)
+    assert us < 3_000_000
+    assert text =~ "matching"
+  end
+
   test "t<n> lists every event of the tick", %{tick: tick, label: label} do
     text = inspect_target("t#{tick}")
     assert text =~ "tick_in"

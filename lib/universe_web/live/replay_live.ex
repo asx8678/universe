@@ -10,21 +10,33 @@ defmodule UniverseWeb.ReplayLive do
 
   alias Universe.Paths
 
-  @impl true
-  def mount(_params, _session, socket),
-    do: {:ok, assign(socket, page_title: "Replay", files: log_files())}
+  # Logs bigger than this are not replayed in the browser.
+  @max_bytes 256 * 1024 * 1024
 
-  # Picking a file patches the URL, so the file is read here, not in mount.
+  @impl true
+  def mount(_params, _session, socket), do: {:ok, assign(socket, page_title: "Replay")}
+
+  # Picking a file patches the URL, so the file is read here, not in mount;
+  # the list is re-read too, since logs come and go.
   @impl true
   def handle_params(params, _uri, socket) do
+    files = log_files()
+    socket = assign(socket, files: files)
+
     socket =
       case params["file"] do
         nil ->
           assign(socket, file: nil, ticks: [], error: nil)
 
         file ->
-          if file in socket.assigns.files do
-            assign(socket, file: file, ticks: ticks_from_events(read(file)), error: nil)
+          if file in files do
+            case read(file) do
+              {:ok, events} ->
+                assign(socket, file: file, ticks: ticks_from_events(events), error: nil)
+
+              {:error, reason} ->
+                assign(socket, file: file, ticks: [], error: reason)
+            end
           else
             assign(socket, file: file, ticks: [], error: "no log named #{file}")
           end
@@ -40,15 +52,37 @@ defmodule UniverseWeb.ReplayLive do
     end
   end
 
+  # Streams the file and keeps only tick_in/tick_out events: a replay never
+  # holds a whole log in the LiveView's memory.
   defp read(file) do
-    Path.join(Paths.log_dir(), file)
-    |> File.stream!()
-    |> Enum.flat_map(fn line ->
-      case Jason.decode(line) do
-        {:ok, %{} = e} -> [e]
-        _ -> []
-      end
-    end)
+    path = Path.join(Paths.log_dir(), file)
+
+    case File.stat(path) do
+      {:ok, %File.Stat{size: size}} when size > @max_bytes ->
+        {:error, "#{file} is over #{div(@max_bytes, 1_048_576)} MB; too big to replay here"}
+
+      {:ok, _} ->
+        try do
+          events =
+            path
+            |> File.stream!()
+            |> Stream.filter(&String.contains?(&1, "\"tick_"))
+            |> Stream.flat_map(fn line ->
+              case Jason.decode(line) do
+                {:ok, %{"type" => t} = e} when t in ["tick_in", "tick_out"] -> [e]
+                _ -> []
+              end
+            end)
+            |> Enum.to_list()
+
+          {:ok, events}
+        rescue
+          e in File.Error -> {:error, "cannot read #{file}: #{Exception.message(e)}"}
+        end
+
+      {:error, reason} ->
+        {:error, "cannot read #{file}: #{reason}"}
+    end
   end
 
   @impl true

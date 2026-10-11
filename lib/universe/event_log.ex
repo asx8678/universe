@@ -6,7 +6,10 @@ defmodule Universe.EventLog do
 
   One process owns the file, so `seq` is strictly increasing. An ETS table
   (rebuilt from the file at boot) answers queries without going through the
-  owner. Every appended event is broadcast on the `"events"` PubSub topic.
+  owner, with three index tables keyed `{id, seq}`, `{tick, seq}` and
+  `{type, seq}` so a query by worker, tick or type reads only its own events
+  (a select on the main table would scan the whole log). Every appended
+  event is broadcast on the `"events"` PubSub topic.
 
   Event shape (string keys, JSON-ready):
 
@@ -16,7 +19,12 @@ defmodule Universe.EventLog do
 
   use GenServer
 
+  require Logger
+
   @table __MODULE__
+  @by_id :universe_events_by_id
+  @by_tick :universe_events_by_tick
+  @by_type :universe_events_by_type
   @topic "events"
   @sync_ms 1_000
 
@@ -51,37 +59,61 @@ defmodule Universe.EventLog do
 
   @doc "All events of the given types, oldest first."
   def by_types(types) do
-    :ets.select(@table, for(t <- types, do: {{:_, :_, :_, t, :"$1"}, [], [:"$1"]}))
-    |> Enum.sort_by(& &1["seq"])
+    types
+    |> Enum.flat_map(&seqs(@by_type, &1, 0))
+    |> Enum.sort()
+    |> events()
   end
 
   @doc "Events with `seq > since`, oldest first."
-  def since(since) do
-    :ets.select(@table, [{{:"$1", :_, :_, :_, :"$2"}, [{:>, :"$1", since}], [:"$2"]}])
-  end
+  def since(since), do: range(since, nil)
 
   @doc "Events with `from <= seq < to`, oldest first (`to: nil` means to the end)."
-  def between(from, nil), do: since(from - 1)
-
-  def between(from, to) do
-    :ets.select(@table, [
-      {{:"$1", :_, :_, :_, :"$2"}, [{:>=, :"$1", from}, {:<, :"$1", to}], [:"$2"]}
-    ])
-  end
+  def between(from, to), do: range(from - 1, to)
 
   @doc "All events recorded under tick `n`, oldest first."
-  def for_tick(n) do
-    :ets.select(@table, [{{:_, n, :_, :_, :"$1"}, [], [:"$1"]}])
-  end
+  def for_tick(n), do: @by_tick |> seqs(n, 0) |> events()
 
   @doc "All events of worker `id`, oldest first."
-  def for_id(id) do
-    :ets.select(@table, [{{:_, :_, id, :_, :"$1"}, [], [:"$1"]}])
-  end
+  def for_id(id), do: @by_id |> seqs(id, 0) |> events()
 
   @doc "Events of worker `id` with `seq > since`, oldest first."
-  def for_id_since(id, since) do
-    :ets.select(@table, [{{:"$1", :_, id, :_, :"$2"}, [{:>, :"$1", since}], [:"$2"]}])
+  def for_id_since(id, since), do: @by_id |> seqs(id, since) |> events()
+
+  # Seqs under `key` in an index, above `since`. The key is bound in the
+  # pattern, so the ordered set only visits that key's entries.
+  defp seqs(_index, nil, _since), do: []
+
+  defp seqs(index, key, since),
+    do: :ets.select(index, [{{{key, :"$1"}}, [{:>, :"$1", since}], [:"$1"]}])
+
+  defp events(seqs) do
+    Enum.flat_map(seqs, fn seq ->
+      case :ets.lookup(@table, seq) do
+        [{_, _, _, _, event}] -> [event]
+        [] -> []
+      end
+    end)
+  end
+
+  # Walks the main table from just after `after_seq`, stopping before `to`.
+  defp range(after_seq, to) do
+    after_seq |> next_seq() |> walk(to, []) |> Enum.reverse()
+  end
+
+  defp next_seq(after_seq), do: :ets.next(@table, after_seq)
+
+  defp walk(:"$end_of_table", _to, acc), do: acc
+  defp walk(seq, to, acc) when is_integer(to) and seq >= to, do: acc
+
+  defp walk(seq, to, acc) do
+    acc =
+      case :ets.lookup(@table, seq) do
+        [{_, _, _, _, event}] -> [event | acc]
+        [] -> acc
+      end
+
+    walk(:ets.next(@table, seq), to, acc)
   end
 
   @impl true
@@ -90,9 +122,13 @@ defmodule Universe.EventLog do
     Process.flag(:trap_exit, true)
     :ets.new(@table, [:ordered_set, :named_table, :protected, read_concurrency: true])
 
+    for index <- [@by_id, @by_tick, @by_type],
+        do: :ets.new(index, [:ordered_set, :named_table, :protected, read_concurrency: true])
+
     path = Path.join(Universe.Paths.log_dir(), "events.jsonl")
     File.mkdir_p!(Path.dirname(path))
     seq = load(path)
+    end_torn_line(path)
     {:ok, io} = File.open(path, [:append, :binary, :raw, :delayed_write])
 
     {:ok, %{io: io, seq: seq, secrets: [], dirty: false}}
@@ -111,7 +147,23 @@ defmodule Universe.EventLog do
       "data" => Universe.Redact.scrub(attrs[:data] || %{}, state.secrets)
     }
 
-    :ok = :file.write(state.io, [Jason.encode_to_iodata!(event), ?\n])
+    # The log owner must never crash on one bad value: that would drop the
+    # ETS table every reader uses. Unencodable data is kept as text.
+    {event, line} =
+      case Jason.encode_to_iodata(event) do
+        {:ok, line} ->
+          {event, line}
+
+        {:error, _} ->
+          event = %{event | "data" => %{"unencodable" => inspect(event["data"], limit: 50)}}
+          {event, Jason.encode_to_iodata!(event)}
+      end
+
+    case :file.write(state.io, [line, ?\n]) do
+      :ok -> :ok
+      error -> Logger.error("event log write failed: #{inspect(error)}")
+    end
+
     insert(event)
     Phoenix.PubSub.broadcast(Universe.PubSub, @topic, {:event, event})
 
@@ -138,7 +190,22 @@ defmodule Universe.EventLog do
   def terminate(_reason, state), do: :file.close(state.io)
 
   defp insert(event) do
-    :ets.insert(@table, {event["seq"], event["tick"], event["id"], event["type"], event})
+    seq = event["seq"]
+    :ets.insert(@table, {seq, event["tick"], event["id"], event["type"], event})
+    if event["id"], do: :ets.insert(@by_id, {{event["id"], seq}})
+    if event["tick"], do: :ets.insert(@by_tick, {{event["tick"], seq}})
+    :ets.insert(@by_type, {{event["type"], seq}})
+  end
+
+  # A crash mid-write leaves a last line without "\n"; the next append would
+  # be glued onto it and lost on the next load. End it first.
+  defp end_torn_line(path) do
+    with {:ok, %File.Stat{size: size}} when size > 0 <- File.stat(path),
+         {:ok, io} <- File.open(path, [:read, :binary, :raw]) do
+      last = :file.pread(io, size - 1, 1)
+      File.close(io)
+      if last != {:ok, "\n"}, do: File.write!(path, "\n", [:append])
+    end
   end
 
   # Rebuilds the index from disk; a torn last line (crash mid-write) is skipped.

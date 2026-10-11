@@ -52,6 +52,47 @@ defmodule Universe.EventLogTest do
     assert next["seq"] > marker["seq"]
   end
 
+  test "an unencodable value is kept as text; the log owner survives" do
+    owner = Process.whereis(EventLog)
+    e = EventLog.append("test_bad", tick: 900_003, data: %{"pid" => self(), "t" => {1, 2}})
+    assert e["data"]["unencodable"] =~ "PID"
+    assert Process.whereis(EventLog) == owner
+    assert [%{"type" => "test_bad"}] = EventLog.for_tick(900_003)
+  end
+
+  test "a torn last line is ended at boot, so the next event isn't lost" do
+    :ok = EventLog.sync()
+    path = Path.join(Universe.Paths.log_dir(), "events.jsonl")
+
+    :ok = Supervisor.terminate_child(Universe.Supervisor, Universe.EventLog)
+    File.write!(path, ~s({"seq": 99999999, "type": "torn), [:append])
+    {:ok, _} = Supervisor.restart_child(Universe.Supervisor, Universe.EventLog)
+
+    after_torn = EventLog.append("test_after_torn", tick: 900_004, data: %{})
+    :ok = EventLog.sync()
+
+    :ok = Supervisor.terminate_child(Universe.Supervisor, Universe.EventLog)
+    {:ok, _} = Supervisor.restart_child(Universe.Supervisor, Universe.EventLog)
+    assert [%{"seq" => seq}] = EventLog.for_tick(900_004)
+    assert seq == after_torn["seq"]
+  end
+
+  test "indexed queries: by id since a seq, by type, between seqs" do
+    id = 900_005
+    a = EventLog.append("test_ix_a", id: id, tick: 900_005, data: %{})
+    _other = EventLog.append("test_ix_b", id: id + 1, data: %{})
+    b = EventLog.append("test_ix_b", id: id, data: %{})
+
+    assert Enum.map(EventLog.for_id(id), & &1["seq"]) == [a["seq"], b["seq"]]
+    assert Enum.map(EventLog.for_id_since(id, a["seq"]), & &1["seq"]) == [b["seq"]]
+
+    assert EventLog.by_types(["test_ix_a", "test_ix_b"]) |> Enum.map(& &1["seq"]) |> Enum.take(-3) ==
+             [a["seq"], a["seq"] + 1, b["seq"]]
+
+    assert Enum.map(EventLog.between(a["seq"], b["seq"]), & &1["seq"]) == [a["seq"], a["seq"] + 1]
+    assert List.last(EventLog.since(a["seq"]))["seq"] == b["seq"]
+  end
+
   test "Redact.scrub/2 walks nested terms and skips tiny values" do
     secrets = [{"a", "abcd1234"}, {"tiny", "ab"}]
     term = %{"x" => ["abcd1234", %{"y" => "pre abcd1234 post"}], "n" => 3, "s" => "ab"}
