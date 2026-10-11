@@ -1,7 +1,11 @@
 defmodule UniverseWeb.Router do
   use UniverseWeb, :router
 
+  import Phoenix.LiveDashboard.Router
+
   pipeline :browser do
+    # DNS-rebinding protection: only pages asked for as localhost.
+    plug UniverseWeb.Plugs.LoopbackOnly
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_live_flash
@@ -46,5 +50,12 @@ defmodule UniverseWeb.Router do
     live "/handles", HandlesLive
     live "/replay", ReplayLive
     live "/replay/:file", ReplayLive
+  end
+
+  # Generic BEAM introspection: supervision trees, processes, ports, ETS.
+  scope "/" do
+    pipe_through :browser
+
+    live_dashboard "/dashboard", metrics: UniverseWeb.Telemetry
   end
 end

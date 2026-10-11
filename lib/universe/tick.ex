@@ -965,6 +965,7 @@ defmodule Universe.Tick do
       spawn = Enum.find(events, &(&1["type"] == "spawn"))
       exit = events |> Enum.filter(&(&1["type"] == "exit")) |> List.last()
       serve = events |> Enum.filter(&(&1["type"] == "serve")) |> List.last()
+      call = Enum.find(events, &(&1["type"] == "call"))
       label = first["data"]["label"]
       kind = first["data"]["kind"] || (spawn && spawn["data"]["kind"]) || "run"
 
@@ -995,7 +996,10 @@ defmodule Universe.Tick do
           lang: spawn && spawn["data"]["lang"],
           budget: %{wall_s: budget["wall_s"], out_kb: budget["out_kb"], mem_mb: budget["mem_mb"]},
           ttl_idle_s: nil,
-          service: serve && serve["data"]["name"]
+          # A call keeps its target, so views can still say what it called.
+          service: (serve && serve["data"]["name"]) || (call && call["data"]["service"]),
+          fn: call && call["data"]["fn"],
+          agent: nil
         },
         deps: [],
         quiet: false,

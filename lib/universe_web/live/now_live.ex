@@ -131,7 +131,7 @@ defmodule UniverseWeb.NowLive do
     services = live |> Enum.filter(&(&1.kind == "serve")) |> Enum.sort_by(& &1.id)
 
     running_calls =
-      for w <- live, w.kind == "call", w.status == "running", into: %{}, do: {w.spec.service, w}
+      for w <- live, w.kind == "call", w.status == "running", into: %{}, do: {w.spec[:service], w}
 
     agents = for w <- services, agent?(w), do: agent_card(w, running_calls)
     code_services = for w <- services, not agent?(w), do: service_card(w)
@@ -171,7 +171,7 @@ defmodule UniverseWeb.NowLive do
 
     %{
       id: w.id,
-      name: w.service || w.spec.service,
+      name: w.service || w.spec[:service],
       model: w.spec.agent.model || "default model",
       pool: w.spec.agent.pool,
       purpose: w.spec.agent.purpose,
@@ -193,7 +193,7 @@ defmodule UniverseWeb.NowLive do
   defp service_card(w) do
     %{
       id: w.id,
-      name: w.service || w.spec.service,
+      name: w.service || w.spec[:service],
       state: w.status,
       fns: w.fns,
       describe: w.describe,
@@ -553,8 +553,8 @@ defmodule UniverseWeb.NowLive do
 
   defp running_detail(%{kind: "call", spec: spec}) do
     case prompt_of(spec) do
-      nil -> "#{spec.service}.#{spec.fn}"
-      p -> "task → #{spec.service}: #{p}"
+      nil -> "#{spec[:service]}.#{spec[:fn]}"
+      p -> "task → #{spec[:service]}: #{p}"
     end
   end
 

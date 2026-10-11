@@ -102,7 +102,7 @@ defmodule UniverseWeb.WorkersLive do
 
   defp detail(%{status: "serving"} = w), do: "#{w.service} · #{Enum.join(w.fns, ", ")}"
   defp detail(%{status: "asking"} = w), do: w.question
-  defp detail(%{kind: "call", spec: spec}), do: "#{spec.service}.#{spec.fn}"
+  defp detail(%{kind: "call", spec: spec}), do: "#{spec[:service]}.#{spec[:fn]}"
   defp detail(%{summary: %{"reason" => r}}) when is_binary(r), do: r
   defp detail(%{summary: %{"last_err" => e}}) when is_binary(e), do: e
   defp detail(%{summary: %{"last_out" => o}}) when is_binary(o), do: o

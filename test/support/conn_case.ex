@@ -32,6 +32,7 @@ defmodule UniverseWeb.ConnCase do
   end
 
   setup _tags do
-    {:ok, conn: Phoenix.ConnTest.build_conn()}
+    # The browser pages only answer requests addressed to localhost.
+    {:ok, conn: %{Phoenix.ConnTest.build_conn() | host: "localhost"}}
   end
 end

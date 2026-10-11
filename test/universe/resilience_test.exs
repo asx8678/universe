@@ -61,6 +61,36 @@ defmodule Universe.ResilienceTest do
     assert result.text =~ ~r/killed\s+#{long}\s+lost: Universe restarted/
   end
 
+  test "a recovered call still knows which service and function it called" do
+    svc = uniq("adder")
+    q = uniq("q")
+    code = "def add(a, b):\n    return a + b\nU.serve(#{inspect(svc)}, {'add': add})"
+
+    result =
+      tick([
+        %{"op" => "serve", "label" => svc, "lang" => "python", "code" => code},
+        %{
+          "op" => "call",
+          "label" => q,
+          "service" => svc,
+          "fn" => "add",
+          "args" => %{"a" => 1, "b" => 2}
+        }
+      ])
+
+    assert status(result, q) == "done"
+
+    q_id =
+      Enum.find_value(result.structured["ids"], fn {"#" <> id, v} -> v["label"] == q && id end)
+
+    old = Process.whereis(Tick)
+    Process.exit(old, :kill)
+    wait_until(fn -> Process.whereis(Tick) not in [nil, old] end)
+
+    spec = Tick.snapshot()[String.to_integer(q_id)].spec
+    assert {spec.service, spec.fn} == {svc, "add"}
+  end
+
   test "settled workers past max_settled are archived but still resolve" do
     labels = for i <- 1..45, do: uniq("bulk#{i}")
     result = tick(Enum.map(labels, &run(&1, "true")))
