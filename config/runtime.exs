@@ -53,6 +53,6 @@ if config_env() == :prod do
   config :universe, UniverseWeb.Endpoint,
     url: [host: "127.0.0.1", port: port, scheme: "http"],
     http: [ip: {127, 0, 0, 1}, port: port],
-    check_origin: ["//127.0.0.1", "//localhost"],
+    check_origin: ["//127.0.0.1", "//localhost", "//[::1]"],
     secret_key_base: secret_key_base
 end
