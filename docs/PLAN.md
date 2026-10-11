@@ -387,13 +387,23 @@ harness now allows `Skill` (M4–M6 ran with it denied).
 **Next (not in M7)**
 - ~~Acceptance: a task where helpers pay off, without telling the model to
   build them; does it build, wire and steer them? Count orchestrator turns.~~
-  Done, not accepted (above). Candidates for the turn gap: fewer verification
-  passes, kills folded into the final tick, `"count"` for pool members.
-- Steer acceptance: a long single task whose direction changes mid-way.
-- Benchmark only after that, on a task that needs a slow-to-build or
-  credentialed resource shared by agents; thresholds fixed first, the same
-  helper model in both setups (the M6 confound).
-- Saved tools (`.universe/tools/`), `ask` as a tool, agent-to-agent calls.
+  Done, not accepted (above). Turn-gap fixes done Oct 11 (80472dd): `kill`
+  takes a pool name, run outputs up to 40 lines inline, "verify by sampling"
+  and "kill helpers in the final tick" in the skill and the hook. Not
+  re-measured on triage (no M7.2, per the pre-registration).
+- ~~Steer acceptance~~ run Oct 11 (`bench/README.md`): Opus steered the
+  running review in 3 of 3 runs and never restarted it; accepted 1 of 3 on
+  the grader, because the steer reached the reviewer only when the model's
+  90 s tick returned. Next: a shorter wait while helpers run, or wake the
+  model on a user message.
+- Benchmark (M8): fixture built (300 refund claims, `bench/gen_claims.py`),
+  but its gate failed: a regex-and-SQL script decides 88.7 %. Not run; the
+  fixture needs claims that only reading can decide (see `bench/README.md`).
+- ~~Saved tools, `ask` as a tool, agent-to-agent calls~~ done Oct 11:
+  `"save": true` / `"tool": "name"` (`.universe/tools/<name>.json`, listed in
+  the manifest); an `ask` MCP tool for every agent (expires with the task);
+  agents may list agents that list none (one level; caller's time left;
+  at most 8 at once). Agent tasks log their cost in dollars.
 - ~~The manifest line for an agent doesn't list its `services`~~ done
   Oct 11, 2026: `· can call: db, search`.
 - ~~A `steer` draws no Model → agent arrow in `/flow` and the tick
