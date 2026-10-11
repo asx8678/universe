@@ -60,8 +60,11 @@ requests can arrive while an invocation is pending; a client must buffer
 `invoke` lines it reads while waiting for a `rid` reply (the Python client
 does).
 
-`args` that are an object are passed as keyword arguments by the bundled
-clients, a list as positional arguments, `null` as none.
+`args` that are a list are passed as positional arguments by the bundled
+clients, `null` as none. An object becomes keyword arguments in Python; in
+Elixir (no keyword arguments) it is one map argument. Elixir spreads a list
+only when its length matches the function's arity, otherwise the list is one
+argument.
 
 ## Limits
 

@@ -190,6 +190,41 @@ defmodule Universe.ServicesTest do
     kill(name)
   end
 
+  test "Elixir services take list args the way Python ones do" do
+    name = uniq("exadd")
+
+    code = """
+    U.serve(#{inspect(name)}, %{
+      "add" => fn a, b -> a + b end,
+      "double" => fn n -> n * 2 end,
+      "sum" => fn %{"xs" => xs} -> Enum.sum(xs) end
+    }, "elixir math")
+    """
+
+    tick([%{"op" => "serve", "label" => name, "lang" => "elixir", "code" => code}], %{
+      "ids" => [name],
+      "timeout_s" => 30
+    })
+
+    call = fn label, fun, args ->
+      %{"op" => "call", "label" => label, "service" => name, "fn" => fun, "args" => args}
+    end
+
+    [a, d, s] = Enum.map(~w(add double sum), &uniq/1)
+
+    result =
+      tick([
+        call.(a, "add", [2, 40]),
+        call.(d, "double", [21]),
+        call.(s, "sum", %{"xs" => [1, 2, 3]})
+      ])
+
+    assert result.text =~ ~r/#{a}\s+\S+ · → 42$/m
+    assert result.text =~ ~r/#{d}\s+\S+ · → 42$/m
+    assert result.text =~ ~r/#{s}\s+\S+ · → 6$/m
+    kill(name)
+  end
+
   test "U.progress sets the running line" do
     label = uniq("prog")
     code = "import time\nU.progress('scanning 800/1240')\ntime.sleep(5)"

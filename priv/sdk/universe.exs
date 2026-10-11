@@ -7,7 +7,10 @@
 #     answer = U.ask("Use the new tokens file?")
 #     U.serve("pg", %{"query" => fn %{"sql" => sql} -> ... end}, "Postgres reader")
 #
-# Service functions receive the call's args as one term (a map, list or nil).
+# Service functions get the call's args like the Python client passes them: a
+# list whose length is the function's arity is spread ([2, 40] -> f.(2, 40),
+# [20] -> f.(20)), nil calls a 0-arity function, anything else (a map, one
+# term) is passed as one argument.
 # Uses the built-in JSON module (Elixir 1.18+), no dependencies.
 defmodule U do
   @moduledoc false
@@ -57,7 +60,7 @@ defmodule U do
     if msg["op"] == "invoke" do
       result =
         try do
-          %{"op" => "result", "cid" => msg["cid"], "ok" => true, "value" => Map.fetch!(fns, msg["fn"]).(msg["args"])}
+          %{"op" => "result", "cid" => msg["cid"], "ok" => true, "value" => apply_args(Map.fetch!(fns, msg["fn"]), msg["args"])}
         rescue
           e -> %{"op" => "result", "cid" => msg["cid"], "ok" => false, "error" => Exception.message(e)}
         end
@@ -66,6 +69,16 @@ defmodule U do
     end
 
     serve_loop(fns)
+  end
+
+  defp apply_args(f, args) do
+    {:arity, n} = Function.info(f, :arity)
+
+    cond do
+      n == 0 -> f.()
+      is_list(args) and length(args) == n -> apply(f, args)
+      true -> f.(args)
+    end
   end
 
   ## Transport
