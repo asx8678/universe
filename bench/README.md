@@ -436,3 +436,27 @@ reviewer was fast and had passed most files by then (finished 35 s after the
 steer). **Finding for Universe:** a model told something mid-tick can't act
 until its `wait` returns; a shorter wait while helpers run (or waking the
 model on a user message) would cut that delay. Not changed here; recorded.
+
+# Benchmark (M8) fixture: refund claims (built Oct 11, 2026; gates FAIL, not run)
+
+`gen_claims.py` + `write_claims.py`: 300 refund claims written by sonnet from
+seeded specs (180 approve, 89 deny, 31 escalate), over 2,000 customers and
+5,722 orders with shipments, payments and refunds; `policy.md` says which
+records decide each claim type. Grader `graders/claims.py` (≥ 95 % right).
+
+Gates (`audit_claims.py`):
+
+- clear: haiku given each claim with that customer's records agrees on 99.7 % — PASS
+- blind: haiku with the claim text only gets 60.3 % (records are needed) — PASS
+- script: a regex-and-SQL solver sonnet wrote from 50 labelled claims gets
+  **88.7 %** (`graders/claims_script_gate_1.py`; gate < 85 %) — **FAIL**
+
+So as built, one script decides most claims without reading them: the claim
+type and the order (by number, or product words plus a month) are easy to
+pick out, and each rule is a single SQL check. Accuracy by type: defect
+50/61, duplicate 55/60, wrong item 59/65, late 66/73, not received 36/41.
+The benchmark was not run on this fixture. To make reading necessary: claims
+that mention several orders or products (only one is the subject), types
+stated indirectly ("it showed up the day after the party", "two lines on my
+statement"), and policy exceptions that turn on what the customer says (a
+gift sent to another address, a defect caused by the customer).

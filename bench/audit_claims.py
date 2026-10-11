@@ -75,6 +75,9 @@ def db_local():
     return sqlite3.connect(DB)
 
 
+REUSE = False
+
+
 def script_gate(seed=1):
     r = random.Random(seed)
     db = sqlite3.connect(DB)
@@ -88,20 +91,27 @@ def script_gate(seed=1):
               "in the claims table by the policy, using regular expressions on the claim text and SQL on the "
               "records, as accurately as you can on unseen claims of the same kind.\n\n" + shown +
               "\n\nAnswer with only the code in one ```python block.")
-    out = claude("sonnet", prompt)
-    m = re.search(r"```python\n(.*?)```", out, re.S)
-    if not m:
-        sys.exit("script gate: no code came back")
-    (BENCH / "graders" / f"claims_script_gate_{seed}.py").write_text(m.group(1))
+    saved = BENCH / "graders" / f"claims_script_gate_{seed}.py"
+    if saved.exists() and REUSE:
+        code = saved.read_text()
+    else:
+        out = claude("sonnet", prompt)
+        m = re.search(r"```python\n(.*?)```", out, re.S)
+        if not m:
+            sys.exit("script gate: no code came back")
+        code = m.group(1)
+        saved.write_text(code)
     with tempfile.TemporaryDirectory() as d:
-        pathlib.Path(d, "solver.py").write_text(m.group(1))
+        pathlib.Path(d, "solver.py").write_text(code)
         runner = ("import json, sys\nsys.path.insert(0, '.')\nimport solver\n"
                   f"print(json.dumps({{str(k): v for k, v in solver.decide({str(DB)!r}).items()}}))")
         res = subprocess.run([sys.executable, "-I", "-c", runner], cwd=d, capture_output=True, text=True,
                              timeout=300)
     if res.returncode != 0:
         sys.exit("script gate: the solver failed:\n" + res.stderr[-2000:])
-    got = json.loads(res.stdout)
+    # Take the decision word from whatever shape each value has.
+    got = {k: (re.search(r"approve|deny|escalate", str(v)) or [None])[0]
+           for k, v in json.loads(res.stdout).items()}
     rate = sum(got.get(c) == a["decision"] for c, a in ANSWERS.items()) / len(ANSWERS)
     print(f"script gate (seed {seed}): {rate:.1%} (need < 85 %) -> {'PASS' if rate < 0.85 else 'FAIL'}")
     return rate < 0.85
@@ -112,7 +122,11 @@ def main():
     ap.add_argument("--skip-clear", action="store_true")
     ap.add_argument("--skip-blind", action="store_true")
     ap.add_argument("--skip-script", action="store_true")
+    ap.add_argument("--reuse", action="store_true", help="re-score saved solvers instead of asking again")
+    ap.add_argument("--seeds", default="1,2")
     a = ap.parse_args()
+    global REUSE
+    REUSE = a.reuse
     ok = True
     if not a.skip_clear:
         rate, bad = decide_batches("haiku", True)
@@ -125,7 +139,8 @@ def main():
         print(f"blind gate: haiku without records {rate:.1%} (need < 70 %) -> {'PASS' if rate < 0.7 else 'FAIL'}")
         ok = ok and rate < 0.7
     if not a.skip_script:
-        ok = script_gate() and ok
+        for seed in map(int, a.seeds.split(",")):
+            ok = script_gate(seed) and ok
     sys.exit(0 if ok else 1)
 
 
