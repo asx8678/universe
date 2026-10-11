@@ -32,6 +32,7 @@ defmodule Universe.SDK.Conn do
 
   alias Universe.{EventLog, Handles, Isolation, Paths, Services, Tick, Worker}
 
+  @progress_burst 3
   @max_buffer 72 * 1024 * 1024
   @default_call_timeout_s 60
   @max_call_timeout_s 1800
@@ -49,7 +50,13 @@ defmodule Universe.SDK.Conn do
        service: nil,
        queue: :queue.new(),
        inflight: nil,
-       next_cid: 1
+       next_cid: 1,
+       # Progress is logged at most @progress_burst at once, then one per
+       # second; in between only the latest text is kept (see progress/2).
+       progress_tokens: @progress_burst,
+       progress_at: System.monotonic_time(:millisecond),
+       progress_pending: nil,
+       progress_timer: nil
      }}
   end
 
@@ -81,6 +88,9 @@ defmodule Universe.SDK.Conn do
     {:noreply, state}
   end
 
+  def handle_info(:flush_progress, state),
+    do: {:noreply, %{state | progress_timer: nil} |> progress(nil)}
+
   def handle_info(_msg, state), do: {:noreply, state}
 
   @impl true
@@ -93,10 +103,43 @@ defmodule Universe.SDK.Conn do
 
   @impl true
   def terminate(_reason, state) do
+    if state.progress_pending, do: event(state, "progress", %{"text" => state.progress_pending})
     closed = {:error, "service connection closed"}
     if state.inflight, do: GenServer.reply(elem(state.inflight, 1), closed)
     for {_, _, from, _} <- :queue.to_list(state.queue), do: GenServer.reply(from, closed)
     :gen_tcp.close(state.sock)
+  end
+
+  ## Progress
+
+  # A token bucket: bursts up to @progress_burst events, then one per second.
+  # Text that arrives without a token waits (only the latest) for the next.
+  defp progress(state, text) do
+    now = System.monotonic_time(:millisecond)
+    tokens = min(@progress_burst, state.progress_tokens + (now - state.progress_at) / 1000)
+    text = text || state.progress_pending
+    state = %{state | progress_tokens: tokens, progress_at: now}
+
+    cond do
+      is_nil(text) ->
+        state
+
+      tokens >= 1 ->
+        event(state, "progress", %{"text" => text})
+        %{state | progress_tokens: tokens - 1, progress_pending: nil}
+
+      state.progress_timer ->
+        %{state | progress_pending: text}
+
+      true ->
+        wait = ceil((1 - tokens) * 1000)
+
+        %{
+          state
+          | progress_pending: text,
+            progress_timer: Process.send_after(self(), :flush_progress, wait)
+        }
+    end
   end
 
   ## Requests
@@ -162,9 +205,8 @@ defmodule Universe.SDK.Conn do
   end
 
   defp handle_msg(%{"op" => "progress", "text" => text} = msg, state) when is_binary(text) do
-    event(state, "progress", %{"text" => String.slice(text, 0, 300)})
     reply(state, msg["rid"], {:ok, true})
-    state
+    progress(state, String.slice(text, 0, 300))
   end
 
   defp handle_msg(%{"op" => "ask", "question" => q} = msg, state) when is_binary(q) do
@@ -185,16 +227,21 @@ defmodule Universe.SDK.Conn do
           _ -> data
         end
 
-      event(state, "call", data)
+      # A task (prompt) is logged when it starts, since it can take minutes;
+      # a plain function call once, when it is answered.
+      task? = Map.has_key?(data, "prompt")
+      if task?, do: event(state, "call", data)
       started = System.monotonic_time(:millisecond)
       result = Services.invoke(service, fun, msg["args"], timeout * 1000)
 
-      event(state, "call_done", %{
-        "service" => service,
-        "fn" => fun,
+      done = %{
         "ok" => match?({:ok, _}, result),
         "wall_ms" => System.monotonic_time(:millisecond) - started
-      })
+      }
+
+      if task?,
+        do: event(state, "call_done", Map.merge(%{"service" => service, "fn" => fun}, done)),
+        else: event(state, "call", Map.merge(data, done))
 
       result
     end)

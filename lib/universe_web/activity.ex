@@ -104,8 +104,12 @@ defmodule UniverseWeb.Activity do
   defp push(state, row),
     do: %{state | recent: Enum.take([row.key | List.delete(state.recent, row.key)], @fold_window)}
 
-  defp fold_key(%{"type" => "call", "id" => id, "data" => %{"via" => "sdk"} = d}),
-    do: if(is_binary(d["prompt"]), do: nil, else: {:call, id, d["service"], d["fn"]})
+  defp fold_key(%{"type" => "call", "id" => id, "data" => %{"via" => "sdk"} = d}) do
+    cond do
+      is_binary(d["prompt"]) or d["ok"] == false -> nil
+      true -> {:call, id, d["service"], d["fn"]}
+    end
+  end
 
   defp fold_key(%{"type" => "call_done", "id" => id, "data" => %{"ok" => true} = d}),
     do: {:call, id, d["service"], d["fn"]}
@@ -119,9 +123,16 @@ defmodule UniverseWeb.Activity do
     st = row.stats
 
     st =
-      case e["type"] do
-        "call" -> %{st | n: st.n + 1}
-        _ -> %{st | done: st.done + 1, wall: e["data"]["wall_ms"]}
+      case e do
+        # Newer logs: one event per answered call.
+        %{"type" => "call", "data" => %{"ok" => _} = d} ->
+          %{st | n: st.n + 1, done: st.done + 1, wall: d["wall_ms"]}
+
+        %{"type" => "call"} ->
+          %{st | n: st.n + 1}
+
+        _ ->
+          %{st | done: st.done + 1, wall: e["data"]["wall_ms"]}
       end
 
     flight = if st.n > st.done, do: " · #{st.n - st.done} in flight", else: ""
@@ -187,9 +198,18 @@ defmodule UniverseWeb.Activity do
 
     by = if d["via"] == "sdk", do: "U.call ", else: ""
 
-    case d["prompt"] do
-      prompt when is_binary(prompt) -> {:info, "#{by}task → #{target}: #{prompt}"}
-      _ -> {:info, String.trim("#{by}call → #{target}.#{d["fn"]} #{d["args"]}")}
+    case d do
+      %{"prompt" => prompt} when is_binary(prompt) ->
+        {:info, "#{by}task → #{target}: #{prompt}"}
+
+      # A U.call logged once, when it was answered.
+      %{"ok" => ok} ->
+        took = d["wall_ms"] && " in #{Digest.duration(d["wall_ms"])}"
+        verb = if ok, do: "answered", else: "failed"
+        {if(ok, do: :info, else: :bad), "#{by}call → #{target}.#{d["fn"]} #{verb}#{took}"}
+
+      _ ->
+        {:info, String.trim("#{by}call → #{target}.#{d["fn"]} #{d["args"]}")}
     end
   end
 

@@ -164,10 +164,7 @@ defmodule UniverseWeb.Flow do
       "call_done" ->
         target = service_lane(d["service"], e["seq"], owner)
 
-        label =
-          if d["ok"], do: "answer · #{dur(d["wall_ms"])}", else: "failed · #{dur(d["wall_ms"])}"
-
-        msg(acc, e, target, w(id), label, if(d["ok"], do: :good, else: :bad), true)
+        msg(acc, e, target, w(id), answer_label(d), if(d["ok"], do: :good, else: :bad), true)
 
       "exit" ->
         exit_row(acc, e, d)
@@ -224,16 +221,27 @@ defmodule UniverseWeb.Flow do
         _ -> "call #{d["fn"]}"
       end
 
-    if d["via"] == "sdk" do
-      msg(acc, e, w(e["id"]), target, label, :info)
-    else
-      # A call directive: Universe calls the service for the model. The call's
-      # own ID is not a lane; remember where its answer comes from.
-      acc = put_in(acc.calls[e["id"]], target)
-      pool = if d["pool"], do: " (pool #{d["pool"]})", else: ""
-      msg(acc, e, "universe", target, label <> pool, :info)
+    cond do
+      # One event for a whole U.call (logged when answered): request and answer.
+      d["via"] == "sdk" and Map.has_key?(d, "ok") ->
+        acc
+        |> msg(e, w(e["id"]), target, label, :info)
+        |> msg(e, target, w(e["id"]), answer_label(d), if(d["ok"], do: :good, else: :bad), true)
+
+      d["via"] == "sdk" ->
+        msg(acc, e, w(e["id"]), target, label, :info)
+
+      true ->
+        # A call directive: Universe calls the service for the model. The call's
+        # own ID is not a lane; remember where its answer comes from.
+        acc = put_in(acc.calls[e["id"]], target)
+        pool = if d["pool"], do: " (pool #{d["pool"]})", else: ""
+        msg(acc, e, "universe", target, label <> pool, :info)
     end
   end
+
+  defp answer_label(%{"ok" => true} = d), do: "answer · #{dur(d["wall_ms"])}"
+  defp answer_label(d), do: "failed · #{dur(d["wall_ms"])}"
 
   defp exit_row(acc, e, d) do
     id = e["id"]

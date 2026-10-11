@@ -37,6 +37,11 @@ defmodule UniverseWeb.ActivityTest do
     assert row.count == 5
     assert row.text == "U.call → kv.put · 5 calls · last took 3ms"
 
+    # Newer logs have one event per answered call; they fold the same way.
+    answered = Map.merge(call, %{"ok" => true, "wall_ms" => 2})
+    assert {_, [row]} = Activity.fold(for i <- 1..3, do: ev.(i, "call", answered))
+    assert row.text == "U.call → kv.put · 3 calls · last took 2ms"
+
     # Agent tasks (calls with a prompt) stay one row each.
     task = Map.put(call, "prompt", "look")
     assert {_, [_, _]} = Activity.fold([ev.(1, "call", task), ev.(2, "call", task)])

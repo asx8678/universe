@@ -126,14 +126,38 @@ defmodule Universe.ServicesTest do
     assert status(result, user) == "done"
     assert result.text =~ "got 42"
 
-    # The observer can draw worker → service and back.
+    # One event per answered call, enough to draw worker → service and back.
     events = EventLog.for_id(id_of(result, user))
-    call = Enum.find(events, &(&1["type"] == "call"))
-    done = Enum.find(events, &(&1["type"] == "call_done"))
-    assert %{"service" => ^name, "fn" => "add", "via" => "sdk"} = call["data"]
-    assert %{"service" => ^name, "ok" => true} = done["data"]
-    assert done["seq"] > call["seq"]
+    assert [call] = Enum.filter(events, &(&1["type"] == "call"))
+    refute Enum.any?(events, &(&1["type"] == "call_done"))
+
+    assert %{"service" => ^name, "fn" => "add", "via" => "sdk", "ok" => true, "wall_ms" => ms} =
+             call["data"]
+
+    assert is_integer(ms)
     kill(name)
+  end
+
+  test "rapid progress is throttled to bursts, and the latest text is kept" do
+    label = uniq("chatty")
+
+    result =
+      tick([
+        py(
+          label,
+          "for i in range(20):\n    U.progress(f'step {i}')\nimport time; time.sleep(1.5)"
+        )
+      ])
+
+    assert status(result, label) == "done"
+
+    texts =
+      for e <- EventLog.for_id(id_of(result, label)),
+          e["type"] == "progress",
+          do: e["data"]["text"]
+
+    assert length(texts) < 6
+    assert List.last(texts) == "step 19"
   end
 
   test "handle reads are logged as get events" do
