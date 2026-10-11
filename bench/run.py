@@ -62,6 +62,11 @@ FIXTURE = {"modules": "modules", "qa": "modules"}
 
 # M7 acceptance: no word about helpers in the prompt.
 TASKS["triage"] = "Triage the open tickets in data/support.db as instructions.md describes, and write triage.md."
+# Steer acceptance: the delegation is given; the question is what the model
+# does when the brief changes while its helper works.
+TASKS["review"] = ("Review the code as instructions.md describes and write review.md. Hand the whole review "
+                   "to one helper agent as a single task (all files, in REVIEW_ORDER.md order) and coordinate; "
+                   "don't review the files yourself.")
 
 # A user message sent while the run is under way: MIDRUN_AFTER_S after the
 # first delegated task starts (an agent `call` in the event log, or an
@@ -72,8 +77,13 @@ MIDRUN = {
     "triage": "Change of rule from the support lead: any ticket that mentions a chargeback, or disputing "
     "the charge with a bank or card issuer (already filed or only threatened), is priority `urgent`, "
     "whatever else applies. Apply it to every open ticket, including ones already triaged.",
+    # Steer acceptance: the change applies to the work still ahead, and done
+    # work stays valid, so steering the running review beats restarting it.
+    "review": "Change from the tech lead, effective now: skip everything under web/ from here on (another "
+    "team reviews it), and also flag every function whose docstring promises something its code "
+    "doesn't do, with kind `docstring`. Files already reviewed don't need another pass.",
 }
-MIDRUN_AFTER_S = 8
+MIDRUN_AFTER_S = {"triage": 8, "review": 10}
 MIDRUN_FALLBACK_S = 240
 
 # Skill: the plugin's skill is part of what the model is taught (M4-M6 runs
@@ -148,10 +158,10 @@ def command(task, setup, cfg_path, model=None, budget=None):
     if budget:
         args += ["--max-budget-usd", str(budget)]
     tools = COMMON_TOOLS
-    if setup in ("universe", "agents", "accept"):
+    if setup in ("universe", "agents", "accept", "steer"):
         args += ["--mcp-config", str(cfg_path), "--plugin-dir", str(PLUGIN)]
         tools = COMMON_TOOLS + UNIVERSE_TOOLS
-    if setup in ("agents", "accept"):
+    if setup in ("agents", "accept", "steer"):
         # Delegation must go through Universe agents, not the built-in Agent tool.
         tools = [t for t in tools if t not in ("Agent", "Task")]
         args += ["--disallowedTools", "Agent", "Task"]
@@ -203,9 +213,9 @@ def converse(cmd, work, out, cell, task):
         while proc.poll() is None and not st["sent"]:
             now = time.time()
             if st["trigger_at"] is None and agent_task_started(work):
-                st["trigger_at"] = now + MIDRUN_AFTER_S
+                st["trigger_at"] = now + MIDRUN_AFTER_S[task]
             if st["trigger_at"] and now >= st["trigger_at"]:
-                send_rule(f"{MIDRUN_AFTER_S}s after the first delegated task")
+                send_rule(f"{MIDRUN_AFTER_S[task]}s after the first delegated task")
             elif now - started >= MIDRUN_FALLBACK_S:
                 send_rule(f"fallback at {MIDRUN_FALLBACK_S}s")
             time.sleep(1)
@@ -224,8 +234,8 @@ def converse(cmd, work, out, cell, task):
         if e.get("type") == "assistant" and st["trigger_at"] is None:
             for c in e.get("message", {}).get("content", []):
                 if c.get("type") == "tool_use" and c.get("name") in ("Agent", "Task"):
-                    st["trigger_at"] = time.time() + MIDRUN_AFTER_S
-        elif e.get("type") == "user" and e.get("isReplay") and "Change of rule" in line:
+                    st["trigger_at"] = time.time() + MIDRUN_AFTER_S[task]
+        elif e.get("type") == "user" and e.get("isReplay") and MIDRUN[task][:30] in line:
             st["echoed"] = True
         elif e.get("type") == "result":
             if not st["sent"]:
@@ -247,7 +257,7 @@ def run_cell(task, setup, n, go, model=None, budget=None):
     work = fresh_copy(task, cell)
     proc = cfg = None
     try:
-        if setup in ("universe", "agents", "accept"):
+        if setup in ("universe", "agents", "accept", "steer"):
             proc, cfg = start_daemon(work)
         log(f"start {cell}")
         started = time.time()
@@ -268,7 +278,7 @@ def run_cell(task, setup, n, go, model=None, budget=None):
         events = work / ".universe/log/events.jsonl"
         if events.exists():
             shutil.copy(events, OUT / f"{cell}.events.jsonl")
-        if setup in ("agents", "accept"):
+        if setup in ("agents", "accept", "steer"):
             (OUT / f"{cell}.helpers.json").write_text(json.dumps({
                 "tokens": sum(h["tokens"] for h in helpers), "tasks": len(helpers),
                 "agents": len(list((work / ".universe/agents").glob("*.usage.jsonl"))),
@@ -299,7 +309,7 @@ def main():
         assert t in TASKS, t
     OUT.mkdir(exist_ok=True)
     WORK.mkdir(parents=True, exist_ok=True)
-    if {"universe", "agents", "accept"} & set(setups) and not UCTL.exists():
+    if {"universe", "agents", "accept", "steer"} & set(setups) and not UCTL.exists():
         sys.exit(f"build the release first: MIX_ENV=prod mix release ({UCTL} missing)")
 
     for n in range(a.start, a.start + a.runs):

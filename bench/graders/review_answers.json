@@ -1,0 +1,1262 @@
+{
+ "order": [
+  "shop/orders_core.py",
+  "shop/invoices_core.py",
+  "shop/customers_core.py",
+  "shop/shipping_core.py",
+  "shop/coupons_core.py",
+  "shop/tickets_core.py",
+  "shop/catalog_core.py",
+  "shop/refunds_core.py",
+  "shop/payments_core.py",
+  "shop/carts_core.py",
+  "shop/reviews_core.py",
+  "shop/suppliers_core.py",
+  "shop/stock_core.py",
+  "shop/reports_core.py",
+  "shop/sessions_core.py",
+  "shop/addresses_core.py",
+  "shop/accounts_core.py",
+  "shop/messages_core.py",
+  "shop/schedules_core.py",
+  "shop/batches_core.py",
+  "shop/orders_store.py",
+  "shop/invoices_store.py",
+  "shop/customers_store.py",
+  "shop/shipping_store.py",
+  "shop/coupons_store.py",
+  "shop/tickets_store.py",
+  "shop/catalog_store.py",
+  "shop/refunds_store.py",
+  "shop/payments_store.py",
+  "shop/carts_store.py",
+  "shop/reviews_store.py",
+  "shop/suppliers_store.py",
+  "shop/stock_store.py",
+  "shop/reports_store.py",
+  "shop/sessions_store.py",
+  "shop/addresses_store.py",
+  "shop/accounts_store.py",
+  "shop/messages_store.py",
+  "shop/schedules_store.py",
+  "shop/batches_store.py",
+  "shop/invoices_sync.py",
+  "shop/suppliers_sync.py",
+  "shop/orders_sync.py",
+  "web/api.py",
+  "shop/payments_rules.py",
+  "web/feeds.py",
+  "web/auth.py",
+  "web/widgets.py",
+  "shop/catalog_sync.py",
+  "web/pages.py",
+  "shop/reports_rules.py",
+  "shop/messages_rules.py",
+  "web/templates.py",
+  "shop/customers_sync.py",
+  "shop/accounts_sync.py",
+  "shop/addresses_rules.py",
+  "web/uploads.py",
+  "shop/refunds_sync.py",
+  "shop/accounts_rules.py",
+  "web/media.py",
+  "shop/schedules_rules.py",
+  "shop/shipping_sync.py",
+  "shop/schedules_sync.py",
+  "shop/sessions_rules.py",
+  "shop/coupons_sync.py",
+  "shop/reports_sync.py",
+  "web/forms.py",
+  "shop/refunds_rules.py",
+  "web/static.py",
+  "web/routes.py",
+  "shop/invoices_rules.py",
+  "shop/shipping_rules.py",
+  "shop/coupons_rules.py",
+  "shop/orders_rules.py",
+  "shop/reviews_rules.py",
+  "web/views.py",
+  "shop/tickets_sync.py",
+  "shop/customers_rules.py",
+  "shop/sessions_sync.py",
+  "shop/tickets_rules.py",
+  "shop/carts_rules.py",
+  "shop/batches_rules.py",
+  "web/search.py",
+  "shop/catalog_rules.py",
+  "web/errors.py",
+  "shop/batches_sync.py",
+  "web/handlers.py",
+  "shop/reviews_sync.py",
+  "web/hooks.py",
+  "shop/suppliers_rules.py",
+  "shop/stock_rules.py",
+  "shop/messages_sync.py",
+  "shop/stock_sync.py",
+  "web/health.py",
+  "shop/carts_sync.py",
+  "web/admin.py",
+  "web/export.py",
+  "shop/addresses_sync.py",
+  "web/import.py",
+  "shop/payments_sync.py"
+ ],
+ "first_half": [
+  "shop/orders_core.py",
+  "shop/invoices_core.py",
+  "shop/customers_core.py",
+  "shop/shipping_core.py",
+  "shop/coupons_core.py",
+  "shop/tickets_core.py",
+  "shop/catalog_core.py",
+  "shop/refunds_core.py",
+  "shop/payments_core.py",
+  "shop/carts_core.py",
+  "shop/reviews_core.py",
+  "shop/suppliers_core.py",
+  "shop/stock_core.py",
+  "shop/reports_core.py",
+  "shop/sessions_core.py",
+  "shop/addresses_core.py",
+  "shop/accounts_core.py",
+  "shop/messages_core.py",
+  "shop/schedules_core.py",
+  "shop/batches_core.py",
+  "shop/orders_store.py",
+  "shop/invoices_store.py",
+  "shop/customers_store.py",
+  "shop/shipping_store.py",
+  "shop/coupons_store.py",
+  "shop/tickets_store.py",
+  "shop/catalog_store.py",
+  "shop/refunds_store.py",
+  "shop/payments_store.py",
+  "shop/carts_store.py",
+  "shop/reviews_store.py",
+  "shop/suppliers_store.py",
+  "shop/stock_store.py",
+  "shop/reports_store.py",
+  "shop/sessions_store.py",
+  "shop/addresses_store.py",
+  "shop/accounts_store.py",
+  "shop/messages_store.py",
+  "shop/schedules_store.py",
+  "shop/batches_store.py"
+ ],
+ "x": [
+  {
+   "path": "shop/orders_core.py",
+   "function": "last_order",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/invoices_core.py",
+   "function": "report_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/customers_core.py",
+   "function": "last_address",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/customers_core.py",
+   "function": "address_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/shipping_core.py",
+   "function": "active_orders",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/coupons_core.py",
+   "function": "customer_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/coupons_core.py",
+   "function": "last_customer",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/tickets_core.py",
+   "function": "cart_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/tickets_core.py",
+   "function": "active_carts",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/catalog_core.py",
+   "function": "payment_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/refunds_core.py",
+   "function": "active_reports",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/payments_core.py",
+   "function": "active_orders",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/payments_core.py",
+   "function": "order_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/carts_core.py",
+   "function": "coupon_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/reviews_core.py",
+   "function": "batch_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/reviews_core.py",
+   "function": "last_batch",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/suppliers_core.py",
+   "function": "address_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/stock_core.py",
+   "function": "active_reviews",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/stock_core.py",
+   "function": "last_review",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/reports_core.py",
+   "function": "supplier_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/reports_core.py",
+   "function": "active_suppliers",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/sessions_core.py",
+   "function": "review_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/sessions_core.py",
+   "function": "active_reviews",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/addresses_core.py",
+   "function": "active_invoices",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/accounts_core.py",
+   "function": "last_ticket",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/accounts_core.py",
+   "function": "active_tickets",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/messages_core.py",
+   "function": "active_orders",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/schedules_core.py",
+   "function": "supplier_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/schedules_core.py",
+   "function": "active_suppliers",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/batches_core.py",
+   "function": "last_address",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/batches_core.py",
+   "function": "address_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/orders_store.py",
+   "function": "batch_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/invoices_store.py",
+   "function": "account_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/invoices_store.py",
+   "function": "last_account",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/customers_store.py",
+   "function": "last_account",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/shipping_store.py",
+   "function": "last_review",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/shipping_store.py",
+   "function": "active_reviews",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/coupons_store.py",
+   "function": "last_message",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/tickets_store.py",
+   "function": "active_products",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/tickets_store.py",
+   "function": "product_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/catalog_store.py",
+   "function": "active_suppliers",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/catalog_store.py",
+   "function": "last_supplier",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/refunds_store.py",
+   "function": "ticket_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/payments_store.py",
+   "function": "batch_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/payments_store.py",
+   "function": "last_batch",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/carts_store.py",
+   "function": "warehouse_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/reviews_store.py",
+   "function": "last_product",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/reviews_store.py",
+   "function": "active_products",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/suppliers_store.py",
+   "function": "schedule_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/stock_store.py",
+   "function": "warehouse_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/stock_store.py",
+   "function": "last_warehouse",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/reports_store.py",
+   "function": "last_message",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/reports_store.py",
+   "function": "active_messages",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/sessions_store.py",
+   "function": "active_suppliers",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/sessions_store.py",
+   "function": "last_supplier",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/addresses_store.py",
+   "function": "active_warehouses",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/addresses_store.py",
+   "function": "last_warehouse",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/accounts_store.py",
+   "function": "active_invoices",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/messages_store.py",
+   "function": "active_schedules",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/messages_store.py",
+   "function": "schedule_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/schedules_store.py",
+   "function": "refund_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/schedules_store.py",
+   "function": "last_refund",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/batches_store.py",
+   "function": "ticket_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/batches_store.py",
+   "function": "last_ticket",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/invoices_sync.py",
+   "function": "payment_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/suppliers_sync.py",
+   "function": "last_report",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/orders_sync.py",
+   "function": "supplier_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/orders_sync.py",
+   "function": "last_supplier",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/payments_rules.py",
+   "function": "last_account",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/payments_rules.py",
+   "function": "active_accounts",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/catalog_sync.py",
+   "function": "active_shipments",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/catalog_sync.py",
+   "function": "shipment_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/reports_rules.py",
+   "function": "last_batch",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/reports_rules.py",
+   "function": "active_batchs",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/messages_rules.py",
+   "function": "active_payments",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/messages_rules.py",
+   "function": "last_payment",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/customers_sync.py",
+   "function": "shipment_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/accounts_sync.py",
+   "function": "last_message",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/accounts_sync.py",
+   "function": "active_messages",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/addresses_rules.py",
+   "function": "customer_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/refunds_sync.py",
+   "function": "last_product",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/accounts_rules.py",
+   "function": "last_schedule",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/accounts_rules.py",
+   "function": "schedule_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/schedules_rules.py",
+   "function": "last_session",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/schedules_rules.py",
+   "function": "active_sessions",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/shipping_sync.py",
+   "function": "active_shipments",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/shipping_sync.py",
+   "function": "last_shipment",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/schedules_sync.py",
+   "function": "last_batch",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/sessions_rules.py",
+   "function": "active_invoices",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/sessions_rules.py",
+   "function": "invoice_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/coupons_sync.py",
+   "function": "last_warehouse",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/coupons_sync.py",
+   "function": "active_warehouses",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/reports_sync.py",
+   "function": "last_refund",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/reports_sync.py",
+   "function": "active_refunds",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/refunds_rules.py",
+   "function": "active_carts",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/invoices_rules.py",
+   "function": "active_tickets",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/shipping_rules.py",
+   "function": "last_account",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/shipping_rules.py",
+   "function": "account_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/coupons_rules.py",
+   "function": "product_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/coupons_rules.py",
+   "function": "last_product",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/orders_rules.py",
+   "function": "invoice_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/reviews_rules.py",
+   "function": "last_report",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/reviews_rules.py",
+   "function": "active_reports",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/tickets_sync.py",
+   "function": "review_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/customers_rules.py",
+   "function": "last_report",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/sessions_sync.py",
+   "function": "last_address",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/tickets_rules.py",
+   "function": "active_payments",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/carts_rules.py",
+   "function": "last_payment",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/batches_rules.py",
+   "function": "last_message",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/batches_rules.py",
+   "function": "message_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/catalog_rules.py",
+   "function": "last_customer",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/catalog_rules.py",
+   "function": "customer_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/batches_sync.py",
+   "function": "address_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/batches_sync.py",
+   "function": "last_address",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/reviews_sync.py",
+   "function": "active_suppliers",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/suppliers_rules.py",
+   "function": "batch_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/stock_rules.py",
+   "function": "shipment_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/stock_rules.py",
+   "function": "active_shipments",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/messages_sync.py",
+   "function": "last_supplier",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/stock_sync.py",
+   "function": "last_refund",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/stock_sync.py",
+   "function": "refund_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/carts_sync.py",
+   "function": "last_coupon",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "shop/addresses_sync.py",
+   "function": "active_carts",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "shop/addresses_sync.py",
+   "function": "cart_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "shop/payments_sync.py",
+   "function": "last_supplier",
+   "kind": "off-by-one"
+  }
+ ],
+ "y": [
+  {
+   "path": "shop/invoices_sync.py",
+   "function": "payment_or_default"
+  },
+  {
+   "path": "shop/suppliers_sync.py",
+   "function": "report_total"
+  },
+  {
+   "path": "shop/orders_sync.py",
+   "function": "count_suppliers_by_status"
+  },
+  {
+   "path": "shop/payments_rules.py",
+   "function": "account_or_default"
+  },
+  {
+   "path": "shop/catalog_sync.py",
+   "function": "find_shipment"
+  },
+  {
+   "path": "shop/catalog_sync.py",
+   "function": "clean_shipment_lines"
+  },
+  {
+   "path": "shop/reports_rules.py",
+   "function": "unique_batch_ids"
+  },
+  {
+   "path": "shop/reports_rules.py",
+   "function": "check_batch_amount"
+  },
+  {
+   "path": "shop/messages_rules.py",
+   "function": "payment_total"
+  },
+  {
+   "path": "shop/messages_rules.py",
+   "function": "sorted_payments"
+  },
+  {
+   "path": "shop/customers_sync.py",
+   "function": "shipment_page"
+  },
+  {
+   "path": "shop/accounts_sync.py",
+   "function": "message_total"
+  },
+  {
+   "path": "shop/addresses_rules.py",
+   "function": "customer_or_default"
+  },
+  {
+   "path": "shop/refunds_sync.py",
+   "function": "product_or_default"
+  },
+  {
+   "path": "shop/refunds_sync.py",
+   "function": "check_product_amount"
+  },
+  {
+   "path": "shop/accounts_rules.py",
+   "function": "count_schedules_by_status"
+  },
+  {
+   "path": "shop/schedules_rules.py",
+   "function": "check_session_amount"
+  },
+  {
+   "path": "shop/schedules_rules.py",
+   "function": "session_or_default"
+  },
+  {
+   "path": "shop/shipping_sync.py",
+   "function": "clean_shipment_lines"
+  },
+  {
+   "path": "shop/schedules_sync.py",
+   "function": "count_batchs_by_status"
+  },
+  {
+   "path": "shop/sessions_rules.py",
+   "function": "clean_invoice_lines"
+  },
+  {
+   "path": "shop/coupons_sync.py",
+   "function": "warehouse_page"
+  },
+  {
+   "path": "shop/reports_sync.py",
+   "function": "sorted_refunds"
+  },
+  {
+   "path": "shop/reports_sync.py",
+   "function": "check_refund_amount"
+  },
+  {
+   "path": "shop/refunds_rules.py",
+   "function": "cart_total"
+  },
+  {
+   "path": "shop/invoices_rules.py",
+   "function": "find_ticket"
+  },
+  {
+   "path": "shop/shipping_rules.py",
+   "function": "sorted_accounts"
+  },
+  {
+   "path": "shop/coupons_rules.py",
+   "function": "product_page"
+  },
+  {
+   "path": "shop/coupons_rules.py",
+   "function": "check_product_amount"
+  },
+  {
+   "path": "shop/orders_rules.py",
+   "function": "clean_invoice_lines"
+  },
+  {
+   "path": "shop/orders_rules.py",
+   "function": "invoice_total"
+  },
+  {
+   "path": "shop/reviews_rules.py",
+   "function": "report_total"
+  },
+  {
+   "path": "shop/reviews_rules.py",
+   "function": "report_page"
+  },
+  {
+   "path": "shop/tickets_sync.py",
+   "function": "sorted_reviews"
+  },
+  {
+   "path": "shop/tickets_sync.py",
+   "function": "count_reviews_by_status"
+  },
+  {
+   "path": "shop/customers_rules.py",
+   "function": "unique_report_ids"
+  },
+  {
+   "path": "shop/sessions_sync.py",
+   "function": "unique_address_ids"
+  },
+  {
+   "path": "shop/tickets_rules.py",
+   "function": "find_payment"
+  },
+  {
+   "path": "shop/carts_rules.py",
+   "function": "sorted_payments"
+  },
+  {
+   "path": "shop/batches_rules.py",
+   "function": "count_messages_by_status"
+  },
+  {
+   "path": "shop/catalog_rules.py",
+   "function": "customer_page"
+  },
+  {
+   "path": "shop/batches_sync.py",
+   "function": "address_page"
+  },
+  {
+   "path": "shop/reviews_sync.py",
+   "function": "supplier_page"
+  },
+  {
+   "path": "shop/suppliers_rules.py",
+   "function": "batch_page"
+  },
+  {
+   "path": "shop/stock_rules.py",
+   "function": "shipment_total"
+  },
+  {
+   "path": "shop/messages_sync.py",
+   "function": "unique_supplier_ids"
+  },
+  {
+   "path": "shop/messages_sync.py",
+   "function": "clean_supplier_lines"
+  },
+  {
+   "path": "shop/stock_sync.py",
+   "function": "refund_or_default"
+  },
+  {
+   "path": "shop/stock_sync.py",
+   "function": "clean_refund_lines"
+  },
+  {
+   "path": "shop/carts_sync.py",
+   "function": "coupon_or_default"
+  },
+  {
+   "path": "shop/addresses_sync.py",
+   "function": "recent_carts"
+  },
+  {
+   "path": "shop/addresses_sync.py",
+   "function": "sorted_carts"
+  },
+  {
+   "path": "shop/payments_sync.py",
+   "function": "clean_supplier_lines"
+  }
+ ],
+ "web_y": [
+  {
+   "path": "web/api.py",
+   "function": "check_order_amount"
+  },
+  {
+   "path": "web/feeds.py",
+   "function": "coupon_total"
+  },
+  {
+   "path": "web/auth.py",
+   "function": "unique_order_ids"
+  },
+  {
+   "path": "web/auth.py",
+   "function": "find_order"
+  },
+  {
+   "path": "web/widgets.py",
+   "function": "find_report"
+  },
+  {
+   "path": "web/pages.py",
+   "function": "count_warehouses_by_status"
+  },
+  {
+   "path": "web/templates.py",
+   "function": "clean_account_lines"
+  },
+  {
+   "path": "web/templates.py",
+   "function": "count_accounts_by_status"
+  },
+  {
+   "path": "web/uploads.py",
+   "function": "clean_report_lines"
+  },
+  {
+   "path": "web/uploads.py",
+   "function": "report_or_default"
+  },
+  {
+   "path": "web/media.py",
+   "function": "recent_coupons"
+  },
+  {
+   "path": "web/media.py",
+   "function": "count_coupons_by_status"
+  },
+  {
+   "path": "web/forms.py",
+   "function": "check_coupon_amount"
+  },
+  {
+   "path": "web/static.py",
+   "function": "account_page"
+  },
+  {
+   "path": "web/static.py",
+   "function": "account_or_default"
+  },
+  {
+   "path": "web/routes.py",
+   "function": "sorted_accounts"
+  },
+  {
+   "path": "web/routes.py",
+   "function": "account_or_default"
+  },
+  {
+   "path": "web/views.py",
+   "function": "sorted_addresss"
+  },
+  {
+   "path": "web/search.py",
+   "function": "find_supplier"
+  },
+  {
+   "path": "web/search.py",
+   "function": "count_suppliers_by_status"
+  },
+  {
+   "path": "web/errors.py",
+   "function": "account_page"
+  },
+  {
+   "path": "web/errors.py",
+   "function": "find_account"
+  },
+  {
+   "path": "web/handlers.py",
+   "function": "sorted_suppliers"
+  },
+  {
+   "path": "web/handlers.py",
+   "function": "supplier_total"
+  },
+  {
+   "path": "web/hooks.py",
+   "function": "clean_message_lines"
+  },
+  {
+   "path": "web/health.py",
+   "function": "unique_supplier_ids"
+  },
+  {
+   "path": "web/admin.py",
+   "function": "payment_page"
+  },
+  {
+   "path": "web/export.py",
+   "function": "sorted_customers"
+  },
+  {
+   "path": "web/import.py",
+   "function": "recent_refunds"
+  }
+ ],
+ "web_x": [
+  {
+   "path": "web/api.py",
+   "function": "last_order",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "web/feeds.py",
+   "function": "coupon_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "web/feeds.py",
+   "function": "last_coupon",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "web/auth.py",
+   "function": "order_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "web/auth.py",
+   "function": "active_orders",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "web/widgets.py",
+   "function": "active_reports",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "web/pages.py",
+   "function": "last_warehouse",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "web/pages.py",
+   "function": "warehouse_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "web/templates.py",
+   "function": "account_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "web/uploads.py",
+   "function": "report_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "web/uploads.py",
+   "function": "active_reports",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "web/media.py",
+   "function": "coupon_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "web/forms.py",
+   "function": "coupon_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "web/forms.py",
+   "function": "active_coupons",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "web/static.py",
+   "function": "active_accounts",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "web/static.py",
+   "function": "last_account",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "web/routes.py",
+   "function": "active_accounts",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "web/views.py",
+   "function": "last_address",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "web/search.py",
+   "function": "active_suppliers",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "web/errors.py",
+   "function": "last_account",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "web/errors.py",
+   "function": "active_accounts",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "web/handlers.py",
+   "function": "active_suppliers",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "web/handlers.py",
+   "function": "supplier_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "web/hooks.py",
+   "function": "last_message",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "web/health.py",
+   "function": "supplier_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "web/admin.py",
+   "function": "active_payments",
+   "kind": "inverted-condition"
+  },
+  {
+   "path": "web/admin.py",
+   "function": "payment_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "web/export.py",
+   "function": "customer_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "web/export.py",
+   "function": "last_customer",
+   "kind": "off-by-one"
+  },
+  {
+   "path": "web/import.py",
+   "function": "refund_discounted",
+   "kind": "wrong-variable"
+  },
+  {
+   "path": "web/import.py",
+   "function": "active_refunds",
+   "kind": "inverted-condition"
+  }
+ ]
+}

@@ -371,8 +371,15 @@ defmodule Universe.AgentToolsTest do
       for n <- [name, svc], do: kill(n)
     end
 
-    test "an agent's services must be live code services" do
-      [a, b, pool, c, d] = [uniq("a"), uniq("b"), uniq("pool"), uniq("c"), uniq("d")]
+    test "an agent's services: live code services, and agents one level deep" do
+      [a, b, pool, c, d, e] = [
+        uniq("a"),
+        uniq("b"),
+        uniq("pool"),
+        uniq("c"),
+        uniq("d"),
+        uniq("e")
+      ]
 
       result =
         tick(
@@ -380,17 +387,61 @@ defmodule Universe.AgentToolsTest do
             agent(a, %{"services" => ["nope-#{a}"]}),
             agent(b, %{"pool" => pool}),
             agent(c, %{"services" => [b]}),
-            agent(d, %{"services" => [pool]})
+            agent(d, %{"services" => [pool]}),
+            agent(e, %{"services" => [c]})
           ],
-          %{"timeout_s" => 10}
+          %{"ids" => [b, c], "timeout_s" => 15}
         )
 
       assert result.text =~
                "agent services: no live service nope-#{a}; serve it first or in the same tick"
 
-      assert result.text =~ "agent services: #{b} is an agent; list code services"
-      assert result.text =~ "agent services: #{pool} is an agent; list code services"
+      # c calls b (an agent that calls none): fine.
+      assert status(result, c) == "serving"
+      assert result.text =~ "agent services: #{pool} is a pool; list its agents by name"
+      assert result.text =~ "agent services: #{c} calls agents itself; list agents that call none"
+
+      # b is called by c, so b can't start calling agents.
+      again = tick([agent(uniq("b2"), %{"services" => [c]})], %{"timeout_s" => 0})
+      assert again.text =~ "calls agents itself"
+      kill(c)
       kill(b)
+    end
+
+    test "an agent gives another agent a task through its tools" do
+      [lead, helper] = [uniq("lead"), uniq("helper")]
+
+      result =
+        tick([agent(helper), agent(lead, %{"services" => [helper]})], %{
+          "ids" => [lead, helper],
+          "timeout_s" => 15
+        })
+
+      lead_id = id_of(result, lead)
+      port = open_mcp(lead_id)
+      tools = Map.new(rpc(port, 1, "tools/list")["result"]["tools"], &{&1["name"], &1})
+      task_tool = tools["#{helper}__task"]
+      assert task_tool["description"] =~ "Give the #{helper} agent a task"
+      assert task_tool["inputSchema"]["required"] == ["prompt"]
+
+      answer =
+        rpc(port, 2, "tools/call", %{
+          "name" => "#{helper}__task",
+          "arguments" => %{"prompt" => "count the files"}
+        })
+
+      assert text_of(answer) == "done #1: count the files"
+
+      # Logged under the caller, so the observer draws lead → helper.
+      assert Enum.any?(
+               EventLog.for_id(lead_id),
+               &(&1["type"] == "call" and &1["data"]["service"] == helper and
+                   &1["data"]["via"] == "sdk")
+             )
+
+      Port.close(port)
+      kill(lead)
+      kill(helper)
     end
   end
 

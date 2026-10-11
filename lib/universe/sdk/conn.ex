@@ -63,6 +63,7 @@ defmodule Universe.SDK.Conn do
   @copy_timeout_ms 30_000
   @default_call_timeout_s 60
   @max_call_timeout_s 1800
+  @max_subcalls 8
   @max_inbox 20
   # put_file copies (and other blocking requests) running at once.
   @max_tasks 16
@@ -365,7 +366,8 @@ defmodule Universe.SDK.Conn do
               "live" => true,
               "fns" => info.fns,
               "describe" => info.describe,
-              "sigs" => Map.get(info, :sigs, %{})
+              "sigs" => Map.get(info, :sigs, %{}),
+              "agent" => Map.get(info, :agent, false)
             }
 
           :error ->
@@ -405,7 +407,7 @@ defmodule Universe.SDK.Conn do
       fns: fns,
       describe: describe,
       sigs: sigs(msg["sigs"], fns),
-      # Agents can't call agents (yet): an agent's own service is marked.
+      # An agent's own service is marked, so callers know it takes tasks.
       agent: state.allow != :any
     }
 
@@ -468,6 +470,30 @@ defmodule Universe.SDK.Conn do
   end
 
   defp sdk_call(state, msg, service, fun) do
+    if state.allow != :any and match?({:ok, %{agent: true}}, Services.lookup(service)) do
+      # An agent's tasks for other agents: at most @max_subcalls at once.
+      case Services.subcall(state.worker, +1) do
+        n when n > @max_subcalls ->
+          Services.subcall(state.worker, -1)
+
+          reply(
+            state,
+            msg["rid"],
+            {:error, "at most #{@max_subcalls} tasks for other agents at once"}
+          )
+
+          state
+
+        _ ->
+          worker = state.worker
+          do_sdk_call(state, msg, service, fun, fn -> Services.subcall(worker, -1) end)
+      end
+    else
+      do_sdk_call(state, msg, service, fun, fn -> :ok end)
+    end
+  end
+
+  defp do_sdk_call(state, msg, service, fun, done_fun) do
     timeout = call_timeout(msg["timeout_s"])
     # The task holds only what it needs, not a copy of the whole state.
     ctx = Map.take(state, [:worker, :tick])
@@ -499,6 +525,7 @@ defmodule Universe.SDK.Conn do
         do: event(ctx, "call_done", Map.merge(%{"service" => service, "fn" => fun}, done)),
         else: event(ctx, "call", Map.merge(data, done))
 
+      done_fun.()
       result
     end)
   end
@@ -535,9 +562,7 @@ defmodule Universe.SDK.Conn do
       service not in allow ->
         {:error, "this agent may call only #{Enum.join(allow, ", ")}, not #{service}"}
 
-      match?({:ok, %{agent: true}}, Services.lookup(service)) ->
-        {:error, "#{service} is an agent; agents can't call agents"}
-
+      # An agent listed here was checked at serve time (one level only).
       true ->
         :ok
     end

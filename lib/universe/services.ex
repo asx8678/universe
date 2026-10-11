@@ -25,6 +25,7 @@ defmodule Universe.Services do
   @services :universe_services
   @calls :universe_service_calls
   @busy :universe_service_busy
+  @subcalls :universe_agent_subcalls
 
   def start_link(opts \\ []), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)
 
@@ -93,6 +94,9 @@ defmodule Universe.Services do
   def mark_busy(conn, true), do: :ets.insert(@busy, {conn})
   def mark_busy(conn, false), do: :ets.delete(@busy, conn)
 
+  @doc "Adds `delta` to an agent's tasks in flight for other agents; the new count."
+  def subcall(worker, delta), do: :ets.update_counter(@subcalls, worker, delta, {worker, 0})
+
   @doc "Whether service `name` is working on an invocation now."
   def busy?(name) do
     case lookup(name) do
@@ -117,6 +121,7 @@ defmodule Universe.Services do
     :ets.new(@services, [:set, :public, :named_table, read_concurrency: true])
     :ets.new(@calls, [:set, :public, :named_table, write_concurrency: true])
     :ets.new(@busy, [:set, :public, :named_table, write_concurrency: true])
+    :ets.new(@subcalls, [:set, :public, :named_table, write_concurrency: true])
     {:ok, %{monitors: %{}}}
   end
 

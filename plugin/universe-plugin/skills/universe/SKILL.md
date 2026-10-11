@@ -59,7 +59,9 @@ you can finish with a few reads needs no agent.
   can't run code, but `"services":["db"]` makes your code services their tools
   (`mcp__services__db__query`): the agent queries the data itself and the rows
   never pass through you. Each listed service must be live or served in the
-  same tick (the agent starts once it serves). Give several agents the same
+  same tick (the agent starts once it serves). `services` may also name other
+  agents that call no agents themselves: the lead agent can then hand them
+  tasks (`mcp__services__<agent>__task`). Give several agents the same
   `"pool":"reviewers"` and call the pool: each task goes to a free agent (an
   agent runs one task at a time; serve one per task you want in parallel). An
   agent with a question (its `ask` tool) shows as `asking`; answer with `reply`. Serving the

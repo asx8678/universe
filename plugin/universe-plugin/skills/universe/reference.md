@@ -155,8 +155,10 @@ Agent fields: `purpose` (its system prompt, required), `model` (`haiku`,
 (from `Read Grep Glob Edit Write NotebookEdit WebSearch WebFetch TodoWrite`;
 default `Read Grep Glob`; writing tools need `leases`), `services` (code
 services it may call as tools, named `<service>__<function>`; each must be
-live or served in the same tick, and the agent starts once they serve; no
-agents or pools), `pool`, `resume` (default true: serving the same agent
+live or served in the same tick, and the agent starts once they serve; it may
+also name agents, by name, that list no agents themselves: their tool
+`<agent>__task` hands them a task, which takes the caller's time left, at most
+8 at once; pools can't be listed), `pool`, `resume` (default true: serving the same agent
 again, after a kill or a daemon restart, resumes its conversation; a changed
 purpose, model, tools, leases or services starts a new one), `memory`
 (`"session"`, the default: one conversation across tasks, so follow-ups know

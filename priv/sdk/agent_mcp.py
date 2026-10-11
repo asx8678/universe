@@ -80,6 +80,12 @@ def ask_timeout():
         return 300.0
 
 
+AGENT_TASK_SCHEMA = {
+    "type": "object",
+    "properties": {"prompt": {"type": "string", "description": "the task, self-contained"}},
+    "required": ["prompt"],
+}
+
 READ_TOOL = {
     "name": "handle_read",
     "description": f"Read a Universe handle's full value a page at a time (at most {MAX_INLINE:,} "
@@ -195,7 +201,12 @@ def schema(sig):
     }
 
 
-def description(service, describe, fn, sig):
+def description(service, describe, fn, sig, agent=False):
+    if agent:
+        # Another agent: one task at a time, answered in its own words.
+        return (f"Give the {service} agent a task (`prompt`: a self-contained instruction) and get its "
+                f"answer. It works on one task at a time; your task's time left is its limit. "
+                f"({service}: {describe})")[:1024]
     doc = (sig or {}).get("doc") or ""
     text = f"{fn} of the {service} service" + (f": {doc}" if doc else ".")
     if not sig:
@@ -212,16 +223,17 @@ def build_tools():
         if not info.get("live"):
             continue
         service, describe = info["name"], info.get("describe") or ""
+        agent = bool(info.get("agent"))
         for fn in info.get("fns") or []:
             sig = (info.get("sigs") or {}).get(fn)
             name = unique(safe(f"{service}__{fn}")[:MAX_TOOL_NAME], taken)
             tools.append({
                 "name": name,
-                "description": description(service, describe, fn, sig),
-                "inputSchema": schema(sig),
+                "description": description(service, describe, fn, sig, agent),
+                "inputSchema": AGENT_TASK_SCHEMA if agent else schema(sig),
                 "_meta": ALWAYS_LOAD,
             })
-            new_routes[name] = (service, fn)
+            new_routes[name] = (service, fn, agent)
     with routes_lock:
         routes.clear()
         routes.update(new_routes)
@@ -247,8 +259,10 @@ def call_tool(name, args):
             route = routes.get(name)
     if route is None:
         raise SdkError(f"no tool {name}: its service is not running")
-    service, fn = route
-    value = sdk("call", service=service, fn=fn, args=args, timeout_s=CALL_TIMEOUT_S)
+    service, fn, agent = route
+    # A task for another agent may take as long as this agent's own task has left.
+    timeout = int(ask_timeout()) if agent else CALL_TIMEOUT_S
+    value = sdk("call", service=service, fn=fn, args=args, timeout_s=max(timeout, 1))
     text = value if isinstance(value, str) else json.dumps(value, ensure_ascii=False)
     if len(text) <= MAX_INLINE:
         return text

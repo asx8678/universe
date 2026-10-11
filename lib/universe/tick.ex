@@ -432,12 +432,19 @@ defmodule Universe.Tick do
           into: MapSet.new(),
           do: name
         ),
+      # Agents of this batch, by name, with the services they list.
       agents:
         for(
           %{op: "serve", agent: %{} = a} = d <- accepted,
-          name <- [d.service | List.wrap(a.pool)],
+          into: %{},
+          do: {d.service, a.services}
+        ),
+      pools:
+        for(
+          %{op: "serve", agent: %{pool: pool}} <- accepted,
+          pool != nil,
           into: MapSet.new(),
-          do: name
+          do: pool
         )
     }
 
@@ -613,15 +620,34 @@ defmodule Universe.Tick do
 
   # An agent's services: code services that serve now or start in this
   # batch. Agents and pools can't be listed (no agent-to-agent calls).
-  defp agent_services(state, %{agent: %{services: [_ | _] = names}}, batch) do
+  # An agent may call code services and agents that call no agents
+  # themselves: one level, so a callee never waits on its caller.
+  defp agent_services(state, %{service: me, agent: %{services: [_ | _] = names}}, batch) do
+    callers = agent_callers(state, me)
+
     Enum.find_value(names, :ok, fn name ->
       holder = state.services[name]
       live = holder && status_of(state, holder) in @live && state.workers[holder]
 
+      callee =
+        Map.get(batch.agents, name) || (live && live.spec[:agent] && live.spec.agent.services)
+
       cond do
-        MapSet.member?(batch.agents, name) or pool_members(state, name) != [] or
-            (live && live.spec[:agent] != nil) ->
-          {:error, "agent services: #{name} is an agent; list code services"}
+        name == me ->
+          {:error, "agent services: an agent can't list itself"}
+
+        is_list(callee) and callers != [] ->
+          {:error,
+           "agent services: #{me} is called by #{Enum.join(callers, ", ")}, so it can't call agents"}
+
+        is_list(callee) and Enum.any?(callee, &agent_name?(state, batch, &1)) ->
+          {:error, "agent services: #{name} calls agents itself; list agents that call none"}
+
+        is_list(callee) ->
+          nil
+
+        MapSet.member?(batch.pools, name) or pool_members(state, name) != [] ->
+          {:error, "agent services: #{name} is a pool; list its agents by name"}
 
         MapSet.member?(batch.services, name) or live ->
           nil
@@ -633,6 +659,22 @@ defmodule Universe.Tick do
   end
 
   defp agent_services(_state, _d, _batch), do: :ok
+
+  defp agent_name?(state, batch, name) do
+    Map.has_key?(batch.agents, name) or
+      match?(
+        %{spec: %{agent: %{}}, status: s} when s in @live,
+        state.workers[state.services[name]]
+      )
+  end
+
+  # Live agents that list `name` among their services. (A new agent of
+  # this batch that lists one calling agents is refused itself instead.)
+  defp agent_callers(state, name) do
+    for {_, %{kind: "serve", status: s, spec: %{agent: %{services: svcs}}} = w} <- state.workers,
+        s in @live and not stopping?(w) and name in svcs,
+        do: w.service || w.spec.service
+  end
 
   # An agent starts once its services serve, so its tool list is complete:
   # live ones already do, this batch's have their new IDs by now.

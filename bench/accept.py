@@ -81,6 +81,10 @@ def score(path):
             for d in t)
         for t in ticks)
 
+    # A delegated task stopped by a kill (restarting it instead of steering).
+    task_ids = {q["id"] for q in task_calls}
+    tasks_killed = sum(1 for e in events
+                       if e["type"] == "exit" and e["id"] in task_ids and e["data"].get("status") == "killed")
     steers_sent = [d for d in directives if d.get("op") == "steer"]
     steers_ok = [e for e in events if e["type"] == "steer"]
     steers_rejected = [e["data"].get("reason") for e in events
@@ -124,6 +128,7 @@ def score(path):
         "steers": f"{len(steers_ok)} delivered / {len(steers_sent)} sent",
         "steer_rejections": steers_rejected,
         "tasks": len(task_calls),
+        "tasks_killed": tasks_killed,
         "run_output_read_tok": read_chars // 4,
         "turns": m["turns"],
         "orch_tokens": m["total"] - m["helpers"],
@@ -133,6 +138,11 @@ def score(path):
         "wall_s": m["wall_s"],
         "model": m["model"],
     }
+
+
+def steer_verdict(r):
+    """Steer acceptance: a delivered steer, the task not killed, review graded."""
+    return r["grade"] == "PASS" and r["steers"].split()[0] != "0" and r["tasks_killed"] == 0
 
 
 def verdict(r):
@@ -152,6 +162,13 @@ def main():
               f"| {r['wired']} | {r['same_tick']} | {r['midrun']} | {r['window']} | {r['steers']} | {r['tasks']} "
               f"| {r['turns']} | {r['orch_tokens']:,} | {r['helper_tokens']:,} | {r['wall_s']:.0f} |")
     print()
+    if all(r["cell"].startswith("review.") for r in rows):
+        for r in rows:
+            print(f"- {r['cell']}: {'PASS' if steer_verdict(r) else 'FAIL'} (steer delivered, task not killed, "
+                  f"review graded) · steers {r['steers']} · tasks killed {r['tasks_killed']} · grade {r['grade']}"
+                  f" · window {r['window']} · turns {r['turns']}"
+                  + (f" · steer rejections: {r['steer_rejections']}" if r["steer_rejections"] else ""))
+        return
     for r in rows:
         passed, steer, turns = verdict(r)
         print(f"- {r['cell']}: {'PASS' if passed else 'FAIL'} (built, wired, correct, <= 25 turns) · steered: {steer} · turns {r['turns']} ({turns})"
