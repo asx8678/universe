@@ -45,7 +45,7 @@ defmodule Universe.Directive do
   @id_re ~r/^#(\d+)$/
 
   @run_fields ~w(op label lang code budget leases after then quiet)
-  @serve_fields ~w(op label name lang code agent budget leases network ttl_idle_s after quiet)
+  @serve_fields ~w(op label name lang code agent budget leases network ttl_idle_s after quiet save tool)
   @call_fields ~w(op label service fn args prompt timeout_s after quiet)
   @agent_fields ~w(purpose model tools pool resume services memory)
   # Built-in tools an agent may get. Code-running tools never: an agent runs
@@ -251,9 +251,11 @@ defmodule Universe.Directive do
 
   defp serve(d) do
     with :ok <- known_fields(d, @serve_fields),
+         {:ok, d} <- saved_tool(d),
          {:ok, label} <- label(d["label"], true),
          {:ok, name} <- service_name(d["name"] || label),
          {:ok, lang, code, agent} <- serve_body(d),
+         {:ok, save} <- save_flag(d["save"], agent),
          {:ok, budget} <- budget(d["budget"], @serve_defaults),
          {:ok, leases} <- leases(d["leases"]),
          {:ok, network} <- network(d["network"]),
@@ -274,10 +276,53 @@ defmodule Universe.Directive do
          ttl_idle_s: ttl,
          after: after_refs,
          then: [],
-         quiet: quiet
+         quiet: quiet,
+         save: save
        }}
     end
   end
+
+  # `"tool": "db"` serves code saved earlier with `"save": true`: its code,
+  # lang, network and idle timeout, under the name it was saved with (its
+  # code serves that name). Fields given here override network and timeout.
+  defp saved_tool(%{"tool" => tool} = d) when is_binary(tool) do
+    cond do
+      Map.has_key?(d, "code") or Map.has_key?(d, "agent") ->
+        {:error, "serve takes a saved tool or code/agent, not both"}
+
+      not Regex.match?(@label_re, tool) ->
+        {:error, "tool must be a saved tool's name"}
+
+      true ->
+        case Universe.Tools.load(tool) do
+          {:ok, saved} ->
+            {:ok,
+             d
+             |> Map.put("name", tool)
+             |> Map.put("lang", saved["lang"])
+             |> Map.put("code", saved["code"])
+             |> Map.put_new("network", saved["network"] || [])
+             |> Map.put_new("ttl_idle_s", saved["ttl_idle_s"])
+             |> Map.delete("tool")}
+
+          :error ->
+            {:error,
+             "no saved tool #{tool} (saved tools: #{Enum.join(Universe.Tools.list(), ", ")})"}
+        end
+    end
+  end
+
+  defp saved_tool(%{"tool" => _}), do: {:error, "tool must be a saved tool's name"}
+  defp saved_tool(d), do: {:ok, d}
+
+  defp save_flag(nil, _agent), do: {:ok, false}
+  defp save_flag(false, _agent), do: {:ok, false}
+  defp save_flag(true, nil), do: {:ok, true}
+
+  defp save_flag(true, _agent),
+    do: {:error, "save keeps a code service's code; agents can't be saved"}
+
+  defp save_flag(_, _), do: {:error, "save must be true or false"}
 
   defp call(d) do
     with :ok <- known_fields(d, @call_fields),

@@ -57,7 +57,7 @@ defmodule Universe.DigestTest do
 
     text = Digest.build(info(rows))
     assert text =~ "#3   done     count 1s · 600\n    open 600\n    pending 85\n"
-    # 20 lines of ~145 chars fit once in the 3,000-char budget, not twice.
+    # 20 lines of ~145 chars fit once in the 4,500-char budget, not twice.
     assert text =~ "    " <> List.last(big)
     assert length(String.split(text, List.last(big))) == 2
     assert text =~ "#5   done     more  1s · 7"

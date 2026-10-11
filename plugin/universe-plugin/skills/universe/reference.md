@@ -23,9 +23,9 @@
 | op | fields |
 |---|---|
 | run | `label`, `lang` (python, bash, elixir), `code`, `budget` {`wall_s` 120, `out_kb` 256, `mem_mb` 2048}, `leases` [paths], `after` [labels, #ids], `then` [run directives], `quiet` |
-| serve | `label`, `name` (defaults to label), `lang`, `code`, `budget` (no wall clock by default), `leases`, `network` ["host:port"], `ttl_idle_s` (900), `after`, `quiet`; or `agent` instead of `lang`/`code` (fields below) |
+| serve | `label`, `name` (defaults to label), `lang`, `code`, `budget` (no wall clock by default), `leases`, `network` ["host:port"], `ttl_idle_s` (900), `after`, `quiet`, `save` (keep the code as a saved tool once it serves); or `tool` (a saved tool's name, instead of `lang`/`code`; it serves under that name); or `agent` instead of `lang`/`code` (fields below) |
 | call | `label`, `service`, `fn`, `args` (object → keyword args, list → positional), `timeout_s` (60, max 300), `after`, `quiet` |
-| kill | `target` (#id or label), optional `label` |
+| kill | `target` (#id, label, or an agent pool name: every member), optional `label` |
 | reply | `target`, `text`, optional `label` |
 | steer | `target` (a busy agent, or its task), `text`, `interrupt` (false), optional `label` |
 
@@ -47,9 +47,9 @@ t12 · 4 changed · 1 running · cursor 812
 Statuses: queued, running, serving, asking, done, failed, budget (a budget
 killed it), killed, rejected (never ran; the line gives the reason).
 
-A run that finished (`done` or `failed`) with at most 20 lines and 1,500
+A run that finished (`done` or `failed`) with at most 40 lines and 3,000
 characters of stdout shows all of it, indented, under its line (up to
-3,000 characters of such output a tick, worst news first); a longer output
+4,500 characters of such output a tick, worst news first); a longer output
 shows its last line, and a run that stored handles shows the handles.
 
 ## inspect

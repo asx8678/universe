@@ -337,7 +337,8 @@ defmodule Universe.SDK.Conn do
 
   defp handle_msg(%{"op" => "ask", "question" => q} = msg, state) when is_binary(q) do
     worker = state.worker
-    async(state, msg["rid"], fn -> Tick.ask(worker, String.slice(q, 0, 2000)) end)
+    timeout = if is_number(msg["timeout_s"]), do: msg["timeout_s"]
+    async(state, msg["rid"], fn -> Tick.ask(worker, String.slice(q, 0, 2000), timeout) end)
   end
 
   defp handle_msg(%{"op" => "call", "service" => service, "fn" => fun} = msg, state)

@@ -19,7 +19,7 @@ defmodule Universe.Digest do
   @max_chars 8_000
   @detail_max 160
   # Small run outputs shown in full under their row, at most this much a tick.
-  @output_max 3_000
+  @output_max 4_500
 
   @order ~w(failed budget rejected asking killed done running queued)
 

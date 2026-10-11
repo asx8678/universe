@@ -45,8 +45,9 @@ You are a worker agent run by Universe for an orchestrating agent. Each user \
 message is one task from it. Do the task, then give the result as your final \
 message: concise, complete, no preamble. That message is returned verbatim. \
 You cannot run code or shell commands. If you cannot continue without \
-information only the orchestrator has, reply with one line that starts with \
-"QUESTION:" and nothing else; its answer comes back as the next message. \
+information only the orchestrator has, ask it with the mcp__services__ask tool \
+and carry on with its answer (or reply with one line that starts with \
+"QUESTION:"; its answer comes back as the next message). \
 A message from the orchestrator can also arrive while you work; it changes \
 or adds to the task in hand."""
 
@@ -59,6 +60,8 @@ services = cfg.get("services") or []
 SDK_DIR = os.path.dirname(os.path.abspath(U.__file__))
 # Per service call from the agent's tools; Claude Code's own MCP timer gets more.
 CALL_TIMEOUT_S = 300
+# An `ask` may wait for the orchestrator as long as the longest task (1,800 s).
+MCP_TIMER_S = 1800 + 30
 STEER_POLL_S = 0.5
 # After a result, how long a steer the session hasn't taken in yet may take to
 # start its own turn (it starts at once: the message is already queued).
@@ -76,8 +79,8 @@ def permissions():
                 path = os.path.join(r, lease.strip("/")) if lease not in (".", "") else r
                 allow += [f"Edit(/{path})", f"Edit(/{path}/**)"]
     deny = [f"{t}(/{r}/.universe/**)" for r in roots for t in ("Read", "Edit")]
-    if services:
-        allow.append("mcp__services")
+    # Every agent has the server: `ask` always, services as tools if given.
+    allow.append("mcp__services")
     return {"permissions": {"allow": allow, "deny": deny}}
 
 
@@ -86,7 +89,7 @@ def mcp_config():
 
     No secrets in the file: the socket path, this worker's ID and the path of
     its token file, which the agent's own file tools can't read."""
-    keep = ("UNIVERSE_SOCK", "UNIVERSE_ID", "UNIVERSE_TOKEN_FILE", "PATH", "LANG")
+    keep = ("UNIVERSE_SOCK", "UNIVERSE_ID", "UNIVERSE_TOKEN_FILE", "UNIVERSE_RUN_DIR", "PATH", "LANG")
     env = {k: os.environ[k] for k in keep if k in os.environ}
     env.update(UNIVERSE_AGENT_SERVICES=",".join(services),
                UNIVERSE_AGENT_CALL_TIMEOUT_S=str(CALL_TIMEOUT_S))
@@ -95,7 +98,7 @@ def mcp_config():
         "command": sys.executable,
         "args": ["-I", "-u", os.path.join(SDK_DIR, "agent_mcp.py")],
         "env": env,
-        "timeout": (CALL_TIMEOUT_S + 30) * 1000,
+        "timeout": MCP_TIMER_S * 1000,
         "alwaysLoad": True,
     }
     path = os.path.join(os.environ["UNIVERSE_RUN_DIR"], "mcp.json")
@@ -116,9 +119,8 @@ def command():
         "--system-prompt", cfg["purpose"] + PROTOCOL + (SERVICES_NOTE if services else ""),
         "--tools", ",".join(cfg["tools"]),
         "--settings", json.dumps(permissions()),
+        "--mcp-config", mcp_config(),
     ]
-    if services:
-        args += ["--mcp-config", mcp_config()]
     if cfg.get("model"):
         args += ["--model", cfg["model"]]
     return args
@@ -174,7 +176,7 @@ def start_session(resume):
         args = command() + ["--session-id", session["id"]]
         resume = False
     # Tool calls into services may take minutes (MCP's own timer is 60 s).
-    env = dict(os.environ, MCP_TOOL_TIMEOUT=str((CALL_TIMEOUT_S + 30) * 1000))
+    env = dict(os.environ, MCP_TOOL_TIMEOUT=str(MCP_TIMER_S * 1000))
     proc = subprocess.Popen(args, cwd=root, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                             text=True, bufsize=1, env=env)
     events = queue.Queue()
@@ -426,9 +428,27 @@ def log_usage(n, started, ok):
         f.write(json.dumps(line) + "\n")
 
 
+DEADLINE_FILE = os.path.join(os.environ.get("UNIVERSE_RUN_DIR", "."), "task_deadline")
+
+
+def note_deadline():
+    """Tells agent_mcp.py when the task in hand runs out, so an `ask` from
+    the agent's tools expires with it instead of outliving the task."""
+    left = U.time_left()
+    try:
+        if left is None:
+            os.remove(DEADLINE_FILE)
+        else:
+            with open(DEADLINE_FILE, "w") as f:
+                f.write(str(time.time() + left))
+    except OSError:
+        pass
+
+
 def task(prompt=None):
     if not isinstance(prompt, str) or not prompt.strip():
         raise ValueError("task needs a prompt")
+    note_deadline()
     state["calls"] = {}
     ok = False
     state["tasks"] += 1

@@ -16,6 +16,8 @@ Universe is running for this project. All execution goes through
 mcp__universe__tick and mcp__universe__inspect (use the universe skill); Bash is redirected.
 Build the helpers a task needs: services for what you use more than once, agents
 for judgment work, given the services they need, steered while they work.
+Verify by sampling, not a second full pass. Kill helpers in the tick that writes
+the result (a pool name kills every member), or leave them: idle ones stop alone.
 
 $manifest
 MSG

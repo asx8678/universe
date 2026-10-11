@@ -14,7 +14,7 @@ digest. Bash is off in this project; read and edit files with your own tools.
 1. Plan the next batch. Independent jobs become separate directives.
 2. Call `mcp__universe__tick` once with all of them and a `wait`.
 3. Read the digest. Act on `failed` and `asking` lines first. A finished run's
-   output of up to 20 lines is shown in full under its line, so print what you
+   output of up to 40 lines is shown in full under its line, so print what you
    need (counts, a summary) rather than everything.
 4. Call `mcp__universe__inspect` only when that isn't enough (`#5` for code
    and output, `t12` for every event of a tick, `h:5/rows` for a handle).
@@ -28,8 +28,11 @@ in the first tick:
 - An **agent** for each chunk of judgment work (reviews, triage, summaries), with
   a precise `purpose` and the `services` it needs, so it fetches its own data.
   Serve it and send its first task in the same tick.
-- `steer` an agent that drifts, `reply` to one that asks, and `kill` helpers
-  when the task is done.
+- `steer` an agent that drifts, `reply` to one that asks.
+- Verify by sampling a few results, not with a second full pass.
+- Kill helpers in the same tick that writes the final result (`kill` with a
+  pool name stops every member), or leave them: idle helpers stop on their
+  own after `ttl_idle_s` and cost nothing meanwhile. Don't spend a tick on it.
 
 Don't build for one-off work: one `run` is cheaper than a service, and a task
 you can finish with a few reads needs no agent.
@@ -42,7 +45,9 @@ you can finish with a few reads needs no agent.
   success into the auto-acked line).
 - `serve`: a long-lived service. Its code calls `U.serve(name, {fn: callable}, describe)`.
   Add `network: ["host:port"]` if it must reach a server, `ttl_idle_s` to change
-  the 900 s idle stop.
+  the 900 s idle stop. `"save": true` keeps a service that works as a saved
+  tool; later (any session) `{"op":"serve","label":"db","tool":"db"}` serves it
+  again without its code. The manifest lists saved tools.
 - `call`: `{"op":"call","label":"n","service":"pg","fn":"query","args":{"sql":"..."}}`.
   Small results show inline; large ones become a handle.
 - Agents: a `serve` with an `agent` block instead of code is a helper Claude
@@ -57,7 +62,7 @@ you can finish with a few reads needs no agent.
   same tick (the agent starts once it serves). Give several agents the same
   `"pool":"reviewers"` and call the pool: each task goes to a free agent (an
   agent runs one task at a time; serve one per task you want in parallel). An
-  agent with a question shows as `asking`; answer with `reply`. Serving the
+  agent with a question (its `ask` tool) shows as `asking`; answer with `reply`. Serving the
   same agent again resumes its conversation (`"resume": false` starts fresh).
   For independent tasks (batches of tickets, files to summarise) add
   `"memory":"task"`: each task starts a fresh session instead of re-reading

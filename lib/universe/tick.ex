@@ -93,8 +93,14 @@ defmodule Universe.Tick do
   @doc "Stops a worker on behalf of the garbage collector."
   def gc_kill(id, reason), do: GenServer.cast(__MODULE__, {:gc_kill, id, reason})
 
-  @doc "Called by a worker's SDK connection; blocks until the model replies."
-  def ask(id, question), do: GenServer.call(__MODULE__, {:ask, id, question}, :infinity)
+  @doc """
+  Called by a worker's SDK connection; parks worker `id` as asking and
+  blocks until the model replies. With `timeout_s`, an
+  unanswered question expires: the caller gets an error and the worker goes
+  back to what it was doing.
+  """
+  def ask(id, question, timeout_s \\ nil),
+    do: GenServer.call(__MODULE__, {:ask, id, question, timeout_s}, :infinity)
 
   @doc """
   Called by a worker's SDK connection on `U.serve`. The Tick checks the
@@ -196,10 +202,14 @@ defmodule Universe.Tick do
     {:reply, ttls, state}
   end
 
-  def handle_call({:ask, id, question}, from, state) do
+  def handle_call({:ask, id, question, timeout_s}, from, state) do
     case state.workers[id] do
       %{status: status} = w when status in ["running", "serving"] ->
         EventLog.append("ask", tick: w.tick, id: id, data: %{"question" => question})
+        ref = make_ref()
+
+        if is_number(timeout_s) and timeout_s > 0,
+          do: Process.send_after(self(), {:ask_timeout, id, ref}, round(timeout_s * 1000))
 
         w = %{
           w
@@ -207,6 +217,7 @@ defmodule Universe.Tick do
             prior_status: status,
             asker: from,
             question: question,
+            ask_ref: ref,
             attention_seq: EventLog.last_seq(),
             attention_at: now()
         }
@@ -257,11 +268,27 @@ defmodule Universe.Tick do
         )
 
         w = %{w | status: "serving", service: name, fns: fns, describe: describe}
+        if w.spec[:save], do: save_tool(w, name, info)
         state = %{state | services: Map.put(state.services, name, id)} |> put_worker(w)
         {:reply, :ok, state |> schedule() |> check_waiters()}
 
       {:error, _} = refused ->
         {:reply, refused, state}
+    end
+  end
+
+  # A serve with "save": true keeps its code once it really serves.
+  defp save_tool(w, name, info) do
+    case Universe.Tools.save(name, w.spec, info) do
+      :ok ->
+        EventLog.append("tool_saved", tick: w.tick, id: w.id, data: %{"name" => name})
+
+      {:error, reason} ->
+        EventLog.append("tool_saved",
+          tick: w.tick,
+          id: w.id,
+          data: %{"name" => name, "error" => reason}
+        )
     end
   end
 
@@ -277,6 +304,26 @@ defmodule Universe.Tick do
   end
 
   @impl true
+  # A question nobody answered in time: the asker gets an error and the
+  # worker goes back to what it was doing.
+  def handle_info({:ask_timeout, id, ref}, state) do
+    case state.workers[id] do
+      %{status: "asking", ask_ref: ^ref} = w ->
+        EventLog.append("ask_expired",
+          tick: w.tick,
+          id: id,
+          data: %{"question" => String.slice(w.question || "", 0, 200)}
+        )
+
+        GenServer.reply(w.asker, {:error, "no answer from the orchestrator in time"})
+        w = %{w | status: w.prior_status, asker: nil, question: nil, prior_status: nil}
+        {:noreply, put_worker(state, w) |> check_waiters()}
+
+      _ ->
+        {:noreply, state}
+    end
+  end
+
   def handle_info({:worker_exit, id, summary}, state) do
     state =
       case state.workers[id] do
@@ -498,7 +545,11 @@ defmodule Universe.Tick do
         end
 
       :error ->
-        {:error, "no worker #{target}"}
+        # A pool name stops every member at once.
+        case pool_members(state, target) do
+          [] -> {:error, "no worker or agent pool #{target}"}
+          members -> {:ok, Enum.reduce(members, state, &stop(&2, &1.id, nil))}
+        end
     end
   end
 
@@ -518,6 +569,7 @@ defmodule Universe.Tick do
          w
          | status: w.prior_status,
            asker: nil,
+           ask_ref: nil,
            question: nil,
            prior_status: nil
        })}
@@ -713,6 +765,7 @@ defmodule Universe.Tick do
       fns: [],
       describe: nil,
       asker: nil,
+      ask_ref: nil,
       question: nil,
       prior_status: nil,
       restarts: [],
@@ -1036,6 +1089,7 @@ defmodule Universe.Tick do
           | status: "running",
             restarts: [now() | recent],
             asker: nil,
+            ask_ref: nil,
             question: nil,
             service: w.spec.service
         })
@@ -1337,6 +1391,7 @@ defmodule Universe.Tick do
         fns: (serve && serve["data"]["fns"]) || [],
         describe: serve && serve["data"]["describe"],
         asker: nil,
+        ask_ref: nil,
         question: nil,
         prior_status: nil,
         restarts: [],
@@ -1521,8 +1576,8 @@ defmodule Universe.Tick do
   # A finished run's whole stdout when it is small, so reading it needs no
   # inspect; Digest caps how much of it a tick shows. A run that stored
   # handles answers with them instead.
-  @output_lines 20
-  @output_chars 1_500
+  @output_lines 40
+  @output_chars 3_000
 
   defp run_output(%{kind: "run", status: s, quiet: false} = w, recent)
        when s in ["done", "failed"] do

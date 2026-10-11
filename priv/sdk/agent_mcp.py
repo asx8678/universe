@@ -4,8 +4,9 @@ The agent bridge lists this server in its claude session's ``--mcp-config``.
 It connects to the Universe SDK socket as the agent's own worker ID (with the
 agent's token file) and offers one tool per function of each service named in
 ``UNIVERSE_AGENT_SERVICES``, called ``<service>__<function>``, plus
-``handle_preview`` and ``handle_read`` (a handle's full value, a page at a
-time). The kernel refuses calls to any other service, so this
+``handle_preview``, ``handle_read`` (a handle's full value, a page at a
+time) and ``ask`` (a question to the orchestrator; the tool returns its
+reply). Every agent gets this server, services or not. The kernel refuses calls to any other service, so this
 server is a convenience, not the boundary.
 
 Each tool call opens its own SDK connection, so parallel calls never share a
@@ -21,6 +22,7 @@ import re
 import socket
 import sys
 import threading
+import time
 
 SERVER = "services"
 # The API takes tool names up to 64 chars, and Claude Code prefixes ours.
@@ -52,6 +54,30 @@ PREVIEW_TOOL = {
     },
     "_meta": ALWAYS_LOAD,
 }
+
+
+ASK_TOOL = {
+    "name": "ask",
+    "description": "Ask the orchestrator a question only it can answer (a choice, missing "
+    "context, a decision). Blocks until it replies and returns the reply; if no reply comes "
+    "before your task's time runs out, returns an error. Don't ask what you can look up.",
+    "inputSchema": {
+        "type": "object",
+        "properties": {"question": {"type": "string", "description": "one clear question"}},
+        "required": ["question"],
+    },
+    "_meta": ALWAYS_LOAD,
+}
+
+
+def ask_timeout():
+    """Seconds until the task in hand runs out (the bridge writes its
+    deadline), less a margin for the answer to come back; 300 if unknown."""
+    try:
+        with open(os.path.join(os.environ["UNIVERSE_RUN_DIR"], "task_deadline")) as f:
+            return max(1.0, float(f.read()) - time.time() - 3)
+    except (KeyError, OSError, ValueError):
+        return 300.0
 
 
 READ_TOOL = {
@@ -199,12 +225,17 @@ def build_tools():
     with routes_lock:
         routes.clear()
         routes.update(new_routes)
-    return tools + [PREVIEW_TOOL, READ_TOOL]
+    return tools + [PREVIEW_TOOL, READ_TOOL, ASK_TOOL]
 
 
 def call_tool(name, args):
     if name == PREVIEW_TOOL["name"]:
         return sdk("preview", handle=str(args.get("handle", "")))
+    if name == ASK_TOOL["name"]:
+        question = str(args.get("question", "")).strip()
+        if not question:
+            raise SdkError("ask needs a question")
+        return sdk("ask", question=question, timeout_s=ask_timeout())
     if name == READ_TOOL["name"]:
         value = sdk("get", handle=str(args.get("handle", "")))
         return read_page(value, args.get("offset"), args.get("limit"))

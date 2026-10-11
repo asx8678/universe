@@ -540,7 +540,7 @@ of the whole universe; the tick timeline moved to `/timeline`.
   3. Install Elixir 1.20 / OTP 29 and run `mix test` with the Bubblewrap adapter.
   On macOS, Apple's `container` CLI works once its default kernel is installed
   (`container system start --enable-kernel-install`; a large download from GitHub).
-- **Blocked:** Kiro integration (MCP registration, steering file, blocking its shell tool). Kiro CLI is not installed. Pick it up after M3 once it is installed and its syntax is checked.
+- ~~**Blocked:** Kiro integration (MCP registration, steering file, blocking its shell tool).~~ **Dropped (Oct 11, 2026)** at the user's call: Claude Code is the only client.
 - **Deferred (not v1):** brain mode, Context-Folding and AgentFold, web chat, 3D view, several clients on one Universe, SQLite event index, the bash `u` helper.
 
 ## 5. Open questions

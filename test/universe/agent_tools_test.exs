@@ -185,7 +185,7 @@ defmodule Universe.AgentToolsTest do
       tools = Map.new(rpc(port, 2, "tools/list")["result"]["tools"], &{&1["name"], &1})
 
       assert Enum.sort(Map.keys(tools)) ==
-               Enum.sort(["#{svc}__add", "#{svc}__rows", "handle_preview", "handle_read"])
+               Enum.sort(["#{svc}__add", "#{svc}__rows", "handle_preview", "handle_read", "ask"])
 
       add = tools["#{svc}__add"]
       assert add["description"] =~ "add of the #{svc} service: Adds two numbers."
@@ -259,6 +259,59 @@ defmodule Universe.AgentToolsTest do
 
       Port.close(port)
       for n <- [name, svc, other], do: kill(n)
+    end
+
+    test "every agent can ask the orchestrator through its ask tool; an unanswered ask expires" do
+      name = uniq("asker")
+      result = tick([agent(name)], %{"ids" => [name], "timeout_s" => 15})
+      agent_id = id_of(result, name)
+      # The fake claude records its argv as it starts, just after serving.
+      eventually(fn ->
+        File.exists?(Path.join([Worker.run_dir(agent_id), "tmp", "fake_claude_args.json"]))
+      end)
+
+      args = args_of(agent_id)
+      # No services, yet the server is there for `ask`.
+      assert arg(args, "--mcp-config") == Path.join(Worker.run_dir(agent_id), "mcp.json")
+      assert arg(args, "--system-prompt") =~ "mcp__services__ask"
+
+      port = open_mcp(agent_id)
+      tools = rpc(port, 1, "tools/list")["result"]["tools"] |> Enum.map(& &1["name"])
+      assert Enum.sort(tools) == ["ask", "handle_preview", "handle_read"]
+
+      ask = %{
+        "jsonrpc" => "2.0",
+        "id" => 2,
+        "method" => "tools/call",
+        "params" => %{"name" => "ask", "arguments" => %{"question" => "Which year?"}}
+      }
+
+      true = Port.command(port, Jason.encode!(ask) <> "\n")
+
+      eventually(fn ->
+        API.inspect(%{"target" => "manifest"}).text =~ "#{name} (##{agent_id}, agent, asking)"
+      end)
+
+      replied =
+        tick([%{"op" => "reply", "target" => name, "text" => "2026"}], %{"timeout_s" => 0})
+
+      refute replied.text =~ "rejected"
+      assert text_of(reply_to(port, 2)) == "2026"
+
+      # With the task's deadline 1 s away, an ask nobody answers expires.
+      File.write!(
+        Path.join(Worker.run_dir(agent_id), "task_deadline"),
+        "#{System.os_time(:second) + 4}"
+      )
+
+      late = put_in(ask, ["params", "arguments", "question"], "Still there?") |> Map.put("id", 3)
+      true = Port.command(port, Jason.encode!(late) <> "\n")
+      expired = reply_to(port, 3)
+      assert expired["result"]["isError"]
+      assert text_of(expired) =~ "no answer from the orchestrator in time"
+      assert API.inspect(%{"target" => "manifest"}).text =~ "#{name} (##{agent_id}, agent, idle)"
+      Port.close(port)
+      kill(name)
     end
 
     test "the kernel lets an agent call only the services it was given" do

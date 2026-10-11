@@ -84,7 +84,7 @@ defmodule Universe.Inspect do
     services = live |> Enum.filter(&(&1.kind == "serve")) |> Enum.sort_by(& &1.id)
     others = live |> Enum.reject(&(&1.kind == "serve")) |> Enum.sort_by(& &1.id)
     leases = Tick.leases()
-    tools = list_tools()
+    tools = Universe.Tools.manifest_lines()
     handles = Handles.list()
 
     busy =
@@ -113,7 +113,7 @@ defmodule Universe.Inspect do
         ["leases: #{if leases == %{}, do: "none", else: ""}"] ++
         Enum.map(Enum.sort(leases), fn {id, paths} -> "  ##{id} #{Enum.join(paths, ", ")}" end) ++
         ["handles: #{length(handles)}#{recent_handles(handles)}"] ++
-        ["saved tools: #{if tools == [], do: "none", else: Enum.join(tools, ", ")}"]
+        ["saved tools: #{if tools == [], do: "none", else: length(tools)}"] ++ tools
 
     Enum.join(lines, "\n")
   end
@@ -131,13 +131,6 @@ defmodule Universe.Inspect do
     case Handles.preview(target) do
       {:ok, text} -> text
       {:error, reason} -> reason
-    end
-  end
-
-  defp list_tools do
-    case File.ls(Paths.tools_dir()) do
-      {:ok, files} -> Enum.sort(files)
-      {:error, _} -> []
     end
   end
 

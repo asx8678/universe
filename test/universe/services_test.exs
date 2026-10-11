@@ -238,6 +238,73 @@ defmodule Universe.ServicesTest do
     assert preview =~ "2  2"
   end
 
+  test "a saved tool serves again by name, in a later tick, without its code" do
+    name = uniq("kept")
+    file = Path.join(Paths.tools_dir(), name <> ".json")
+    on_exit(fn -> File.rm(file) end)
+
+    serve = %{
+      "op" => "serve",
+      "label" => name,
+      "lang" => "python",
+      "code" => "NAME = #{inspect(name)}\n" <> @adder,
+      "save" => true
+    }
+
+    assert status(tick([serve], %{"ids" => [name], "timeout_s" => 15}), name) == "serving"
+
+    assert %{"lang" => "python", "fns" => ["add", "boom", "rows"]} =
+             Jason.decode!(File.read!(file))
+
+    assert API.inspect(%{"target" => "manifest"}).text =~
+             ~s(#{name}: serve with "tool": "#{name}")
+
+    kill(name)
+
+    again = "again-#{name}"
+
+    result =
+      tick([
+        %{"op" => "serve", "label" => again, "tool" => name},
+        %{
+          "op" => "call",
+          "label" => "sum-#{name}",
+          "service" => name,
+          "fn" => "add",
+          "args" => %{"a" => 2, "b" => 5}
+        }
+      ])
+
+    assert status(result, again) == "serving"
+    assert result.text =~ "→ 7"
+    kill(again)
+
+    bad =
+      tick([%{"op" => "serve", "label" => uniq("x"), "tool" => "nope-#{name}"}], %{
+        "timeout_s" => 0
+      })
+
+    assert bad.text =~ "no saved tool nope-#{name}"
+
+    both =
+      tick(
+        [
+          %{
+            "op" => "serve",
+            "label" => uniq("y"),
+            "tool" => name,
+            "code" => "pass",
+            "lang" => "python"
+          }
+        ],
+        %{
+          "timeout_s" => 0
+        }
+      )
+
+    assert both.text =~ "serve takes a saved tool or code/agent, not both"
+  end
+
   test "serve then call in one tick; the call waits for the service" do
     name = uniq("adder")
     sum = uniq("sum")
