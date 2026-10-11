@@ -124,60 +124,56 @@ defmodule UniverseWeb.FlowLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
-      <div class="flex flex-wrap items-baseline justify-between gap-3">
-        <div class="flex items-center gap-3">
-          <h1 class="text-xl font-semibold tracking-tight">Flow</h1>
-          <span class="inline-flex items-center gap-1.5 rounded-full bg-success/10 px-2.5 py-0.5 text-xs font-medium text-success">
-            <span class="size-1.5 animate-pulse rounded-full bg-success"></span> live
-          </span>
-        </div>
-        <div class="flex items-center gap-3">
-          <p class="text-sm opacity-60">
-            Who talks to whom · {@window} events. Numbers count messages; moving edges just carried one.
-          </p>
-          <div class="flex gap-1" id="flow-window">
-            <button
-              :for={w <- [60, 300, 1800]}
-              id={"window-#{w}"}
-              phx-click="window"
-              phx-value-s={w}
-              class={[
-                "rounded-full px-3 py-1 text-xs font-medium transition",
-                @window_s == w && "bg-base-content text-base-100",
-                @window_s != w && "bg-base-200 hover:bg-base-300"
-              ]}
-            >
-              {window_label(w)}
-            </button>
-          </div>
-        </div>
-      </div>
+    <Layouts.app flash={@flash} page={:flow}>
+      <.page_header title="Flow">
+        <:meta><.live_dot /></:meta>
+        <:subtitle>
+          Who talks to whom over the last {window_label(@window_s)} ({@window} events).
+          Numbers count messages; a moving edge just carried one.
+        </:subtitle>
+        <:actions>
+          <.seg
+            id="flow-window"
+            id_prefix="window-"
+            options={for w <- [60, 300, 1800], do: {w, window_label(w)}}
+            value={@window_s}
+            event="window"
+            key="s"
+          />
+        </:actions>
+      </.page_header>
 
       <div class="rounded-xl border border-base-300 bg-base-100 p-2" id="flow-graph">
         <.topology graph={@graph} active={@active} />
       </div>
 
       <div class="grid gap-4 lg:grid-cols-3">
-        <section class="space-y-2 lg:col-span-2" id="flow-recent">
-          <h2 class="text-sm font-semibold uppercase tracking-wide opacity-80">Latest messages</h2>
-          <ol class="divide-y divide-base-300/60 overflow-hidden rounded-xl border border-base-300 bg-base-100 text-xs">
-            <li :if={@graph.recent == []} class="p-4 text-center opacity-60">Nothing yet.</li>
-            <li :for={r <- @graph.recent} class="flex gap-2 px-3 py-1.5 font-mono">
-              <span class="shrink-0 opacity-40">{r.at}</span>
-              <span class="shrink-0 opacity-80">{lane_name(@graph, r.from)} → {lane_name(@graph, r.to)}</span>
-              <span class="min-w-0 truncate opacity-70" title={r.label}>{r.label}</span>
+        <.panel id="flow-recent" title="Latest messages" class="lg:col-span-2">
+          <.empty :if={@graph.recent == []}>Nothing yet.</.empty>
+          <ol
+            :if={@graph.recent != []}
+            class="divide-y divide-base-300/60 overflow-hidden rounded-xl border border-base-300 bg-base-100"
+          >
+            <li
+              :for={r <- @graph.recent}
+              class="grid grid-cols-[4.25rem_minmax(0,14rem)_minmax(0,1fr)] gap-x-3 px-3 py-1.5 text-[13px] leading-5"
+            >
+              <span class="text-xs leading-5 tabular-nums text-muted">{r.at}</span>
+              <span class="truncate font-medium">
+                {lane_name(@graph, r.from)}
+                <span class="text-muted">→</span> {lane_name(@graph, r.to)}
+              </span>
+              <span class="truncate text-muted" title={r.label}>{r.label}</span>
             </li>
           </ol>
-        </section>
-        <section class="space-y-2 text-xs" id="flow-legend">
-          <h2 class="text-sm font-semibold uppercase tracking-wide opacity-80">Reading it</h2>
-          <ul class="space-y-1.5 opacity-80">
+        </.panel>
+        <.panel id="flow-legend" title="Reading it">
+          <ul class="space-y-1.5 text-muted">
             <li>
               <span class="font-semibold text-primary">Model ⇄ Universe</span>: ticks and digests
             </li>
             <li>
-              <span class="font-semibold">Universe → worker</span>: start, tasks and calls; back: serving, answers, exits
+              <span class="font-semibold text-base-content">Universe → worker</span>: start, tasks and calls; back: serving, answers, exits
             </li>
             <li>
               <span class="font-semibold text-info">run → service</span>: a <code>U.call</code>
@@ -191,13 +187,13 @@ defmodule UniverseWeb.FlowLive do
             </li>
             <li>Upper curve: request · lower curve: answer · faded node: worker gone</li>
           </ul>
-          <p class="opacity-60">
+          <p class="text-muted">
             For one tick in order, open a tick's flow from the <.link
               navigate={~p"/timeline"}
-              class="underline"
+              class="text-base-content underline"
             >Timeline</.link>.
           </p>
-        </section>
+        </.panel>
       </div>
     </Layouts.app>
     """

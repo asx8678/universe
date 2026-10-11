@@ -64,50 +64,27 @@ defmodule UniverseWeb.TickFlowLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <div class="flex items-center gap-3">
-          <.link navigate={~p"/timeline"} class="text-sm opacity-60 transition hover:opacity-100">
-            ← Timeline
-          </.link>
-          <h1 class="text-xl font-semibold tracking-tight">Flow of tick t{@tick}</h1>
-          <span
-            :if={@open}
-            id="flow-live"
-            class="inline-flex items-center gap-1.5 rounded-full bg-success/10 px-2.5 py-0.5 text-xs font-medium text-success"
-          >
-            <span class="size-1.5 animate-pulse rounded-full bg-success"></span> live
-          </span>
-        </div>
-        <div class="flex items-center gap-2 text-sm">
-          <.link
-            :if={@prev}
-            id="flow-prev"
-            patch={~p"/timeline/#{@prev}"}
-            class="rounded-lg bg-base-200 px-3 py-1.5 transition hover:bg-base-300"
-          >
-            ← t{@prev}
-          </.link>
-          <.link
-            :if={@next}
-            id="flow-next"
-            patch={~p"/timeline/#{@next}"}
-            class="rounded-lg bg-base-200 px-3 py-1.5 transition hover:bg-base-300"
-          >
-            t{@next} →
-          </.link>
-        </div>
-      </div>
+    <Layouts.app flash={@flash} page={:timeline}>
+      <.page_header title={"Flow of tick t#{@tick}"} back={~p"/timeline"} back_label="Timeline">
+        <:meta><.live_dot :if={@open} id="flow-live" /></:meta>
+        <:subtitle>
+          Everything from this tick until the model's next one, as messages between lanes.
+          Hover a label for its full text.
+        </:subtitle>
+        <:actions>
+          <.action :if={@prev} id="flow-prev" patch={~p"/timeline/#{@prev}"}>
+            <.icon name="hero-arrow-left-micro" class="size-3.5" /> t{@prev}
+          </.action>
+          <.action :if={@next} id="flow-next" patch={~p"/timeline/#{@next}"}>
+            t{@next} <.icon name="hero-arrow-right-micro" class="size-3.5" />
+          </.action>
+        </:actions>
+      </.page_header>
 
-      <p
-        :if={is_nil(@diagram)}
-        class="rounded-xl border border-dashed border-base-300 p-8 text-center text-sm opacity-60"
-      >
-        No tick t{@tick} in this log.
-      </p>
+      <.empty :if={is_nil(@diagram)}>No tick t{@tick} in this log.</.empty>
 
       <div :if={@diagram} class="space-y-3">
-        <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs opacity-80" id="flow-legend">
+        <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted" id="flow-legend">
           <span>{@diagram.events} events · {length(@diagram.rows)} rows · {length(@diagram.lanes)} lanes</span>
           <span class="flex items-center gap-1.5">
             <svg width="28" height="8"><line
@@ -143,9 +120,6 @@ defmodule UniverseWeb.TickFlowLive do
           </span>
         </div>
         <.sequence_diagram diagram={@diagram} />
-        <p class="text-xs opacity-60">
-          Shows everything from this tick until the model's next tick. Hover a label for its full text.
-        </p>
       </div>
     </Layouts.app>
     """

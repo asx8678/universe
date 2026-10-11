@@ -54,8 +54,8 @@ defmodule UniverseWeb.Layouts do
       assign(assigns, nav: @nav, root: root, project: UniverseWeb.Format.project_name(root))
 
     ~H"""
-    <header class="sticky top-0 z-40 border-b border-base-300 bg-base-100/85 backdrop-blur">
-      <div class="mx-auto flex h-13 max-w-7xl items-center gap-6 px-4 sm:px-6 lg:px-8">
+    <header class="sticky top-0 z-40 border-b border-base-300 bg-base-100/85 px-4 backdrop-blur sm:px-6 lg:px-8">
+      <div class="mx-auto flex h-13 max-w-7xl items-center gap-6">
         <.link navigate="/" class="flex shrink-0 items-center gap-2" title={@root}>
           <span class="relative flex size-5 items-center justify-center">
             <span class="absolute inset-0 rounded-full border border-base-content/30"></span>

@@ -338,7 +338,7 @@ defmodule UniverseWeb.UIComponents do
 
   @doc "Shared table cell classes, so every table looks the same."
   def th_class, do: "px-3 py-2 text-left text-xs font-medium text-muted"
-  def td_class, do: "px-3 py-2 align-top"
+  def td_class, do: "px-3 py-2 align-middle"
 
   attr :id, :string, default: nil
   attr :class, :any, default: nil

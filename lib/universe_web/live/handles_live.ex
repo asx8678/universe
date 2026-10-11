@@ -23,7 +23,7 @@ defmodule UniverseWeb.HandlesLive do
         %{
           id: id,
           label: labels[id],
-          handles: Enum.reverse(hs),
+          handles: Enum.sort_by(hs, &natural(&1["handle"])),
           bytes: hs |> Enum.map(&(&1["bytes"] || 0)) |> Enum.sum()
         }
       end)
@@ -37,6 +37,17 @@ defmodule UniverseWeb.HandlesLive do
      |> assign(:open_groups, @open_groups)
      |> assign(:selected, nil)
      |> assign(:preview, nil)}
+  end
+
+  # batch2 before batch10.
+  defp natural(handle) do
+    Regex.split(~r/(\d+)/, handle, include_captures: true)
+    |> Enum.map(fn part ->
+      case Integer.parse(part) do
+        {n, ""} -> {0, n}
+        _ -> {1, part}
+      end
+    end)
   end
 
   defp owner(%{"handle" => "h:" <> rest}) do
@@ -98,7 +109,7 @@ defmodule UniverseWeb.HandlesLive do
                 {length(g.handles)} · {Handles.human_bytes(g.bytes)}
               </span>
             </summary>
-            <table class="w-full border-t border-base-300 text-sm">
+            <table class="w-full table-fixed border-t border-base-300 text-sm">
               <tbody>
                 <tr
                   :for={h <- g.handles}
@@ -111,10 +122,10 @@ defmodule UniverseWeb.HandlesLive do
                   phx-click="preview"
                   phx-value-handle={h["handle"]}
                 >
-                  <td class={[td_class(), "w-0 whitespace-nowrap font-mono text-xs"]}>
+                  <td class={[td_class(), "w-56 max-w-56 truncate font-mono text-xs"]}>
                     {name(h["handle"])}
                   </td>
-                  <td class={[td_class(), "w-0 whitespace-nowrap text-xs text-muted"]}>
+                  <td class={[td_class(), "w-20 whitespace-nowrap text-xs text-muted"]}>
                     {h["kind"]}
                   </td>
                   <td class={[td_class(), "break-words"]}>{h["summary"]}</td>

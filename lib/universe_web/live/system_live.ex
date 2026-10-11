@@ -70,44 +70,42 @@ defmodule UniverseWeb.SystemLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
-      <div class="flex flex-wrap items-baseline justify-between gap-3">
-        <div>
-          <h1 class="text-xl font-semibold tracking-tight">System</h1>
-          <p class="text-sm opacity-60">
-            Every process in the daemon, what it is, what it does and who it talks to. Refreshes every second.
-          </p>
-        </div>
-        <a href="/dashboard/processes" class="text-sm opacity-60 transition hover:opacity-100">
-          raw process list in LiveDashboard →
-        </a>
-      </div>
+    <Layouts.app flash={@flash} page={:system}>
+      <.page_header title="System">
+        <:meta><.live_dot label="every second" /></:meta>
+        <:subtitle>
+          <span id="system-totals" class="flex flex-wrap gap-x-2 gap-y-1">
+            <.total value={@totals.processes} label="Universe processes" />
+            <.total value={@totals.workers} label="workers" />
+            <.total value={@totals.os} label="OS processes" />
+            <.total value={@totals[:beam_processes]} label="BEAM processes in all" />
+            <.total value={mb(@totals[:beam_memory])} label="BEAM memory" />
+          </span>
+        </:subtitle>
+        <:actions>
+          <.action href="/dashboard/processes" variant={:ghost}>
+            Raw process list <.icon name="hero-arrow-up-right-micro" class="size-3.5" />
+          </.action>
+        </:actions>
+      </.page_header>
 
-      <section id="system-totals" class="grid grid-cols-2 gap-3 sm:grid-cols-5">
-        <.total label="Universe processes" value={@totals.processes} />
-        <.total label="Workers" value={@totals.workers} />
-        <.total label="OS processes" value={@totals.os} />
-        <.total label="All BEAM processes" value={@totals[:beam_processes]} />
-        <.total label="BEAM memory" value={mb(@totals[:beam_memory])} />
-      </section>
-
-      <div id="system-legend" class="flex flex-wrap items-center gap-2 text-xs">
+      <div id="system-legend" class="flex flex-wrap items-center gap-x-2 gap-y-1.5 text-xs text-muted">
         <.kind_badge kind={:supervisor} strategy={nil} /> restarts its children by strategy
         <.kind_badge kind={:dynamic_supervisor} strategy={nil} /> children started on demand
         <.kind_badge kind={:genserver} strategy={nil} /> a server process
         <.kind_badge kind={:task} strategy={nil} /> a short job
-        <span class="inline-flex items-center gap-1 rounded-md bg-base-200 px-1.5 py-0.5 font-mono">
+        <span class="inline-flex items-center gap-1 rounded-md bg-base-200 px-1.5 py-px font-mono text-base-content">
           <.icon name="hero-command-line" class="size-3" /> OS
         </span>
-        an OS process · <span class="opacity-70">q = messages waiting · activity = reductions/s</span>
+        an OS process · q = messages waiting · activity = reductions per second
       </div>
 
-      <div :if={@root} id="system-tree" class="rounded-xl border border-base-300 bg-base-100 p-3">
+      <div :if={@root} id="system-tree" class="rounded-xl border border-base-300 bg-base-100 p-2">
         <ul class="text-sm">
           <.tree_node node={@root} rates={@rates} expanded={@expanded} />
         </ul>
       </div>
-      <p :if={is_nil(@root)} class="text-sm opacity-60">Universe.Supervisor is not running.</p>
+      <.empty :if={is_nil(@root)}>Universe.Supervisor is not running.</.empty>
     </Layouts.app>
     """
   end
@@ -122,20 +120,15 @@ defmodule UniverseWeb.SystemLive do
       <div class="group flex flex-wrap items-start gap-x-3 gap-y-0.5 rounded-lg px-2 py-1.5 transition hover:bg-base-200/70">
         <div class="flex min-w-0 flex-1 flex-wrap items-center gap-2">
           <.kind_badge kind={@node.kind} strategy={@node.strategy} />
-          <span class="font-mono font-semibold">{@node.name}</span>
-          <span
-            :if={@node.status}
-            class={["rounded-full px-2 py-0.5 text-xs font-medium", status_class(@node.status)]}
-          >
-            {@node.status}
-          </span>
-          <span :if={@node.detail} class="text-xs opacity-70">{@node.detail}</span>
+          <span class="font-mono text-[13px] font-semibold">{@node.name}</span>
+          <.badge :if={@node.status} status={@node.status} />
+          <span :if={@node.detail} class="text-xs text-muted">{@node.detail}</span>
           <button
             :if={@node.expandable}
             id={"toggle-" <> dom_key(@node.key)}
             phx-click="toggle"
             phx-value-key={@node.key}
-            class="rounded-md bg-base-200 px-1.5 py-0.5 text-xs transition hover:bg-base-300"
+            class="rounded-md px-1.5 py-px text-xs text-muted ring-1 ring-inset ring-base-300 transition hover:bg-base-200 hover:text-base-content"
           >
             <%= if MapSet.member?(@expanded, @node.key) do %>
               hide children
@@ -144,7 +137,7 @@ defmodule UniverseWeb.SystemLive do
             <% end %>
           </button>
         </div>
-        <div class="flex shrink-0 items-center gap-3 font-mono text-xs tabular-nums opacity-80">
+        <div class="flex shrink-0 items-center gap-3 text-xs tabular-nums text-muted">
           <span
             :if={@node.queue}
             class={[@node.queue > 0 && "font-semibold text-warning"]}
@@ -164,8 +157,8 @@ defmodule UniverseWeb.SystemLive do
           </span>
         </div>
         <div :if={@node.role} class="basis-full pl-1 text-xs">
-          <span class="opacity-80">{@node.role}</span>
-          <span :if={@node.talks} class="opacity-50"> · {@node.talks}</span>
+          <span>{@node.role}</span>
+          <span :if={@node.talks} class="text-muted"> · {@node.talks}</span>
         </div>
       </div>
 
@@ -176,7 +169,7 @@ defmodule UniverseWeb.SystemLive do
       <ul :if={@node.children != []} class="ml-5 border-l border-base-content/15 pl-3">
         <.tree_node :for={c <- @node.children} node={c} rates={@rates} expanded={@expanded} />
       </ul>
-      <p :if={@node.children != [] and @node.hidden > 0} class="ml-8 text-xs opacity-60">
+      <p :if={@node.children != [] and @node.hidden > 0} class="ml-8 text-xs text-muted">
         … and {@node.hidden} more
       </p>
     </li>
@@ -189,9 +182,9 @@ defmodule UniverseWeb.SystemLive do
     ~H"""
     <li id={"os-#{@proc.pid}"}>
       <div class="flex items-center gap-2 rounded-lg px-2 py-1 font-mono text-xs transition hover:bg-base-200/70">
-        <.icon name="hero-command-line" class="size-3.5 shrink-0 opacity-60" />
-        <span class="shrink-0 opacity-60">pid {@proc.pid}</span>
-        <span class="shrink-0 opacity-60">{kb(@proc.rss_kb * 1024)}</span>
+        <.icon name="hero-command-line" class="size-3.5 shrink-0 text-muted" />
+        <span class="shrink-0 text-muted">pid {@proc.pid}</span>
+        <span class="shrink-0 text-muted">{kb(@proc.rss_kb * 1024)}</span>
         <span class="min-w-0 truncate" title={@proc.command}>{@proc.command}</span>
       </div>
       <ul :if={@proc.children != []} class="ml-4 border-l border-dashed border-base-content/20 pl-3">
@@ -207,10 +200,10 @@ defmodule UniverseWeb.SystemLive do
   defp kind_badge(assigns) do
     ~H"""
     <span class={[
-      "inline-flex shrink-0 items-center rounded-md px-1.5 py-0.5 font-mono text-[11px] font-medium",
+      "inline-flex shrink-0 items-center rounded-md px-1.5 py-px text-xs font-medium",
       kind_class(@kind)
     ]}>
-      {kind_label(@kind)}<span :if={@strategy} class="opacity-70">&nbsp;· {@strategy}</span>
+      {kind_label(@kind)}<span :if={@strategy} class="font-normal">&nbsp;· {@strategy}</span>
     </span>
     """
   end
@@ -220,10 +213,10 @@ defmodule UniverseWeb.SystemLive do
 
   defp total(assigns) do
     ~H"""
-    <div class="rounded-xl border border-base-300 bg-base-100 px-4 py-3">
-      <div class="text-xs font-medium uppercase tracking-wide opacity-60">{@label}</div>
-      <div class="mt-1 text-xl font-semibold tabular-nums">{@value}</div>
-    </div>
+    <span class="inline-flex items-baseline gap-1 after:ml-1 after:text-base-300 after:content-['·'] last:after:content-none">
+      <span class="font-semibold tabular-nums text-base-content">{@value}</span>
+      <span>{@label}</span>
+    </span>
     """
   end
 
@@ -242,12 +235,7 @@ defmodule UniverseWeb.SystemLive do
   defp kind_class(:genserver), do: "bg-info/15 text-info"
   defp kind_class(:task), do: "bg-success/15 text-success"
   defp kind_class(:down), do: "bg-error/15 text-error"
-  defp kind_class(_), do: "bg-base-200"
-
-  defp status_class("serving"), do: "bg-success/15 text-success"
-  defp status_class("asking"), do: "bg-warning/20 text-warning"
-  defp status_class(s) when s in ["running", "queued"], do: "bg-info/15 text-info"
-  defp status_class(_), do: "bg-base-200"
+  defp kind_class(_), do: "bg-base-200 text-muted"
 
   defp dom_key(key), do: key |> String.replace(~r/[^A-Za-z0-9_-]+/, "-") |> String.trim("-")
 

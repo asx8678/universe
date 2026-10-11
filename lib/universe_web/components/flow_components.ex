@@ -82,7 +82,7 @@ defmodule UniverseWeb.FlowComponents do
             <title>{lane.label}</title>
             {fit(lane.label, @lane_w - 28)}
           </text>
-          <text x={x(i, @lane_w)} y="41" text-anchor="middle" class="fill-base-content/60 text-[10px]">
+          <text x={x(i, @lane_w)} y="41" text-anchor="middle" class="fill-base-content/60 text-[11px]">
             {lane.sub}
           </text>
         </g>
@@ -93,7 +93,7 @@ defmodule UniverseWeb.FlowComponents do
             :if={row.at != ""}
             x="8"
             y={y(n) + 4}
-            class="fill-base-content/40 text-[10px] tabular-nums"
+            class="fill-base-content/55 text-[11px] tabular-nums"
           >
             {row.at}
           </text>
@@ -111,7 +111,7 @@ defmodule UniverseWeb.FlowComponents do
                 class="stroke-base-content/25"
                 stroke-dasharray="6 4"
               />
-              <text x={@left} y={y(n) - 5} class="fill-base-content/50 text-[10px] italic">
+              <text x={@left} y={y(n) - 5} class="fill-base-content/50 text-[11px] italic">
                 {row.label}
               </text>
           <% end %>
@@ -139,7 +139,7 @@ defmodule UniverseWeb.FlowComponents do
       stroke-width="1.4"
       stroke-dasharray={if @row.dashed, do: "5 4"}
     />
-    <text x={@x + 32} y={@y + 4} class={["text-[11px]", tone_fill(@row.tone)]}>
+    <text x={@x + 32} y={@y + 4} class={["text-[12px]", tone_fill(@row.tone)]}>
       <title>{@row.label}</title>
       {fit(@row.label, @lane_w - 40)}
     </text>
@@ -177,7 +177,7 @@ defmodule UniverseWeb.FlowComponents do
       stroke-dasharray={if @row.dashed, do: "5 4"}
     />
     <polygon points={@head} class={tone_fill(@row.tone)} />
-    <text x={@label_x} y={@y - 6} class={["text-[11px]", tone_fill(@row.tone)]}>
+    <text x={@label_x} y={@y - 6} class={["text-[12px]", tone_fill(@row.tone)]}>
       <title>{@row.label}</title>
       {fit(@row.label, @room)}
     </text>
@@ -206,7 +206,7 @@ defmodule UniverseWeb.FlowComponents do
       rx="6"
       class={note_class(@row.tone)}
     />
-    <text x={@x} y={@y + 4} text-anchor="middle" class="fill-base-content/80 text-[10px] font-mono">
+    <text x={@x} y={@y + 4} text-anchor="middle" class="fill-base-content/80 text-[11px] font-mono">
       <title>{@label}</title>
       {fit(@label, @lane_w - 34)}
     </text>
@@ -274,7 +274,7 @@ defmodule UniverseWeb.FlowComponents do
             x={e.mx}
             y={e.my - 14}
             text-anchor="middle"
-            class={["text-[11px] font-medium", tone_fill(e.tone)]}
+            class={["text-[12px] font-medium", tone_fill(e.tone)]}
           >
             {fit(e.label, 240)} · {e.count}×
           </text>
@@ -317,7 +317,7 @@ defmodule UniverseWeb.FlowComponents do
           >
             {fit(n.label, @node_w - 30)}
           </text>
-          <text x={n.x} y={n.y + 13} text-anchor="middle" class="fill-base-content/60 text-[10px]">
+          <text x={n.x} y={n.y + 13} text-anchor="middle" class="fill-base-content/60 text-[11px]">
             {fit(
               n.sub <> if(n.status && n.status != "gone", do: " · #{n.status}", else: ""),
               @node_w - 16

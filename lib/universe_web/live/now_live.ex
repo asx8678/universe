@@ -410,10 +410,6 @@ defmodule UniverseWeb.NowLive do
                   ]}
                   title={r.text}
                 >{r.text}</span>
-                <span
-                  :if={r.count > 1}
-                  class="ml-1 rounded bg-base-200 px-1 py-px text-xs font-medium tabular-nums text-muted"
-                >×{r.count}</span>
               </span>
             </li>
           </ol>

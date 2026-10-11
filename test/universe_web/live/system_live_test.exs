@@ -5,7 +5,7 @@ defmodule UniverseWeb.SystemLiveTest do
 
   defp uniq(label), do: "#{label}-#{System.unique_integer([:positive])}"
 
-  defp tick(directives, wait \\ %{"timeout_s" => 30}),
+  defp tick(directives, wait),
     do: Universe.API.tick(%{"directives" => directives, "wait" => wait})
 
   defp id_of(result, label) do
