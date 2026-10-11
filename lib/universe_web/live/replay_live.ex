@@ -51,19 +51,23 @@ defmodule UniverseWeb.ReplayLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
-      <h1 class="text-lg font-semibold">Replay</h1>
-      <div class="flex flex-wrap gap-2">
-        <.link
-          :for={f <- @files}
-          navigate={~p"/replay/#{f}"}
-          class={["btn btn-sm", if(f == @file, do: "btn-primary", else: "btn-ghost")]}
-        >
-          {f}
-        </.link>
-      </div>
-      <p :if={@error} class="text-error text-sm">{@error}</p>
-      <p :if={@file && @ticks == [] && !@error} class="text-sm opacity-60">No ticks in {@file}.</p>
+    <Layouts.app flash={@flash} page={:replay}>
+      <.page_header title="Replay">
+        <:subtitle>
+          Saved event logs in <code class="font-mono text-xs">.universe/log/</code>, read from the file alone.
+        </:subtitle>
+      </.page_header>
+      <.empty :if={@files == []}>No saved logs yet.</.empty>
+      <.seg
+        :if={@files != []}
+        id="replay-files"
+        options={for f <- @files, do: {f, f}}
+        value={@file}
+        patch={&~p"/replay/#{&1}"}
+      />
+      <p :if={@error} class="text-error">{@error}</p>
+      <.empty :if={@file && @ticks == [] && !@error}>No ticks in {@file}.</.empty>
+      <.empty :if={is_nil(@file) and @files != []}>Pick a log to replay its ticks.</.empty>
       <div class="space-y-4">
         <.tick_card :for={t <- @ticks} id={"replay-" <> t.id} tick={t} />
       </div>

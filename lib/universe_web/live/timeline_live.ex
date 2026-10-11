@@ -51,24 +51,27 @@ defmodule UniverseWeb.TimelineLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
-      <div class="flex flex-wrap items-baseline justify-between gap-2">
-        <h1 class="text-lg font-semibold">Tick timeline</h1>
-        <div class="flex items-center gap-3">
-          <span class="text-sm opacity-60">{@count} ticks · token counts are estimates (chars / 4)</span>
-          <button
+    <Layouts.app flash={@flash} page={:timeline}>
+      <.page_header title="Tick timeline">
+        <:meta>
+          <span class="text-sm tabular-nums text-muted">{@count}</span>
+        </:meta>
+        <:subtitle>
+          Each tick as the model saw it: what it sent and the digest it got back, newest first.
+        </:subtitle>
+        <:actions>
+          <.action
+            id="stop-all"
+            variant={:danger}
             phx-click="stop_all"
             data-confirm="Kill every live worker, service and call?"
-            class="btn btn-error btn-sm"
           >
-            Stop all
-          </button>
-        </div>
-      </div>
+            <.icon name="hero-stop-circle-micro" class="size-4" /> Stop all
+          </.action>
+        </:actions>
+      </.page_header>
 
-      <div :if={@count == 0} class="text-sm opacity-60 py-12 text-center">
-        No ticks yet. They appear here as the model sends them.
-      </div>
+      <.empty :if={@count == 0}>No ticks yet. They appear here as the model sends them.</.empty>
 
       <div id="ticks" phx-update="stream" class="space-y-4">
         <.tick_card :for={{dom_id, t} <- @streams.ticks} id={dom_id} tick={t} flow_link />

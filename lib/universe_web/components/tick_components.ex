@@ -6,6 +6,9 @@ defmodule UniverseWeb.TickComponents do
 
   use Phoenix.Component
 
+  import UniverseWeb.CoreComponents, only: [icon: 1]
+  import UniverseWeb.UIComponents
+
   alias Universe.Digest
 
   @doc "Builds a tick card's data from its `tick_in`/`tick_out` events."
@@ -42,54 +45,155 @@ defmodule UniverseWeb.TickComponents do
   attr :flow_link, :boolean, default: false, doc: "link to the tick's flow diagram"
 
   def tick_card(assigns) do
+    assigns = assign(assigns, :digest, parse_digest(assigns.tick.digest))
+
     ~H"""
-    <article id={@id} class="rounded-box border border-base-300 bg-base-100">
-      <header class="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2 border-b border-base-300 text-sm">
-        <span class="font-mono font-semibold">t{@tick.tick}</span>
-        <span class="opacity-60 font-mono text-xs">{@tick.at}</span>
-        <span :if={@tick.wake} class={["badge badge-sm", wake_class(@tick.wake)]}>{@tick.wake}</span>
-        <span :if={is_nil(@tick.wake)} class="badge badge-sm badge-ghost">waiting…</span>
-        <span :if={@tick.wait_ms} class="opacity-70">waited {Digest.duration(@tick.wait_ms)}</span>
-        <span class="ml-auto font-mono text-xs opacity-70">
-          ~{@tick.tokens_in} tok in → ~{@tick.tokens_out || "…"} tok out
+    <article id={@id} class="overflow-hidden rounded-xl border border-base-300 bg-base-100">
+      <header class="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b border-base-300 bg-base-200/40 px-4 py-2.5">
+        <span class="font-mono text-sm font-semibold">t{@tick.tick}</span>
+        <.stamp ts={@tick.at} class="text-xs text-muted" />
+        <.badge :if={@tick.wake} status={@tick.wake} title={wake_hint(@tick.wake)} />
+        <.badge :if={is_nil(@tick.wake)} status="running">waiting…</.badge>
+        <span :if={@tick.wait_ms} class="text-xs text-muted">
+          answered after {Digest.duration(@tick.wait_ms)}
         </span>
-        <.link
+        <span class="ml-auto text-xs tabular-nums text-muted" title="estimated tokens (chars / 4)">
+          ~{@tick.tokens_in} tokens in · ~{@tick.tokens_out || "…"} out
+        </span>
+        <.action
           :if={@flow_link}
           id={"flow-link-#{@tick.tick}"}
           navigate={"/timeline/#{@tick.tick}"}
-          class="inline-flex items-center gap-1 rounded-lg bg-base-200 px-2 py-0.5 text-xs font-medium transition hover:bg-base-300"
         >
-          flow →
-        </.link>
+          <.icon name="hero-arrows-right-left-micro" class="size-3.5" /> Flow
+        </.action>
       </header>
 
-      <div class="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-base-300">
-        <section class="p-4 space-y-2 min-w-0">
-          <h2 class="text-xs uppercase tracking-wide opacity-60">
-            Model → Universe · {length(@tick.directives)} directive(s)
-            <span :if={@tick.wait} class="normal-case font-mono">· wait {Jason.encode!(@tick.wait)}</span>
-          </h2>
-          <div :for={d <- @tick.directives} class="text-sm">
-            <div class="font-mono">
-              <span class="font-semibold">{op(d)}</span>
-              <span>{label(d)}</span>
-              <span class="opacity-60">{meta(d)}</span>
-            </div>
-            <details :if={is_map(d) and is_binary(d["code"])} class="mt-1">
-              <summary class="cursor-pointer text-xs opacity-60">code</summary>
-              <pre class="mt-1 overflow-x-auto rounded bg-base-200 p-2 text-xs"><code>{d["code"]}</code></pre>
-            </details>
-          </div>
+      <div class="grid divide-y divide-base-300 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:divide-x lg:divide-y-0">
+        <section class="min-w-0 space-y-3 p-4">
+          <h3 class="text-xs font-medium text-muted">
+            Model sent {count(length(@tick.directives), "directive")}
+          </h3>
+          <ul class="space-y-2">
+            <li :for={d <- @tick.directives} class="min-w-0">
+              <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                <code class="rounded bg-base-200 px-1.5 py-px font-mono text-xs font-medium">{op(d)}</code>
+                <span class="font-medium">{label(d)}</span>
+                <span class="text-xs text-muted">{meta(d)}</span>
+              </div>
+              <details :if={is_map(d) and is_binary(d["code"])} class="group mt-1.5">
+                <summary class="inline-flex cursor-pointer list-none items-center gap-1 text-xs text-muted transition hover:text-base-content">
+                  <.icon
+                    name="hero-chevron-right-micro"
+                    class="size-3.5 transition group-open:rotate-90"
+                  /> code · {line_count(d["code"])}
+                </summary>
+                <.code_block class="mt-1.5 max-h-80">{d["code"]}</.code_block>
+              </details>
+            </li>
+          </ul>
+          <p :if={@tick.wait} class="flex items-start gap-1.5 text-xs text-muted">
+            <.icon name="hero-clock-micro" class="mt-px size-3.5 shrink-0" />
+            {wait_text(@tick.wait)}
+          </p>
         </section>
 
-        <section class="p-4 space-y-2 min-w-0">
-          <h2 class="text-xs uppercase tracking-wide opacity-60">Universe → model · digest</h2>
-          <pre :if={@tick.digest} class="overflow-x-auto text-xs leading-relaxed"><code>{@tick.digest}</code></pre>
-          <p :if={is_nil(@tick.digest)} class="text-sm opacity-60">waiting for a wake rule…</p>
+        <section class="min-w-0 space-y-3 p-4">
+          <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <h3 class="text-xs font-medium text-muted">Universe answered</h3>
+            <span :if={@digest} class="text-xs text-muted">{@digest.header}</span>
+          </div>
+          <p :if={is_nil(@tick.digest)} class="text-muted">Waiting for a wake rule…</p>
+          <ul :if={@digest} class="space-y-1">
+            <li
+              :for={row <- @digest.rows}
+              class="grid grid-cols-[2.75rem_4.75rem_minmax(0,1fr)] items-baseline gap-x-2"
+            >
+              <%= case row do %>
+                <% {:row, id, status, label, detail} -> %>
+                  <span class="font-mono text-xs text-muted">{id}</span>
+                  <span><.badge status={status} /></span>
+                  <span class="min-w-0 break-words">
+                    <span class="font-medium">{label}</span>
+                    <span class={["ml-1", status in ~w(done killed) && "text-muted"]}>{detail}</span>
+                  </span>
+                <% {:text, text} -> %>
+                  <span class="col-span-3 break-words font-mono text-xs">{text}</span>
+              <% end %>
+            </li>
+          </ul>
+          <p :if={@digest && @digest.footer} class="text-xs text-muted">{@digest.footer}</p>
+          <details :if={@tick.digest} class="group">
+            <summary class="inline-flex cursor-pointer list-none items-center gap-1 text-xs text-muted transition hover:text-base-content">
+              <.icon name="hero-chevron-right-micro" class="size-3.5 transition group-open:rotate-90" />
+              exact text the model got
+            </summary>
+            <.code_block class="mt-1.5 max-h-96">{@tick.digest}</.code_block>
+          </details>
         </section>
       </div>
     </article>
     """
+  end
+
+  @doc """
+  Splits a digest's text into its header line, one entry per worker line
+  (`{:row, id, status, label, detail}`, or `{:text, line}` when a line has
+  another shape) and the footer (`+N auto-acked …`/`inspect(…)`).
+  """
+  def parse_digest(nil), do: nil
+
+  def parse_digest(text) do
+    [header | rest] = String.split(text, "\n")
+
+    {footer, rows} =
+      case List.last(rest) do
+        nil -> {nil, []}
+        last -> if footer?(last), do: {last, Enum.drop(rest, -1)}, else: {nil, rest}
+      end
+
+    %{header: header, footer: footer, rows: Enum.map(rows, &digest_row/1)}
+  end
+
+  defp footer?(line),
+    do: String.contains?(line, "inspect(") and not String.starts_with?(line, "#")
+
+  defp digest_row(line) do
+    case Regex.run(~r/^(#\d+|--)\s+(\S+)\s+(\S+)\s*(.*)$/, line) do
+      [_, id, status, label, detail] -> {:row, id, status, label, detail}
+      _ -> {:text, line}
+    end
+  end
+
+  @doc "A tick's wait as a sentence."
+  def wait_text(wait) when is_map(wait) do
+    ids = List.wrap(wait["ids"])
+    quantifier = if wait["until"] == "any", do: "any", else: "all"
+
+    what =
+      case ids do
+        [] -> "Wakes when this tick's work settles"
+        [one] -> "Wakes when #{one} settles"
+        _ -> "Wakes when #{quantifier} of #{Enum.join(ids, ", ")} settle"
+      end
+
+    limit = if is_number(wait["timeout_s"]), do: " · at most #{wait["timeout_s"]}s", else: ""
+    what <> limit <> ", or sooner if a worker needs attention"
+  end
+
+  def wait_text(_), do: ""
+
+  defp wake_hint("settled"), do: "everything it waited for finished"
+  defp wake_hint("attention"), do: "a worker failed or asked a question"
+  defp wake_hint("timeout"), do: "the wait timed out; work goes on"
+  defp wake_hint(_), do: nil
+
+  defp count(1, word), do: "1 #{word}"
+  defp count(n, word), do: "#{n} #{word}s"
+
+  defp line_count(code) do
+    n = code |> String.trim_trailing() |> String.split("\n") |> length()
+    count(n, "line")
   end
 
   defp op(%{"op" => op}) when is_binary(op), do: op
@@ -112,16 +216,4 @@ defmodule UniverseWeb.TickComponents do
   end
 
   defp meta(_), do: ""
-
-  def wake_class("settled"), do: "badge-success"
-  def wake_class("attention"), do: "badge-warning"
-  def wake_class("timeout"), do: "badge-info"
-  def wake_class(_), do: "badge-ghost"
-
-  def status_class(s) when s in ["failed", "budget"], do: "badge-error"
-  def status_class("asking"), do: "badge-warning"
-  def status_class(s) when s in ["running", "queued"], do: "badge-info"
-  def status_class("serving"), do: "badge-accent"
-  def status_class("done"), do: "badge-success"
-  def status_class(_), do: "badge-ghost"
 end
