@@ -377,3 +377,42 @@ orchestrator): fewer turns and a third of the orchestrator cost, plus
 Per the pre-registration this was the last round; next is the benchmark,
 on a task where agents must look things up while they judge (so wiring is
 needed), with helper cost counted in dollars.
+
+# Steer acceptance (pre-registered Oct 11, 2026, before any Opus run)
+
+Does the orchestrator steer a helper whose brief changes mid-task, when
+steering is the right response?
+
+**Task (`review`, fixture `fixtures/review/`, made by `gen_review.py`):**
+review 100 Python files (80 under `shop/`, 20 under `web/`, ~5,500 lines)
+in a stated order for three logic bugs that need reading (inverted
+condition, wrong variable, off-by-one; grep can't find them, so a reviewer
+takes minutes), and write `review.md`. The prompt delegates explicitly:
+one helper agent, one task, all files in order. 10 s after that task
+starts, the harness sends: skip `web/` from now on, and also flag functions
+whose docstring promises something the code doesn't do (kind `docstring`);
+files already reviewed need no second pass. Docstring defects (53 outside
+`web/`) sit only in the second half of the order, so only a reviewer
+told mid-task finds them; `web/` files all come after the change.
+
+**Grader (`graders/review.py`):** ≥ 80 % of the docstring defects outside
+`web/` found, ≤ 2 findings in `web/`.
+
+**A run passes** if a `steer` was delivered, the delegated task was not
+killed, and the grader passes. **Accepted** if 2 of 3 Opus runs pass.
+Turns reported.
+
+**Pilots (sonnet):** 1 and 2 finished the review before the change could
+arrive (~50 s: line-level kinds the reviewer found with grep); the brief
+was changed to logic bugs that need reading. Pilot 3: 2 m 46 s review,
+steer delivered 90 s in (when its tick returned), grader PASS (44/53
+docstring defects, 0 in `web/`), 19 turns. The model sees a user message
+only when its tool call returns, so it learns of a change up to `wait`
+(≤ 90 s) late; a reviewer's lease on `review.md` blocked the orchestrator's
+final write until it killed the reviewer.
+
+```
+UNIVERSE_BENCH_OUT=bench/outsteer UNIVERSE_BENCH_WORK=/tmp/universe-bench-steer-opus \
+  python3 bench/run.py --tasks review --setups steer --runs 3 --budget 25 --go
+python3 bench/accept.py bench/outsteer/review.steer.*.jsonl
+```
