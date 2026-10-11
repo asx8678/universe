@@ -103,6 +103,44 @@ defmodule Universe.DirectiveTest do
     assert reasons(result)["self"] =~ "cycle"
   end
 
+  test "a long dependency DAG validates fast; a cycle in it is found" do
+    dag =
+      for i <- 0..63 do
+        deps = for j <- [i - 1, i - 2], j >= 0, do: "d#{j}"
+        run("d#{i}", %{"after" => deps})
+      end
+
+    {us, result} = :timer.tc(fn -> Directive.validate(dag) end)
+    assert length(labels(result)) == 64
+    assert us < 500_000
+
+    # Closing the chain into a loop rejects its members, and only those.
+    looped = dag |> Enum.take(40) |> List.update_at(0, &Map.put(&1, "after", ["d39"]))
+    {ok, rejected} = Directive.validate(looped ++ [run("free")])
+    assert Enum.map(ok, & &1.label) == ["free"]
+    assert Enum.all?(rejected, &(&1.reason =~ "cycle involving"))
+  end
+
+  test "a malformed wait comes back as rejections and a clean wait" do
+    assert {nil, []} = Directive.validate_wait(nil)
+
+    assert {%{"ids" => ["#5", "kv"], "until" => "any"}, []} =
+             Directive.validate_wait(%{"ids" => [5, "kv"], "until" => "any"})
+
+    {wait, rejected} =
+      Directive.validate_wait(%{
+        "ids" => [%{"a" => 1}, "ok"],
+        "until" => "some",
+        "timeout_s" => "10",
+        "x" => 1
+      })
+
+    assert wait == %{"ids" => ["ok"]}
+    assert length(rejected) == 4
+    assert {nil, [%{op: "wait"}]} = Directive.validate_wait("x")
+    assert {%{}, [_]} = Directive.validate_wait(%{"ids" => "x"})
+  end
+
   test "anything depending on a rejected directive is rejected, transitively" do
     result =
       Directive.validate([

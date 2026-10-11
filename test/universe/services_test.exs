@@ -50,6 +50,57 @@ defmodule Universe.ServicesTest do
     )
   end
 
+  test "a service killed while it waits to restart stays killed" do
+    Application.put_env(:universe, :restart_delay_ms, 3_000)
+    on_exit(fn -> Application.delete_env(:universe, :restart_delay_ms) end)
+    name = uniq("crashy")
+
+    code =
+      "import os, threading\nthreading.Timer(0.5, os._exit, [3]).start()\nU.serve(#{inspect(name)}, {'ping': lambda: 'pong'}, '')"
+
+    tick([%{"op" => "serve", "label" => name, "lang" => "python", "code" => code}], %{
+      "ids" => [name],
+      "timeout_s" => 10
+    })
+
+    # Wait for the crash and the restart that is now pending.
+    assert Enum.any?(1..40, fn _ ->
+             Process.sleep(100)
+             EventLog.by_types(["restart"]) |> Enum.any?(&(&1["data"] && restart_of?(&1, name)))
+           end)
+
+    result = tick([%{"op" => "kill", "target" => name}], %{"ids" => [name], "timeout_s" => 5})
+    assert status(result, name) == "killed"
+
+    # The pending restart must not bring it back.
+    Process.sleep(3_500)
+    w = Universe.Tick.snapshot() |> Map.values() |> Enum.find(&(&1.label == name))
+    assert w.status == "killed"
+  end
+
+  test "killing a running call reports killed, not a crash" do
+    name = uniq("slowsvc")
+    c = uniq("slowcall")
+    code = "import time\nU.serve(#{inspect(name)}, {'wait': lambda: time.sleep(30)}, '')"
+
+    tick([%{"op" => "serve", "label" => name, "lang" => "python", "code" => code}], %{
+      "ids" => [name],
+      "timeout_s" => 10
+    })
+
+    tick([%{"op" => "call", "label" => c, "service" => name, "fn" => "wait", "args" => nil}], %{
+      "timeout_s" => 1
+    })
+
+    result = tick([%{"op" => "kill", "target" => c}], %{"ids" => [c], "timeout_s" => 5})
+    assert status(result, c) == "killed"
+    kill(name)
+  end
+
+  defp restart_of?(event, name) do
+    Enum.any?(Map.values(Universe.Tick.snapshot()), &(&1.id == event["id"] and &1.label == name))
+  end
+
   test "U.put stores rows as a handle; the digest shows only its summary" do
     label = uniq("put")
 

@@ -39,6 +39,7 @@ defmodule Universe.Tick do
   @default_max_settled 1_000
   @max_services 20
   @restart_window_ms 60_000
+  @max_archive 10_000
   @max_restarts 3
   @inline_result_chars 1_000
 
@@ -113,7 +114,9 @@ defmodule Universe.Tick do
 
   @impl true
   def handle_call({:tick, args}, from, state) do
-    args = if is_map(args["wait"]), do: args, else: Map.delete(args, "wait")
+    # A malformed wait is reported, never allowed to reach the kernel's state.
+    {wait, wait_rejected} = Directive.validate_wait(args["wait"])
+    args = if wait, do: Map.put(args, "wait", wait), else: Map.delete(args, "wait")
     tick = Ids.next_tick()
 
     since =
@@ -123,7 +126,7 @@ defmodule Universe.Tick do
 
     {accepted, rejected} = Directive.validate(args["directives"], &resolve(state, &1))
     {state, new_ids, more_rejected} = apply_directives(state, tick, accepted)
-    rejected = rejected ++ more_rejected ++ unknown_wait_ids(state, args["wait"])
+    rejected = wait_rejected ++ rejected ++ more_rejected ++ unknown_wait_ids(state, args["wait"])
     Enum.each(rejected, &EventLog.append("rejected", tick: tick, data: stringify(&1)))
 
     state = schedule(state)
@@ -136,7 +139,9 @@ defmodule Universe.Tick do
       rejected: rejected,
       started_ms: now(),
       until: if(get_in(args, ["wait", "until"]) == "any", do: "any", else: "all"),
-      watch: watch_set(state, args["wait"], new_ids),
+      # A malformed wait answers at once, so the model sees what was wrong.
+      watch:
+        if(wait_rejected == [], do: watch_set(state, args["wait"], new_ids), else: MapSet.new()),
       deadline_ms: now() + timeout_s(args["wait"]) * 1000
     }
 
@@ -245,7 +250,7 @@ defmodule Universe.Tick do
   def handle_info({:restart, id}, state) do
     state =
       case state.workers[id] do
-        %{status: "running", kill_reason: nil} = w -> start_process(state, w)
+        %{status: "running"} = w -> if(stopping?(w), do: state, else: start_process(state, w))
         _ -> state
       end
 
@@ -266,8 +271,8 @@ defmodule Universe.Tick do
     w = state.workers[id]
 
     summary =
-      if w && w.kill_reason,
-        do: %{"status" => "killed", "reason" => w.kill_reason},
+      if w && stopping?(w),
+        do: %{"status" => "killed", "reason" => w.kill_reason || "killed"},
         else: %{"status" => "failed", "reason" => "call crashed: #{inspect(reason)}"}
 
     state = %{state | tasks: tasks} |> settle_with_event(id, summary)
@@ -457,13 +462,15 @@ defmodule Universe.Tick do
 
   defp asking_handler(_state, _w), do: nil
 
-  # A lease clash is rejected at once, unless the directive waits for other
-  # workers anyway (`after`): then it is placed without the lease and takes
-  # it when it is about to start (see `take_leases/2`).
+  # A directive that waits for other workers (`after`) never holds leases
+  # while it waits: it takes them when it is about to start (see
+  # `take_leases/2`). Holding them while queued could deadlock: A holds x
+  # waiting for B, B waits for x. Without `after` a clash is rejected at once.
+  defp lease_plan(_state, %{after: [_ | _]}), do: {:ok, false}
+
   defp lease_plan(state, d) do
     case Leases.conflict(state.leases, d.leases) do
       nil -> {:ok, true}
-      _ when d.after != [] -> {:ok, false}
       {path, holder, _} -> {:error, "lease #{path} held by ##{holder}"}
     end
   end
@@ -556,17 +563,29 @@ defmodule Universe.Tick do
 
       _ when w.kind == "call" ->
         case Enum.find(state.tasks, fn {_ref, {tid, _}} -> tid == id end) do
-          {_ref, {_, pid}} -> Process.exit(pid, :kill)
-          nil -> :ok
+          {_ref, {_, pid}} ->
+            Process.exit(pid, :kill)
+            state
+
+          nil ->
+            killed_now(state, id, reason)
         end
 
-        state
-
       _ ->
-        Worker.kill(id, {:kill, reason})
-        state
+        if Worker.whereis(id) do
+          Worker.kill(id, {:kill, reason})
+          state
+        else
+          # No process to signal: a service between crash and restart (or
+          # one whose start is being retried). Nothing will report its exit,
+          # so it ends here.
+          killed_now(state, id, reason)
+        end
     end
   end
+
+  defp killed_now(state, id, reason),
+    do: settle_with_event(state, id, %{"status" => "killed", "reason" => reason || "killed"})
 
   defp resolve(state, ref) do
     case Directive.parse_id(ref) do
@@ -758,7 +777,7 @@ defmodule Universe.Tick do
     recent = Enum.filter(w.restarts, &(now() - &1 < @restart_window_ms))
 
     cond do
-      w.kill_reason != nil or summary["status"] in ["killed", "budget", "done"] ->
+      stopping?(w) or summary["status"] in ["killed", "budget", "done"] ->
         settle(state, w.id, summary)
 
       length(recent) >= @max_restarts ->
@@ -784,7 +803,7 @@ defmodule Universe.Tick do
           }
         )
 
-        Process.send_after(self(), {:restart, w.id}, 200)
+        Process.send_after(self(), {:restart, w.id}, restart_delay_ms())
 
         put_worker(state, %{
           w
@@ -798,6 +817,27 @@ defmodule Universe.Tick do
   end
 
   defp finish_call(state, id, {:ok, value}) do
+    case Jason.encode(value) do
+      {:ok, _} ->
+        finish_ok(state, id, value)
+
+      {:error, _} ->
+        finish_call(state, id, {:error, "the result is not JSON: #{inspect(value, limit: 20)}"})
+    end
+  end
+
+  defp finish_call(state, id, {:error, reason}) do
+    settle_with_event(state, id, %{
+      "status" => "failed",
+      "reason" => if(is_binary(reason), do: reason, else: inspect(reason)),
+      "wall_ms" => now() - state.workers[id].started_ms
+    })
+  end
+
+  # Anything else from a service call fails the call, never the kernel.
+  defp finish_call(state, id, other), do: finish_call(state, id, {:error, other})
+
+  defp finish_ok(state, id, value) do
     text = clip_json(value, nil)
 
     summary =
@@ -826,14 +866,6 @@ defmodule Universe.Tick do
       id,
       Map.put(summary, "wall_ms", now() - state.workers[id].started_ms)
     )
-  end
-
-  defp finish_call(state, id, {:error, reason}) do
-    settle_with_event(state, id, %{
-      "status" => "failed",
-      "reason" => to_string(reason),
-      "wall_ms" => now() - state.workers[id].started_ms
-    })
   end
 
   # Records the end of an ID whose exit event is already logged.
@@ -872,9 +904,15 @@ defmodule Universe.Tick do
 
   # For endings no worker process logged (never started, crashed, calls).
   defp settle_with_event(state, id, summary) do
-    w = state.workers[id]
-    EventLog.append("exit", tick: w.tick, id: id, data: summary)
-    settle(state, id, summary)
+    case state.workers[id] do
+      %{status: status} = w when status in @live ->
+        EventLog.append("exit", tick: w.tick, id: id, data: summary)
+        settle(state, id, summary)
+
+      # Already ended (killed and failed in the same batch): one exit only.
+      _ ->
+        state
+    end
   end
 
   defp release_leases(state, id) do
@@ -955,7 +993,28 @@ defmodule Universe.Tick do
           Map.put(acc, id, %{status: state.workers[id].status, label: state.workers[id].label})
         end)
 
-      %{state | workers: Map.drop(state.workers, drop), archive: archive}
+      trim_archive(%{state | workers: Map.drop(state.workers, drop), archive: archive})
+    else
+      state
+    end
+  end
+
+  # The archive keeps the newest @max_archive IDs; older ones are forgotten
+  # with the labels and service names that pointed at them, so a daemon that
+  # runs for months stays bounded.
+  defp trim_archive(state) do
+    excess = map_size(state.archive) - @max_archive
+
+    if excess > 0 do
+      gone = state.archive |> Map.keys() |> Enum.sort() |> Enum.take(excess) |> MapSet.new()
+      forget = fn map -> Map.reject(map, fn {_k, id} -> MapSet.member?(gone, id) end) end
+
+      %{
+        state
+        | archive: Map.drop(state.archive, MapSet.to_list(gone)),
+          labels: forget.(state.labels),
+          services: forget.(state.services)
+      }
     else
       state
     end
@@ -997,6 +1056,10 @@ defmodule Universe.Tick do
     if first do
       spawn = Enum.find(events, &(&1["type"] == "spawn"))
       exit = events |> Enum.filter(&(&1["type"] == "exit")) |> List.last()
+      restart = events |> Enum.filter(&(&1["type"] == "restart")) |> List.last()
+      # A service that crashed, restarted and was live at shutdown has an old
+      # exit before its restart: it was lost, not failed.
+      exit = if exit && restart && restart["seq"] > exit["seq"], do: nil, else: exit
       serve = events |> Enum.filter(&(&1["type"] == "serve")) |> List.last()
       call = Enum.find(events, &(&1["type"] == "call"))
       label = first["data"]["label"]
@@ -1135,6 +1198,11 @@ defmodule Universe.Tick do
         t - w.attention_at >= attention_ms()
     end)
   end
+
+  # Asked to stop (kill, stop all, gc): never restart it, never fail it.
+  defp stopping?(w), do: Map.get(w, :stopping, false) or w.kill_reason != nil
+
+  defp restart_delay_ms, do: Application.get_env(:universe, :restart_delay_ms, 200)
 
   defp attention_ms, do: Application.get_env(:universe, :attention_ms, @attention_ms)
 

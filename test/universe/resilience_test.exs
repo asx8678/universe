@@ -61,6 +61,40 @@ defmodule Universe.ResilienceTest do
     assert result.text =~ ~r/stopped when Universe restarted \(.*##{long_id} #{long}/
   end
 
+  test "a service that crashed and restarted before a Tick crash is recovered as lost" do
+    name = uniq("phoenix")
+
+    code = """
+    import os, threading
+    marker = os.path.join(os.environ["TMPDIR"], "crashed-once")
+    if not os.path.exists(marker):
+        open(marker, "w").close()
+        threading.Timer(0.3, os._exit, [4]).start()
+    U.serve(#{inspect(name)}, {"ping": lambda: "pong"}, "")
+    """
+
+    tick([%{"op" => "serve", "label" => name, "lang" => "python", "code" => code}], %{
+      "ids" => [name],
+      "timeout_s" => 10
+    })
+
+    # Serving again after its restart.
+    wait_until(fn ->
+      Enum.any?(EventLog.by_types(["restart"]), fn e ->
+        Tick.snapshot()[e["id"]][:label] == name
+      end) and
+        Enum.any?(Map.values(Tick.snapshot()), &(&1.label == name and &1.status == "serving"))
+    end)
+
+    old = Process.whereis(Tick)
+    Process.exit(old, :kill)
+    wait_until(fn -> Process.whereis(Tick) not in [nil, old] end)
+
+    w = Tick.snapshot() |> Map.values() |> Enum.find(&(&1.label == name))
+    assert w.status == "killed"
+    assert w.summary["reason"] == "lost: Universe restarted"
+  end
+
   test "a recovered call still knows which service and function it called" do
     svc = uniq("adder")
     q = uniq("q")

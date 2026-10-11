@@ -167,6 +167,45 @@ defmodule Universe.TickTest do
     assert result.text =~ "network is blocked for this worker"
   end
 
+  test "two queued workers that need one lease don't deadlock" do
+    [z, a, b] = Enum.map(~w(lz la lb), &uniq/1)
+
+    result =
+      tick(
+        [
+          run(z, "sleep 0.3"),
+          run(a, "mkdir -p dl && echo a >> dl/log", %{"leases" => ["dl"], "after" => [b]}),
+          run(b, "mkdir -p dl && echo b >> dl/log", %{"leases" => ["dl"], "after" => [z]})
+        ],
+        %{"ids" => [a, b], "timeout_s" => 20}
+      )
+
+    assert status_of(result, a) == "done"
+    assert status_of(result, b) == "done"
+  end
+
+  test "a malformed wait is rejected and the kernel keeps running" do
+    live = uniq("alive")
+    tick([run(live, "sleep 30")], %{"timeout_s" => 0})
+    kernel = Process.whereis(Universe.Tick)
+
+    for wait <- [%{"ids" => [%{"a" => 1}]}, "x", %{"ids" => "x"}, %{"timeout_s" => "10"}] do
+      {us, result} = :timer.tc(fn -> API.tick(%{"directives" => [], "wait" => wait}) end)
+      assert result.text =~ "rejected"
+      assert us < 2_000_000
+    end
+
+    # Same kernel process, and it still tracks the running worker.
+    assert Process.whereis(Universe.Tick) == kernel
+
+    assert Enum.any?(
+             Map.values(Universe.Tick.snapshot()),
+             &(&1.label == live and &1.status == "running")
+           )
+
+    tick([%{"op" => "kill", "target" => live}], %{"timeout_s" => 5})
+  end
+
   test "an empty tick reports changes since the cursor, then nothing" do
     noisy = uniq("noisy")
     tick([run(noisy, "true")])

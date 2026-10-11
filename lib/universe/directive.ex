@@ -113,6 +113,84 @@ defmodule Universe.Directive do
 
   def parse_id(_), do: :error
 
+  @wait_fields ~w(until ids timeout_s)
+
+  @doc """
+  Checks a tick's `wait` before anything runs: `{wait, rejections}`. The wait
+  comes back with only well-formed parts (`nil` when there is none), so the
+  kernel never meets a value it can't handle. IDs may be labels, `"#5"` or
+  integers (normalised to `"#5"`).
+  """
+  def validate_wait(nil), do: {nil, []}
+
+  def validate_wait(wait) when is_map(wait) do
+    unknown =
+      for k <- Map.keys(wait),
+          k not in @wait_fields,
+          do: reject(nil, "wait", "unknown wait field #{inspect(k)}")
+
+    {until, r1} =
+      case wait["until"] do
+        nil ->
+          {nil, []}
+
+        u when u in ["any", "all"] ->
+          {u, []}
+
+        other ->
+          {nil,
+           [reject(nil, "wait", "wait.until must be \"any\" or \"all\", got #{inspect(other)}")]}
+      end
+
+    {ids, r2} =
+      case wait["ids"] do
+        nil ->
+          {nil, []}
+
+        ids when is_list(ids) ->
+          {ok, bad} = Enum.split_with(ids, &(is_binary(&1) or (is_integer(&1) and &1 > 0)))
+          ok = Enum.map(ok, &if(is_integer(&1), do: "##{&1}", else: &1))
+
+          {ok,
+           for(
+             b <- bad,
+             do: reject(nil, "wait", "wait.ids entries must be labels or #ids, got #{inspect(b)}")
+           )}
+
+        other ->
+          {nil, [reject(nil, "wait", "wait.ids must be a list, got #{inspect(other)}")]}
+      end
+
+    {timeout, r3} =
+      case wait["timeout_s"] do
+        nil ->
+          {nil, []}
+
+        t when is_number(t) and t >= 0 ->
+          {t, []}
+
+        other ->
+          {nil,
+           [
+             reject(
+               nil,
+               "wait",
+               "wait.timeout_s must be a number of seconds, got #{inspect(other)}"
+             )
+           ]}
+      end
+
+    clean =
+      %{"until" => until, "ids" => ids, "timeout_s" => timeout}
+      |> Enum.reject(fn {_k, v} -> is_nil(v) end)
+      |> Map.new()
+
+    {clean, unknown ++ r1 ++ r2 ++ r3}
+  end
+
+  def validate_wait(other),
+    do: {nil, [reject(nil, "wait", "wait must be an object, got #{inspect(other)}")]}
+
   ## Shape
 
   defp normalize(d, nested?) when is_map(d) do
@@ -591,13 +669,7 @@ defmodule Universe.Directive do
         {d.label, Enum.filter(Map.get(d, :after, []), &Map.has_key?(by_label, &1))}
       end)
 
-    cyclic =
-      Enum.reduce(ok, MapSet.new(), fn d, acc ->
-        case find_cycle(d.label, edges, [d.label]) do
-          nil -> acc
-          path -> MapSet.union(acc, MapSet.new(path))
-        end
-      end)
+    cyclic = cyclic_labels(edges)
 
     Enum.split_with(ok, &(not MapSet.member?(cyclic, &1.label)))
     |> then(fn {keep, drop} ->
@@ -605,14 +677,56 @@ defmodule Universe.Directive do
     end)
   end
 
-  defp find_cycle(start, edges, [current | _] = path) do
-    Enum.find_value(Map.get(edges, current, []), fn next ->
-      cond do
-        next == start -> Enum.reverse([next | path])
-        next in path -> nil
-        true -> find_cycle(start, edges, [next | path])
-      end
+  # Labels on a cycle: members of a strongly connected component with more
+  # than one node, or with an edge to itself (Tarjan, linear in the graph;
+  # a path-by-path search is exponential on a dependency DAG).
+  defp cyclic_labels(edges) do
+    st = %{index: 0, idx: %{}, low: %{}, stack: [], on: MapSet.new(), cyclic: MapSet.new()}
+
+    edges
+    |> Map.keys()
+    |> Enum.reduce(st, fn v, st ->
+      if Map.has_key?(st.idx, v), do: st, else: strong(v, edges, st)
     end)
+    |> Map.fetch!(:cyclic)
+  end
+
+  defp strong(v, edges, st) do
+    st = %{
+      st
+      | index: st.index + 1,
+        idx: Map.put(st.idx, v, st.index),
+        low: Map.put(st.low, v, st.index),
+        stack: [v | st.stack],
+        on: MapSet.put(st.on, v)
+    }
+
+    st =
+      Enum.reduce(Map.get(edges, v, []), st, fn w, st ->
+        cond do
+          not Map.has_key?(st.idx, w) ->
+            st = strong(w, edges, st)
+            %{st | low: Map.put(st.low, v, min(st.low[v], st.low[w]))}
+
+          MapSet.member?(st.on, w) ->
+            %{st | low: Map.put(st.low, v, min(st.low[v], st.idx[w]))}
+
+          true ->
+            st
+        end
+      end)
+
+    if st.low[v] == st.idx[v] do
+      {component, [^v | rest]} = Enum.split_while(st.stack, &(&1 != v))
+      component = [v | component]
+      on = Enum.reduce(component, st.on, &MapSet.delete(&2, &1))
+
+      cyclic? = length(component) > 1 or v in Map.get(edges, v, [])
+      cyclic = if cyclic?, do: MapSet.union(st.cyclic, MapSet.new(component)), else: st.cyclic
+      %{st | stack: rest, on: on, cyclic: cyclic}
+    else
+      st
+    end
   end
 
   # Anything waiting on a rejected label in this batch is rejected too.
