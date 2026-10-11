@@ -50,7 +50,7 @@ defmodule UniverseWeb.NowLiveTest do
     {:ok, view, _html} = live(conn, ~p"/")
 
     for id <-
-          ~w(#stats #stat-live #stat-agents #stat-ticks #agents #running #activity #feed #feed-filters #stop-all),
+          ~w(#stats #stat-live #stat-ticks #agents #running #activity #feed #feed-filters #stop-all),
         do: assert(has_element?(view, id))
   end
 
@@ -95,7 +95,7 @@ defmodule UniverseWeb.NowLiveTest do
     tick([%{"op" => "run", "label" => label, "lang" => "bash", "code" => "echo paused-line"}])
 
     refute has_element?(view, "#feed", "paused-line")
-    assert render(view) =~ ~r/resume \(\d+ new\)/
+    assert render(view) =~ ~r/resume · \d+ new/
 
     view |> element("#feed-pause") |> render_click()
     assert has_element?(view, "#feed", "paused-line")

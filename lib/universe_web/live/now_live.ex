@@ -40,6 +40,7 @@ defmodule UniverseWeb.NowLive do
        paused: false,
        missed: 0,
        pending: false,
+       fold: Activity.new_feed(),
        ticks: length(EventLog.by_types(["tick_in"]))
      )
      |> stream_configure(:feed, dom_id: & &1.key)
@@ -94,34 +95,36 @@ defmodule UniverseWeb.NowLive do
     cond do
       not Activity.in_filter?(e, socket.assigns.filter) -> socket
       socket.assigns.paused -> update(socket, :missed, &(&1 + 1))
-      true -> insert_row(socket, row(e))
+      true -> step(socket, e)
     end
   end
 
-  # A progress row moves to the top with its new text instead of piling up.
-  defp insert_row(socket, %{type: "progress"} = r) do
-    socket
-    |> stream_delete_by_dom_id(:feed, r.key)
-    |> stream_insert(:feed, r, at: 0, limit: @feed_max)
-  end
+  # New rows go on top; a row that changed (progress, a fold that grew)
+  # moves to the top with its new text instead of piling up.
+  defp step(socket, e) do
+    {fold, {action, row}} = Activity.feed_step(socket.assigns.fold, e)
+    socket = assign(socket, :fold, fold)
 
-  defp insert_row(socket, r), do: stream_insert(socket, :feed, r, at: 0, limit: @feed_max)
+    socket =
+      if action == :update or row.type == "progress",
+        do: stream_delete_by_dom_id(socket, :feed, row.key),
+        else: socket
+
+    stream_insert(socket, :feed, row, at: 0, limit: @feed_max)
+  end
 
   defp reset_feed(socket) do
     since = max(EventLog.last_seq() - 2000, 0)
 
-    rows =
+    {fold, rows} =
       EventLog.since(since)
       |> Enum.filter(&Activity.in_filter?(&1, socket.assigns.filter))
-      |> Enum.take(-@feed_max)
-      |> Enum.reverse()
-      |> Enum.map(&row/1)
-      |> Enum.uniq_by(& &1.key)
+      |> Activity.fold()
 
-    socket |> assign(missed: 0) |> stream(:feed, rows, reset: true)
+    socket
+    |> assign(missed: 0, fold: fold)
+    |> stream(:feed, Enum.take(rows, @feed_max), reset: true)
   end
-
-  defp row(e), do: Activity.describe(e)
 
   ## State
 
@@ -153,6 +156,7 @@ defmodule UniverseWeb.NowLive do
         live: length(live),
         running: Enum.count(live, &(&1.status == "running" and &1.kind != "serve")),
         services: length(code_services),
+        agents: length(agents),
         idle: Enum.count(agents, &(&1.state == "idle")),
         busy: Enum.count(agents, &(&1.state in ["busy", "asking"])),
         asking: length(asking)
@@ -215,204 +219,205 @@ defmodule UniverseWeb.NowLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <div class="flex items-center gap-3">
-          <h1 class="text-xl font-semibold tracking-tight">Now</h1>
-          <span class="inline-flex items-center gap-1.5 rounded-full bg-success/10 px-2.5 py-0.5 text-xs font-medium text-success">
-            <span class="relative flex size-2">
-              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60"></span>
-              <span class="relative inline-flex size-2 rounded-full bg-success"></span>
-            </span>
-            live
+    <Layouts.app flash={@flash} page={:now}>
+      <.page_header title="Now">
+        <:meta><.live_dot /></:meta>
+        <:subtitle>
+          <span id="stats" class="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <.stat id="stat-live" value={@stats.live} label="live" />
+            <.stat
+              :if={@stats.running > 0}
+              id="stat-running"
+              value={@stats.running}
+              label="running"
+              tone={:active}
+            />
+            <.stat
+              :if={@stats.asking > 0}
+              id="stat-asking"
+              value={@stats.asking}
+              label="waiting on the model"
+              tone={:warn}
+            />
+            <.stat
+              :if={@stats.agents > 0}
+              id="stat-agents"
+              value={@stats.agents}
+              label={agents_label(@stats)}
+              tone={@stats.busy > 0 && :busy}
+            />
+            <.stat
+              :if={@stats.services > 0}
+              id="stat-services"
+              value={@stats.services}
+              label={if @stats.services == 1, do: "service", else: "services"}
+            />
+            <.stat id="stat-ticks" value={@ticks} label={if @ticks == 1, do: "tick", else: "ticks"} />
           </span>
-        </div>
-        <button
-          id="stop-all"
-          phx-click="stop_all"
-          data-confirm="Kill every live worker, service, agent and call?"
-          class="rounded-lg border border-error/40 px-3 py-1.5 text-sm font-medium text-error transition hover:bg-error hover:text-error-content active:scale-95"
-        >
-          Stop all
-        </button>
-      </div>
-
-      <section id="stats" class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        <.stat id="stat-live" label="Live" value={@stats.live} />
-        <.stat
-          id="stat-running"
-          label="Running"
-          value={@stats.running}
-          tone={@stats.running > 0 && "info"}
-        />
-        <.stat id="stat-services" label="Services" value={@stats.services} />
-        <.stat
-          id="stat-agents"
-          label="Agents idle / busy"
-          value={"#{@stats.idle} / #{@stats.busy}"}
-          tone={@stats.busy > 0 && "accent"}
-        />
-        <.stat
-          id="stat-asking"
-          label="Waiting on model"
-          value={@stats.asking}
-          tone={@stats.asking > 0 && "warning"}
-        />
-        <.stat id="stat-ticks" label="Ticks" value={@ticks} />
-      </section>
+        </:subtitle>
+        <:actions>
+          <.action
+            id="stop-all"
+            variant={:danger}
+            phx-click="stop_all"
+            data-confirm="Kill every live worker, service, agent and call?"
+          >
+            <.icon name="hero-stop-circle-micro" class="size-4" /> Stop all
+          </.action>
+        </:actions>
+      </.page_header>
 
       <section
         :if={@asking != []}
         id="attention"
-        class="rounded-xl border border-warning/40 bg-warning/10 p-4 space-y-2"
+        class="space-y-1 rounded-xl border border-warning/40 bg-warning/8 p-3"
       >
-        <h2 class="flex items-center gap-2 text-sm font-semibold text-warning">
-          <.icon name="hero-chat-bubble-left-ellipsis" class="size-4" /> Waiting for the model's reply
+        <h2 class="flex items-center gap-2 px-2 text-sm font-semibold text-warning">
+          <.icon name="hero-chat-bubble-left-ellipsis-micro" class="size-4" />
+          Waiting for the model's reply
         </h2>
         <.link
           :for={w <- @asking}
           navigate={~p"/workers/#{w.id}"}
-          class="block rounded-lg px-2 py-1 text-sm transition hover:bg-warning/10"
+          class="flex gap-2 rounded-lg px-2 py-1.5 transition hover:bg-warning/10"
         >
-          <span class="font-mono font-semibold">#{w.id} {w.label}</span>
-          <span class="opacity-80">asks: {w.question}</span>
+          <span class="shrink-0 font-mono text-muted">#{w.id}</span>
+          <span class="shrink-0 font-medium">{w.label}</span>
+          <span class="min-w-0">{w.question}</span>
         </.link>
       </section>
 
-      <div class="grid gap-6 lg:grid-cols-5">
-        <div class="space-y-6 lg:col-span-3 min-w-0">
-          <section id="agents" class="space-y-3">
-            <.section_title icon="hero-cpu-chip" title="Agents" count={length(@agents)} />
-            <p
-              :if={@agents == []}
-              class="rounded-xl border border-dashed border-base-300 p-6 text-center text-sm opacity-60"
-            >
-              No agents. The model starts one with a <code class="font-mono">serve</code>
-              that has an <code class="font-mono">agent</code>
+      <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)]">
+        <div class="min-w-0 space-y-8">
+          <.panel id="agents" title="Agents" count={length(@agents)}>
+            <.empty :if={@agents == []}>
+              No agents. The model starts one with a <code class="font-mono text-xs">serve</code>
+              that has an <code class="font-mono text-xs">agent</code>
               block.
-            </p>
-            <div class="grid gap-3 sm:grid-cols-2">
+            </.empty>
+            <div :if={@agents != []} class="grid gap-3 xl:grid-cols-2">
               <.agent_card :for={a <- @agents} agent={a} now={@now} />
             </div>
-          </section>
+          </.panel>
 
-          <section :if={@services != []} id="services" class="space-y-3">
-            <.section_title icon="hero-server-stack" title="Services" count={length(@services)} />
-            <div class="grid gap-3 sm:grid-cols-2">
-              <.link
-                :for={s <- @services}
-                id={"service-#{s.id}"}
-                navigate={~p"/workers/#{s.id}"}
-                class="group rounded-xl border border-base-300 bg-base-100 p-4 transition hover:-translate-y-0.5 hover:border-base-content/20 hover:shadow-md"
-              >
-                <div class="flex items-center justify-between gap-2">
-                  <span class="font-mono font-semibold">{s.name}</span>
-                  <.pill state={s.state} />
-                </div>
-                <p :if={s.describe not in [nil, ""]} class="mt-1 text-sm opacity-70">{s.describe}</p>
-                <p :if={s.fns != []} class="mt-2 font-mono text-xs opacity-60">
-                  fns: {Enum.join(s.fns, ", ")}
-                </p>
-              </.link>
-            </div>
-          </section>
+          <.panel :if={@services != []} id="services" title="Services" count={length(@services)}>
+            <ul class="divide-y divide-base-300/70 overflow-hidden rounded-xl border border-base-300 bg-base-100">
+              <li :for={s <- @services} id={"service-#{s.id}"}>
+                <.link
+                  navigate={~p"/workers/#{s.id}"}
+                  class="flex items-start gap-3 px-4 py-3 transition hover:bg-base-200/60"
+                >
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2">
+                      <span class="font-medium">{s.name}</span>
+                      <span class="font-mono text-xs text-muted">#{s.id}</span>
+                    </div>
+                    <p :if={s.describe not in [nil, ""]} class="mt-0.5 text-muted">{s.describe}</p>
+                    <div :if={s.fns != []} class="mt-1.5 flex flex-wrap gap-1">
+                      <code
+                        :for={f <- s.fns}
+                        class="rounded bg-base-200 px-1.5 py-px font-mono text-xs"
+                      >{f}</code>
+                    </div>
+                  </div>
+                  <.badge status={s.state} />
+                </.link>
+              </li>
+            </ul>
+          </.panel>
 
-          <section id="running" class="space-y-3">
-            <.section_title icon="hero-bolt" title="Running now" count={length(@running)} />
-            <p
-              :if={@running == []}
-              class="rounded-xl border border-dashed border-base-300 p-6 text-center text-sm opacity-60"
+          <.panel id="running" title="Running now" count={length(@running)}>
+            <.empty :if={@running == []}>Nothing in flight.</.empty>
+            <ul
+              :if={@running != []}
+              class="divide-y divide-base-300/70 overflow-hidden rounded-xl border border-base-300 bg-base-100"
             >
-              Nothing in flight.
-            </p>
-            <ul class="divide-y divide-base-300 overflow-hidden rounded-xl border border-base-300 bg-base-100">
               <li :for={w <- @running} id={"running-#{w.id}"}>
                 <.link
                   navigate={~p"/workers/#{w.id}"}
-                  class="flex items-center gap-3 px-4 py-2.5 text-sm transition hover:bg-base-200"
+                  class="flex items-center gap-3 px-4 py-2.5 transition hover:bg-base-200/60"
                 >
-                  <span class="relative flex size-2 shrink-0">
-                    <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-info opacity-50"></span>
-                    <span class="relative inline-flex size-2 rounded-full bg-info"></span>
-                  </span>
-                  <span class="font-mono font-semibold">#{w.id}</span>
-                  <span class="font-mono truncate">{w.label}</span>
-                  <span class="truncate text-xs opacity-60">{running_detail(w)}</span>
-                  <span class="ml-auto shrink-0 font-mono text-xs tabular-nums opacity-70">
+                  <.badge status={w.status} />
+                  <span class="shrink-0 font-mono text-xs text-muted">#{w.id}</span>
+                  <span class="shrink-0 font-medium">{w.label}</span>
+                  <span class="min-w-0 truncate text-muted">{running_detail(w)}</span>
+                  <span class="ml-auto shrink-0 text-xs tabular-nums text-muted">
                     {Digest.duration(@now - (w.started_ms || @now))}
                   </span>
                 </.link>
               </li>
             </ul>
-          </section>
+          </.panel>
         </div>
 
-        <section id="activity" class="space-y-3 lg:col-span-2 min-w-0">
-          <div class="flex items-center justify-between gap-2">
-            <.section_title icon="hero-signal" title="Activity" />
-            <button
+        <.panel id="activity" title="Activity">
+          <:actions>
+            <.action
               id="feed-pause"
+              variant={if @paused, do: :default, else: :ghost}
               phx-click="pause"
-              class={[
-                "rounded-lg px-2.5 py-1 text-xs font-medium transition active:scale-95",
-                @paused && "bg-warning/15 text-warning",
-                !@paused && "bg-base-200 hover:bg-base-300"
-              ]}
+              class={@paused && "text-warning"}
             >
               <%= if @paused do %>
-                resume{if @missed > 0, do: " (#{@missed} new)"}
+                <.icon name="hero-play-micro" class="size-3.5" />
+                resume{if @missed > 0, do: " · #{@missed} new"}
               <% else %>
-                pause
+                <.icon name="hero-pause-micro" class="size-3.5" /> pause
               <% end %>
-            </button>
-          </div>
-          <div class="flex flex-wrap gap-1.5" id="feed-filters">
-            <button
-              :for={f <- Activity.filters()}
-              id={"filter-#{f}"}
-              phx-click="filter"
-              phx-value-filter={f}
-              class={[
-                "rounded-full px-3 py-1 text-xs font-medium transition",
-                @filter == f && "bg-base-content text-base-100",
-                @filter != f && "bg-base-200 hover:bg-base-300"
-              ]}
-            >
-              {f}
-            </button>
-          </div>
+            </.action>
+          </:actions>
+          <.seg
+            id="feed-filters"
+            id_prefix="filter-"
+            options={for f <- Activity.filters(), do: {f, f}}
+            value={@filter}
+            event="filter"
+            key="filter"
+          />
           <ol
             id="feed"
             phx-update="stream"
-            class="max-h-[75vh] overflow-y-auto rounded-xl border border-base-300 bg-base-100 font-mono text-xs"
+            class="max-h-[calc(100vh-14rem)] overflow-y-auto rounded-xl border border-base-300 bg-base-100"
           >
-            <li id="feed-empty" class="hidden only:block p-6 text-center font-sans text-sm opacity-60">
+            <li id="feed-empty" class="hidden px-4 py-6 text-center text-muted only:block">
               Quiet. Events show up here as they happen.
             </li>
             <li
               :for={{dom_id, r} <- @streams.feed}
               id={dom_id}
-              class="flex gap-2 border-b border-base-300/60 px-3 py-1.5 last:border-0 animate-[fadein_0.4s_ease-out]"
+              class="grid grid-cols-[4.25rem_4.75rem_minmax(0,1fr)] gap-x-2 border-b border-base-300/60 px-3 py-1.5 text-[13px] leading-5 last:border-0 motion-safe:animate-[fadein_0.25s_ease-out]"
             >
-              <span class="shrink-0 tabular-nums opacity-40">{r.at}</span>
-              <span class={["shrink-0 w-[4.5rem] truncate", tone_class(r.tone)]} title={r.type}>{r.type}</span>
-              <.link
-                :if={r.id}
-                navigate={~p"/workers/#{r.id}"}
-                class="shrink-0 opacity-70 hover:underline"
-              >
-                #{r.id}
-              </.link>
-              <span :if={is_nil(r.id) and r.tick} class="shrink-0 opacity-50">t{r.tick}</span>
               <span
-                class={["min-w-0 break-words line-clamp-3", r.tone == :muted && "opacity-60"]}
-                title={r.text}
-              >
-                {r.text}
+                class="text-xs leading-5 tabular-nums text-muted"
+                title={UniverseWeb.Format.full(r.ts)}
+              >{r.at}</span>
+              <span
+                class={["truncate text-xs font-medium leading-5", tone_text(r.tone)]}
+                title={r.type}
+              >{r.type}</span>
+              <span class="min-w-0">
+                <.link
+                  :if={r.id}
+                  navigate={~p"/workers/#{r.id}"}
+                  class="mr-1 font-mono text-xs text-muted hover:text-base-content hover:underline"
+                >#{r.id}</.link>
+                <span :if={is_nil(r.id) and r.tick} class="mr-1 font-mono text-xs text-muted">t{r.tick}</span>
+                <span
+                  class={[
+                    "break-words",
+                    r.tone == :muted && "text-muted",
+                    r.tone == :bad && "text-error"
+                  ]}
+                  title={r.text}
+                >{r.text}</span>
+                <span
+                  :if={r.count > 1}
+                  class="ml-1 rounded bg-base-200 px-1 py-px text-xs font-medium tabular-nums text-muted"
+                >×{r.count}</span>
               </span>
             </li>
           </ol>
-        </section>
+        </.panel>
       </div>
     </Layouts.app>
     """
@@ -425,32 +430,19 @@ defmodule UniverseWeb.NowLive do
 
   defp stat(assigns) do
     ~H"""
-    <div id={@id} class="rounded-xl border border-base-300 bg-base-100 px-4 py-3 transition">
-      <div class="text-xs font-medium uppercase tracking-wide opacity-60">{@label}</div>
-      <div class={[
-        "mt-1 text-2xl font-semibold tabular-nums",
-        @tone == "info" && "text-info",
-        @tone == "accent" && "text-accent",
-        @tone == "warning" && "text-warning"
-      ]}>
-        {@value}
-      </div>
-    </div>
+    <span
+      id={@id}
+      class="inline-flex items-baseline gap-1 after:ml-1 after:text-base-300 after:content-['·'] last:after:content-none"
+    >
+      <span class={["font-semibold tabular-nums text-base-content", @tone && tone_text(@tone)]}>{@value}</span>
+      <span>{@label}</span>
+    </span>
     """
   end
 
-  attr :icon, :string, required: true
-  attr :title, :string, required: true
-  attr :count, :integer, default: nil
-
-  defp section_title(assigns) do
-    ~H"""
-    <h2 class="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide opacity-80">
-      <.icon name={@icon} class="size-4" />
-      {@title}
-      <span :if={@count} class="rounded-full bg-base-200 px-2 py-0.5 text-xs font-medium normal-case">{@count}</span>
-    </h2>
-    """
+  defp agents_label(%{agents: n, idle: idle, busy: busy}) do
+    word = if n == 1, do: "agent", else: "agents"
+    "#{word} (#{busy} busy, #{idle} idle)"
   end
 
   attr :agent, :map, required: true
@@ -462,47 +454,49 @@ defmodule UniverseWeb.NowLive do
       id={"agent-#{@agent.id}"}
       navigate={~p"/workers/#{@agent.id}"}
       class={[
-        "group block rounded-xl border bg-base-100 p-4 transition hover:-translate-y-0.5 hover:shadow-md",
-        @agent.state == "busy" && "border-accent/50 shadow-sm shadow-accent/10",
-        @agent.state == "asking" && "border-warning/60",
-        @agent.state not in ["busy", "asking"] && "border-base-300 hover:border-base-content/20"
+        "group flex flex-col rounded-xl border bg-base-100 p-4 transition hover:shadow-sm",
+        @agent.state == "busy" && "border-accent/45",
+        @agent.state == "asking" && "border-warning/55",
+        @agent.state not in ["busy", "asking"] && "border-base-300 hover:border-base-content/25"
       ]}
     >
-      <div class="flex items-start justify-between gap-2">
+      <div class="flex items-start justify-between gap-3">
         <div class="min-w-0">
-          <div class="font-mono font-semibold truncate">{@agent.name}</div>
-          <div class="mt-0.5 flex flex-wrap gap-1.5 text-xs opacity-60">
-            <span>{@agent.model}</span>
-            <span :if={@agent.pool}>· pool {@agent.pool}</span>
-            <span>· #{@agent.id}</span>
+          <div class="truncate font-medium">{@agent.name}</div>
+          <div class="mt-0.5 truncate text-xs text-muted">
+            {@agent.model}<span :if={@agent.pool}> · pool {@agent.pool}</span>
+            · <span class="font-mono">#{@agent.id}</span>
           </div>
         </div>
-        <.pill state={@agent.state} />
+        <.badge status={@agent.state} />
       </div>
 
-      <p class="mt-2 line-clamp-2 text-sm opacity-70" title={@agent.purpose}>{@agent.purpose}</p>
+      <p class="mt-2 line-clamp-2 text-muted" title={@agent.purpose}>{@agent.purpose}</p>
 
       <div
         :if={@agent.state == "busy" and @agent.task}
-        class="mt-3 rounded-lg bg-accent/10 px-3 py-2 text-sm"
+        class="mt-3 rounded-lg border border-accent/20 bg-accent/6 px-3 py-2"
       >
         <div class="flex items-center justify-between text-xs font-medium text-accent">
-          <span>working on</span>
-          <span :if={@agent.task_started} class="font-mono tabular-nums">
+          <span>Working on</span>
+          <span :if={@agent.task_started} class="tabular-nums">
             {Digest.duration(@now - @agent.task_started)}
           </span>
         </div>
         <div class="mt-0.5 line-clamp-2">{@agent.task}</div>
       </div>
 
-      <div :if={@agent.state == "asking"} class="mt-3 rounded-lg bg-warning/10 px-3 py-2 text-sm">
-        <div class="text-xs font-medium text-warning">asks the model</div>
+      <div
+        :if={@agent.state == "asking"}
+        class="mt-3 rounded-lg border border-warning/25 bg-warning/8 px-3 py-2"
+      >
+        <div class="text-xs font-medium text-warning">Asks the model</div>
         <div class="mt-0.5">{@agent.question}</div>
       </div>
 
-      <div :if={@agent.state == "idle" and @agent.last} class="mt-3 text-sm">
-        <div class="text-xs font-medium opacity-60">last answer</div>
-        <div class="mt-0.5 line-clamp-2 opacity-90">
+      <div :if={@agent.state == "idle" and @agent.last} class="mt-3">
+        <div class="text-xs text-muted">Last answer</div>
+        <div class="mt-0.5 line-clamp-2">
           {@agent.last.answer || (@agent.last.handle && "→ #{@agent.last.handle}") ||
             @agent.last.reason}
         </div>
@@ -510,44 +504,13 @@ defmodule UniverseWeb.NowLive do
 
       <div
         :if={@agent.progress}
-        class="mt-3 truncate border-t border-base-300 pt-2 font-mono text-xs opacity-50"
+        class="mt-3 truncate border-t border-base-300/70 pt-2 font-mono text-xs text-muted"
       >
         {@agent.progress}
       </div>
     </.link>
     """
   end
-
-  attr :state, :string, required: true
-
-  defp pill(assigns) do
-    ~H"""
-    <span class={[
-      "inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium",
-      pill_class(@state)
-    ]}>
-      <span
-        :if={@state in ["busy", "running", "starting"]}
-        class="size-1.5 animate-pulse rounded-full bg-current"
-      ></span>
-      {@state}
-    </span>
-    """
-  end
-
-  defp pill_class("idle"), do: "bg-success/15 text-success"
-  defp pill_class("serving"), do: "bg-success/15 text-success"
-  defp pill_class("busy"), do: "bg-accent/15 text-accent"
-  defp pill_class("asking"), do: "bg-warning/20 text-warning"
-  defp pill_class(s) when s in ["running", "starting", "queued"], do: "bg-info/15 text-info"
-  defp pill_class(_), do: "bg-base-200"
-
-  defp tone_class(:model), do: "text-primary"
-  defp tone_class(:good), do: "text-success"
-  defp tone_class(:bad), do: "text-error"
-  defp tone_class(:warn), do: "text-warning"
-  defp tone_class(:info), do: "text-info"
-  defp tone_class(_), do: "opacity-50"
 
   defp running_detail(%{status: "asking"} = w), do: "asks: #{w.question}"
 

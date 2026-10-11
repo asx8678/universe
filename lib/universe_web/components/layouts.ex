@@ -31,30 +31,75 @@ defmodule UniverseWeb.Layouts do
     default: nil,
     doc: "the current [scope](https://phoenix.hexdocs.pm/scopes.html)"
 
+  attr :page, :atom, default: nil, doc: "the nav item to mark as current"
+
   slot :inner_block, required: true
 
+  @nav [
+    {"Live", [{:now, "Now", "/"}, {:flow, "Flow", "/flow"}]},
+    {"History",
+     [
+       {:timeline, "Timeline", "/timeline"},
+       {:workers, "Workers", "/workers"},
+       {:handles, "Handles", "/handles"},
+       {:replay, "Replay", "/replay"}
+     ]},
+    {"Internals", [{:system, "System", "/system"}]}
+  ]
+
   def app(assigns) do
+    root = Universe.Paths.project_root()
+
+    assigns =
+      assign(assigns, nav: @nav, root: root, project: UniverseWeb.Format.project_name(root))
+
     ~H"""
-    <header class="navbar border-b border-base-300 px-4 sm:px-6 lg:px-8">
-      <div class="flex-1 flex items-center gap-4 min-w-0">
-        <a href="/" class="font-mono font-semibold tracking-tight">universe</a>
-        <span class="text-xs opacity-60 truncate font-mono">{Universe.Paths.project_root()}</span>
-      </div>
-      <div class="flex-none flex items-center gap-2">
-        <.link navigate="/" class="btn btn-ghost btn-sm">Now</.link>
-        <.link navigate="/timeline" class="btn btn-ghost btn-sm">Timeline</.link>
-        <.link navigate="/flow" class="btn btn-ghost btn-sm">Flow</.link>
-        <.link navigate="/workers" class="btn btn-ghost btn-sm">Workers</.link>
-        <.link navigate="/system" class="btn btn-ghost btn-sm">System</.link>
-        <.link navigate="/handles" class="btn btn-ghost btn-sm">Handles</.link>
-        <.link navigate="/replay" class="btn btn-ghost btn-sm">Replay</.link>
-        <a href="/dashboard" class="btn btn-ghost btn-sm">Dashboard</a>
+    <header class="sticky top-0 z-40 border-b border-base-300 bg-base-100/85 backdrop-blur">
+      <div class="mx-auto flex h-13 max-w-7xl items-center gap-6 px-4 sm:px-6 lg:px-8">
+        <.link navigate="/" class="flex shrink-0 items-center gap-2" title={@root}>
+          <span class="relative flex size-5 items-center justify-center">
+            <span class="absolute inset-0 rounded-full border border-base-content/30"></span>
+            <span class="size-1.5 rounded-full bg-primary"></span>
+          </span>
+          <span class="font-semibold tracking-tight">universe</span>
+          <span class="text-muted">/</span>
+          <span class="max-w-40 truncate text-muted">{@project}</span>
+        </.link>
+
+        <nav id="nav" class="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
+          <%= for {{group, items}, i} <- Enum.with_index(@nav) do %>
+            <span :if={i > 0} class="mx-1.5 h-4 w-px shrink-0 bg-base-300" aria-hidden="true"></span>
+            <div class="flex items-center gap-0.5" aria-label={group} role="group">
+              <.link
+                :for={{key, label, path} <- items}
+                id={"nav-#{key}"}
+                navigate={path}
+                aria-current={@page == key && "page"}
+                class={[
+                  "rounded-md px-2.5 py-1.5 text-sm font-medium transition",
+                  @page == key && "bg-base-200 text-base-content",
+                  @page != key && "text-muted hover:bg-base-200/60 hover:text-base-content"
+                ]}
+              >
+                {label}
+              </.link>
+            </div>
+          <% end %>
+          <a
+            href="/dashboard"
+            id="nav-dashboard"
+            class="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-sm font-medium text-muted transition hover:bg-base-200/60 hover:text-base-content"
+          >
+            Dashboard <.icon name="hero-arrow-up-right-micro" class="size-3.5" />
+          </a>
+        </nav>
+
         <.theme_toggle />
       </div>
     </header>
 
-    <main class="px-4 py-6 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-6xl space-y-4">
+    <main class="px-4 py-6 text-sm sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-7xl space-y-6">
         {render_slot(@inner_block)}
       </div>
     </main>
@@ -119,31 +164,22 @@ defmodule UniverseWeb.Layouts do
   """
   def theme_toggle(assigns) do
     ~H"""
-    <div class="card relative flex flex-row items-center border-2 border-base-300 bg-base-300 rounded-full">
-      <div class="absolute w-1/3 h-full rounded-full border-1 border-base-200 bg-base-100 brightness-200 left-0 [[data-theme=light]_&]:left-1/3 [[data-theme=dark]_&]:left-2/3 [[data-theme-source=system]_&]:!left-0 transition-[left]" />
-
+    <div class="relative flex shrink-0 items-center rounded-lg border border-base-300 bg-base-200/60 p-0.5">
+      <div class="absolute inset-y-0.5 left-0.5 w-7 rounded-md bg-base-100 shadow-sm ring-1 ring-base-300 transition-[left] [[data-theme=light]_&]:left-[1.875rem] [[data-theme=dark]_&]:left-[3.625rem] [[data-theme-source=system]_&]:!left-0.5" />
       <button
-        class="flex p-2 cursor-pointer w-1/3"
+        :for={
+          {theme, icon} <- [
+            system: "hero-computer-desktop-micro",
+            light: "hero-sun-micro",
+            dark: "hero-moon-micro"
+          ]
+        }
+        class="relative flex size-7 cursor-pointer items-center justify-center text-muted transition hover:text-base-content"
         phx-click={JS.dispatch("phx:set-theme")}
-        data-phx-theme="system"
+        data-phx-theme={theme}
+        title={"#{theme} theme"}
       >
-        <.icon name="hero-computer-desktop-micro" class="size-4 opacity-75 hover:opacity-100" />
-      </button>
-
-      <button
-        class="flex p-2 cursor-pointer w-1/3"
-        phx-click={JS.dispatch("phx:set-theme")}
-        data-phx-theme="light"
-      >
-        <.icon name="hero-sun-micro" class="size-4 opacity-75 hover:opacity-100" />
-      </button>
-
-      <button
-        class="flex p-2 cursor-pointer w-1/3"
-        phx-click={JS.dispatch("phx:set-theme")}
-        data-phx-theme="dark"
-      >
-        <.icon name="hero-moon-micro" class="size-4 opacity-75 hover:opacity-100" />
+        <.icon name={icon} class="size-4" />
       </button>
     </div>
     """

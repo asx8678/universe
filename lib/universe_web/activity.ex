@@ -34,12 +34,124 @@ defmodule UniverseWeb.Activity do
       key: if(type == "progress" and e["id"], do: "p-#{e["id"]}", else: "ev-#{e["seq"]}"),
       seq: e["seq"],
       at: time_of(e["ts"]),
+      ts: e["ts"],
       type: type,
+      count: 1,
+      fold: nil,
       id: e["id"],
       tick: e["tick"],
       tone: tone,
       text: clip(text, 220)
     }
+  end
+
+  ## Folding
+
+  # How many of the newest rows a repeat may fold into.
+  @fold_window 6
+
+  @doc """
+  An empty feed state for `feed_step/2`.
+  """
+  def new_feed, do: %{folds: %{}, recent: []}
+
+  @doc """
+  Adds one event to the feed: `{state, {:insert, row}}`, or `{state,
+  {:update, row}}` when the event folds into a recent row. Repeats fold:
+  a worker's `U.call`s to the same function (with their answers), its reads
+  and its stores become one row with a count instead of one row each.
+  Calls with a prompt (agent tasks) never fold.
+  """
+  def feed_step(state, e) do
+    row = describe(e)
+
+    case fold_key(e) do
+      nil ->
+        {push(state, row), {:insert, row}}
+
+      fk ->
+        case state.folds[fk] do
+          %{key: key} = head ->
+            if key in state.recent do
+              merged = merge(head, e)
+              {state |> push(merged) |> put_in([:folds, fk], merged), {:update, merged}}
+            else
+              start(state, fk, row, e)
+            end
+
+          nil ->
+            start(state, fk, row, e)
+        end
+    end
+  end
+
+  @doc "Folds a list of events (oldest first) into feed rows, newest first."
+  def fold(events, state \\ new_feed()) do
+    {state, rows} =
+      Enum.reduce(events, {state, []}, fn e, {st, rows} ->
+        {st, {_, row}} = feed_step(st, e)
+        {st, [row | Enum.reject(rows, &(&1.key == row.key))]}
+      end)
+
+    {state, rows}
+  end
+
+  defp start(state, fk, row, e) do
+    row = merge(Map.merge(row, %{fold: fk, stats: %{n: 0, done: 0, wall: nil, last: nil}}), e)
+    {state |> push(row) |> put_in([:folds, fk], row), {:insert, row}}
+  end
+
+  defp push(state, row),
+    do: %{state | recent: Enum.take([row.key | List.delete(state.recent, row.key)], @fold_window)}
+
+  defp fold_key(%{"type" => "call", "id" => id, "data" => %{"via" => "sdk"} = d}),
+    do: if(is_binary(d["prompt"]), do: nil, else: {:call, id, d["service"], d["fn"]})
+
+  defp fold_key(%{"type" => "call_done", "id" => id, "data" => %{"ok" => true} = d}),
+    do: {:call, id, d["service"], d["fn"]}
+
+  defp fold_key(%{"type" => t, "id" => id}) when t in ["get", "put"] and is_integer(id),
+    do: {t, id}
+
+  defp fold_key(_e), do: nil
+
+  defp merge(%{fold: {:call, _, svc, fun}} = row, e) do
+    st = row.stats
+
+    st =
+      case e["type"] do
+        "call" -> %{st | n: st.n + 1}
+        _ -> %{st | done: st.done + 1, wall: e["data"]["wall_ms"]}
+      end
+
+    flight = if st.n > st.done, do: " · #{st.n - st.done} in flight", else: ""
+    took = if st.wall, do: " · last took #{Digest.duration(st.wall)}", else: ""
+
+    text =
+      if st.n <= 1 and st.done <= 1,
+        do: if(e["type"] == "call", do: row.text, else: "U.call → #{svc}.#{fun} answered#{took}"),
+        else: "U.call → #{svc}.#{fun} · #{st.n} calls#{flight}#{took}"
+
+    %{
+      row
+      | stats: st,
+        count: max(st.n, 1),
+        text: clip(text, 220),
+        at: time_of(e["ts"]),
+        ts: e["ts"]
+    }
+  end
+
+  defp merge(%{fold: {kind, _}} = row, e) when kind in ["get", "put"] do
+    st = %{row.stats | n: row.stats.n + 1, last: e["data"]["handle"]}
+    verb = if kind == "get", do: "read", else: "stored"
+
+    text =
+      if st.n == 1,
+        do: elem(line(kind, e["data"] || %{}), 1),
+        else: "#{verb} #{st.n} handles · last #{st.last}"
+
+    %{row | stats: st, count: st.n, text: clip(text, 220), at: time_of(e["ts"]), ts: e["ts"]}
   end
 
   defp line("tick_in", d) do
@@ -199,12 +311,5 @@ defmodule UniverseWeb.Activity do
     if String.length(text) > max, do: String.slice(text, 0, max) <> "…", else: text
   end
 
-  defp time_of(ts) when is_binary(ts) do
-    case Regex.run(~r/T(\d\d:\d\d:\d\d)/, ts) do
-      [_, t] -> t
-      _ -> ts
-    end
-  end
-
-  defp time_of(_), do: ""
+  defp time_of(ts), do: UniverseWeb.Format.clock(ts)
 end

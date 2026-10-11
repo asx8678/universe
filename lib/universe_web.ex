@@ -86,6 +86,8 @@ defmodule UniverseWeb do
       import Phoenix.HTML
       # Core UI components
       import UniverseWeb.CoreComponents
+      # The observer's own components (page header, badge, panel, ...)
+      import UniverseWeb.UIComponents
 
       # Common modules used in templates
       alias Phoenix.LiveView.JS
