@@ -156,6 +156,17 @@ defmodule Universe.TickTest do
     assert status_of(result, waiter) == "done"
   end
 
+  test "a blocked connection is explained, not left as a DNS error" do
+    net = uniq("net")
+
+    code =
+      "import urllib.request; urllib.request.urlopen('https://example.com', timeout=5)"
+
+    result = tick([run(net, code, %{"lang" => "python"})], %{"ids" => [net], "timeout_s" => 20})
+    assert status_of(result, net) == "failed"
+    assert result.text =~ "network is blocked for this worker"
+  end
+
   test "an empty tick reports changes since the cursor, then nothing" do
     noisy = uniq("noisy")
     tick([run(noisy, "true")])

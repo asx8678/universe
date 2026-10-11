@@ -32,14 +32,16 @@ defmodule Universe.Digest do
   """
   def build(info) do
     {acked, rows} = Enum.split_with(info.rows, &(&1[:quiet] && &1.status == "done"))
+    {restarted, rows} = Enum.split_with(rows, &restart_kill?/1)
     rows = Enum.sort_by(rows, &{rank(&1.status), &1.id || 0})
 
     header = header(info, length(info.rows))
     width = rows |> Enum.map(&String.length(&1.label || "")) |> Enum.max(fn -> 0 end) |> min(24)
     footer = footer(info.tick, acked)
+    rows_lines = Enum.map(rows, &line(&1, width)) ++ restarted_line(restarted)
 
     {lines, dropped} =
-      fit(Enum.map(rows, &line(&1, width)), String.length(header) + String.length(footer) + 2)
+      fit(rows_lines, String.length(header) + String.length(footer) + 2)
 
     overflow =
       if dropped > 0,
@@ -60,6 +62,23 @@ defmodule Universe.Digest do
         if(info.wake == "timeout", do: ["woke on timeout"], else: [])
 
     Enum.join(parts, " · ")
+  end
+
+  # Workers that only ended because the daemon stopped or restarted fold
+  # into one line: one per worker after every restart says nothing new.
+  @restart_reasons ["Universe shut down", "lost: Universe restarted"]
+
+  defp restart_kill?(row),
+    do:
+      row.status == "killed" and
+        Enum.any?(@restart_reasons, &String.starts_with?(row[:detail] || "", &1))
+
+  defp restarted_line([]), do: []
+
+  defp restarted_line(rows) do
+    names = rows |> Enum.map(&"##{&1.id} #{&1.label}") |> Enum.take(6) |> Enum.join(", ")
+    more = if length(rows) > 6, do: ", …", else: ""
+    ["+#{length(rows)} stopped when Universe restarted (#{names}#{more})"]
   end
 
   defp count(0, _what), do: []

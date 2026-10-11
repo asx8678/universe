@@ -58,7 +58,7 @@ defmodule Universe.ResilienceTest do
     after_label = uniq("after")
     result = tick([run(after_label, "echo fine", %{"after" => [before]})])
     assert status(result, after_label) == "done"
-    assert result.text =~ ~r/killed\s+#{long}\s+lost: Universe restarted/
+    assert result.text =~ ~r/stopped when Universe restarted \(.*##{long_id} #{long}/
   end
 
   test "a recovered call still knows which service and function it called" do

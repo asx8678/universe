@@ -786,7 +786,7 @@ defmodule Universe.Tick do
 
     summary =
       if String.length(text) <= @inline_result_chars do
-        %{"status" => "done", "result" => value, "result_text" => text}
+        %{"status" => "done", "result_text" => text}
       else
         case Handles.put(id, "result", value) do
           {:ok, handle, meta} ->
@@ -1257,7 +1257,7 @@ defmodule Universe.Tick do
 
     case {w.status, s["handle"]} do
       {"done", handle} when is_binary(handle) -> "→ #{handle} (#{s["handle_summary"]})"
-      {"done", _} -> join([Digest.duration(s["wall_ms"]), "→ #{s["result_text"]}"])
+      {"done", _} -> join([Digest.duration(s["wall_ms"]), "→ #{readable(s["result_text"])}"])
       _ -> join([s["reason"], Digest.duration(s["wall_ms"])])
     end
   end
@@ -1276,7 +1276,7 @@ defmodule Universe.Tick do
       case w.status do
         "done" when handles != [] -> join([took, "→ " <> Enum.join(handles, ", ")])
         "done" -> join([took, last])
-        "failed" -> join([s["reason"] || "exit #{s["code"]}", err])
+        "failed" -> join([s["reason"] || "exit #{s["code"]}", err, network_hint(w, err)])
         "budget" -> join([s["reason"] || "budget hit", err])
         "killed" -> join([s["reason"] || "killed after #{took}", last])
         other -> join([other, last])
@@ -1320,6 +1320,27 @@ defmodule Universe.Tick do
       end
     end
   end
+
+  # A string result reads as text, not as its JSON encoding with escapes.
+  defp readable(text) when is_binary(text) do
+    case Jason.decode(text) do
+      {:ok, s} when is_binary(s) -> s
+      _ -> text
+    end
+  end
+
+  defp readable(other), do: other
+
+  # A blocked connection fails like a typo in the host name ("nodename nor
+  # servname"); say what really happened.
+  @network_errors ~r/nodename nor servname|Name or service not known|Temporary failure in name resolution|getaddrinfo|Network is unreachable|Could not resolve host/
+
+  defp network_hint(w, err) when is_binary(err) do
+    if Map.get(w.spec, :network, []) == [] and Regex.match?(@network_errors, err),
+      do: "network is blocked for this worker; only a serve with \"network\" can reach hosts"
+  end
+
+  defp network_hint(_w, _err), do: nil
 
   defp join(parts), do: parts |> Enum.reject(&(&1 in [nil, false, ""])) |> Enum.join(" · ")
 

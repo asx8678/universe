@@ -316,8 +316,8 @@ defmodule Universe.ServicesTest do
         %{"op" => "call", "label" => no, "service" => name, "fn" => "probe", "args" => [port + 1]}
       ])
 
-    assert result.text =~ ~r/#{ok}\s+\S+ · → "open"/
-    assert result.text =~ ~r/#{no}\s+\S+ · → "blocked"/
+    assert result.text =~ ~r/#{ok}\s+\S+ · → open$/m
+    assert result.text =~ ~r/#{no}\s+\S+ · → blocked$/m
     kill(name)
     :gen_tcp.close(listen)
   end

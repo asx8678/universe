@@ -54,6 +54,19 @@ defmodule Universe.DigestTest do
              ~w(failed budget rejected asking killed done running queued)
   end
 
+  test "workers stopped by a restart fold into one line" do
+    rows = [
+      %{id: 3, label: "kv", status: "killed", detail: "Universe shut down"},
+      %{id: 4, label: "job", status: "killed", detail: "lost: Universe restarted"},
+      %{id: 5, label: "victim", status: "killed", detail: "stopped by stop all"}
+    ]
+
+    text = Digest.build(info(rows))
+    assert text =~ "+2 stopped when Universe restarted (#3 kv, #4 job)"
+    assert text =~ ~r/#5\s+killed\s+victim/
+    refute text =~ ~r/#3\s+killed/
+  end
+
   test "rejected rows have no ID" do
     text =
       Digest.build(info([%{id: nil, label: "bad", status: "rejected", detail: "unknown op"}]))

@@ -30,7 +30,9 @@ defmodule Universe.MCP.Server do
   parallel. Returns one compact digest line per worker that changed, failed \
   first. Bad directives come back as rejected lines, never as errors. An empty \
   directives list just waits and reports. Workers run in the project root, \
-  which is read-only except their leased paths, with no network.
+  which is read-only except their leased paths, with no network: only a \
+  serve with "network" can reach the hosts it lists. A lease another worker \
+  holds rejects the directive, unless it has "after": then it waits for it.
 
   Ops (each needs a unique "label"):
   run: one-shot code. {"op":"run","label":"l","lang":"python|bash|elixir", \
