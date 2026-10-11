@@ -73,6 +73,40 @@ defmodule Universe.HandlesTest do
     assert preview =~ "1   1.5"
   end
 
+  test "a name ending in .meta is refused; a damaged meta file doesn't break list/0" do
+    id = id()
+    assert {:ok, _, _} = Handles.put(id, "x", 1)
+    assert {:error, msg} = Handles.put(id, "x.meta", %{"kind" => "forged"})
+    assert msg =~ ".meta"
+    assert {:ok, %{"kind" => "json"}} = Handles.meta("h:#{id}/x")
+
+    dir = Path.join(Universe.Paths.handles_dir(), Integer.to_string(id))
+    File.write!(Path.join(dir, "junk.meta.json"), "{not json")
+    File.write!(Path.join(dir, "odd.meta.json"), ~s({"handle": "nope"}))
+    assert Enum.any?(Handles.list(), &(&1["handle"] == "h:#{id}/x"))
+  end
+
+  test "a damaged value reads as an error, not a crash" do
+    id = id()
+    {:ok, handle, _} = Handles.put(id, "v", %{"a" => 1})
+
+    File.write!(
+      Path.join([Universe.Paths.handles_dir(), Integer.to_string(id), "v.json"]),
+      "{trunc"
+    )
+
+    assert {:error, msg} = Handles.get(handle)
+    assert msg =~ "damaged"
+    assert {:ok, preview} = Handles.preview(handle)
+    assert preview =~ "damaged"
+  end
+
+  test "redaction replaces the longest secret first and covers map keys" do
+    secrets = [{"a.SHORT", "token-123"}, {"a.LONG", "token-123-extended"}]
+    assert Universe.Redact.scrub("x token-123-extended y", secrets) == "x «redacted:a.LONG» y"
+    assert Universe.Redact.scrub(%{"token-123" => 1}, secrets) == %{"«redacted:a.SHORT»" => 1}
+  end
+
   test "parse and errors" do
     assert Handles.parse("h:12/orders") == {:ok, {12, "orders"}}
     assert Handles.parse("h:x/orders") == :error

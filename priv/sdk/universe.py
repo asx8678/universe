@@ -60,8 +60,12 @@ def _connect():
 
 
 def _send(msg):
-    data = json.dumps(msg, default=str, separators=(",", ":")).encode("utf-8") + b"\n"
-    _sock.sendall(data)
+    try:
+        text = json.dumps(msg, default=str, separators=(",", ":"), allow_nan=False)
+    except ValueError:
+        # JSON has no NaN or Infinity; Universe would reject the whole line.
+        raise UniverseError("value contains NaN or Infinity, which JSON can't carry") from None
+    _sock.sendall(text.encode("utf-8") + b"\n")
 
 
 def _read():

@@ -25,7 +25,14 @@ defmodule Universe.SDK.Conn do
 
   Invocations of a service are handed to it one at a time. `timeout_ms` is
   what is left of the caller's timeout; an invocation whose caller has
-  already given up while it waited in the queue is dropped, not sent.
+  already given up while it waited in the queue is dropped, not sent, and
+  one that gets no `result` in time is failed so the next can go (its late
+  result is ignored). At most @max_queue calls wait per service.
+
+  Before `hello` a connection may send at most @preauth_bytes and must say
+  hello within @hello_ms. A line that isn't JSON is answered with an error
+  carrying its `rid` when one can be read from it (and fails the invocation
+  it answers, by `cid`), so no client waits forever.
   """
 
   use GenServer, restart: :temporary
@@ -34,6 +41,11 @@ defmodule Universe.SDK.Conn do
 
   @progress_burst 3
   @max_buffer 72 * 1024 * 1024
+  @preauth_bytes 64 * 1024
+  @hello_ms 10_000
+  @max_queue 1_000
+  @max_file_bytes 64 * 1024 * 1024
+  @copy_timeout_ms 30_000
   @default_call_timeout_s 60
   @max_call_timeout_s 1800
 
@@ -51,6 +63,7 @@ defmodule Universe.SDK.Conn do
        queue: :queue.new(),
        inflight: nil,
        next_cid: 1,
+       tasks: MapSet.new(),
        # Progress is logged at most @progress_burst at once, then one per
        # second; in between only the latest text is kept (see progress/2).
        progress_tokens: @progress_burst,
@@ -63,30 +76,55 @@ defmodule Universe.SDK.Conn do
   @impl true
   def handle_info(:go, state) do
     :ok = :inet.setopts(state.sock, active: :once)
+    Process.send_after(self(), :hello_timeout, @hello_ms)
     {:noreply, state}
   end
 
+  def handle_info(:hello_timeout, %{worker: nil} = state), do: {:stop, :normal, state}
+  def handle_info(:hello_timeout, state), do: {:noreply, state}
+
   def handle_info({:tcp, sock, data}, %{sock: sock} = state) do
     buf = state.buf <> data
+    limit = if state.worker, do: @max_buffer, else: @preauth_bytes
 
-    if byte_size(buf) > @max_buffer do
-      send_line(state, %{"ok" => false, "error" => "message over 72 MB; connection closed"})
-      {:stop, :normal, state}
-    else
-      {lines, rest} = split_lines(buf)
-      state = Enum.reduce(lines, %{state | buf: rest}, &handle_line/2)
-      :inet.setopts(sock, active: :once)
-      {:noreply, state}
+    cond do
+      byte_size(buf) > limit ->
+        send_line(state, %{
+          "ok" => false,
+          "error" => "message over #{div(limit, 1024)} KB; connection closed"
+        })
+
+        {:stop, :normal, state}
+
+      # Only split when the new data ends a line: re-scanning a long
+      # unfinished line on every chunk would be quadratic.
+      :binary.match(data, "\n") == :nomatch ->
+        :inet.setopts(sock, active: :once)
+        {:noreply, %{state | buf: buf}}
+
+      true ->
+        {lines, rest} = split_lines(buf)
+        state = Enum.reduce(lines, %{state | buf: rest}, &handle_line/2)
+        :inet.setopts(sock, active: :once)
+        {:noreply, state}
     end
   end
 
   def handle_info({:tcp_closed, _}, state), do: {:stop, :normal, state}
   def handle_info({:tcp_error, _, _}, state), do: {:stop, :normal, state}
 
-  def handle_info({:reply, rid, result}, state) do
+  def handle_info({:reply, rid, result, task}, state) do
     reply(state, rid, result)
-    {:noreply, state}
+    {:noreply, %{state | tasks: MapSet.delete(state.tasks, task)}}
   end
+
+  # A service that didn't answer in time: fail that call, serve the next.
+  def handle_info({:invoke_timeout, cid}, %{inflight: {cid, from, _timer}} = state) do
+    GenServer.reply(from, {:error, "service did not answer in time"})
+    {:noreply, dispatch(%{state | inflight: nil})}
+  end
+
+  def handle_info({:invoke_timeout, _cid}, state), do: {:noreply, state}
 
   def handle_info(:flush_progress, state),
     do: {:noreply, %{state | progress_timer: nil} |> progress(nil)}
@@ -95,10 +133,14 @@ defmodule Universe.SDK.Conn do
 
   @impl true
   def handle_call({:invoke, fun, args, timeout_ms}, from, state) do
-    deadline = System.monotonic_time(:millisecond) + timeout_ms
+    if :queue.len(state.queue) >= @max_queue do
+      {:reply, {:error, "service is busy: #{@max_queue} calls already waiting"}, state}
+    else
+      deadline = System.monotonic_time(:millisecond) + timeout_ms
 
-    {:noreply,
-     %{state | queue: :queue.in({fun, args, from, deadline}, state.queue)} |> dispatch()}
+      {:noreply,
+       %{state | queue: :queue.in({fun, args, from, deadline}, state.queue)} |> dispatch()}
+    end
   end
 
   @impl true
@@ -106,6 +148,8 @@ defmodule Universe.SDK.Conn do
     if state.progress_pending, do: event(state, "progress", %{"text" => state.progress_pending})
     closed = {:error, "service connection closed"}
     if state.inflight, do: GenServer.reply(elem(state.inflight, 1), closed)
+    # Blocking requests of this connection (ask, call) have no one to answer.
+    Enum.each(state.tasks, &Process.exit(&1, :kill))
     for {_, _, from, _} <- :queue.to_list(state.queue), do: GenServer.reply(from, closed)
     :gen_tcp.close(state.sock)
   end
@@ -146,8 +190,31 @@ defmodule Universe.SDK.Conn do
 
   defp handle_line(line, state) do
     case Jason.decode(line) do
-      {:ok, %{} = msg} -> handle_msg(msg, state)
-      _ -> tap(state, &send_line(&1, %{"ok" => false, "error" => "invalid JSON"}))
+      {:ok, %{} = msg} ->
+        handle_msg(msg, state)
+
+      _ ->
+        # NaN and Infinity (Python's json emits them) are the usual cause.
+        error = "invalid JSON (NaN and Infinity can't be sent)"
+        rid = number_field(line, "rid")
+        send_line(state, %{"rid" => rid, "ok" => false, "error" => error})
+
+        case {number_field(line, "cid"), state.inflight} do
+          {cid, {cid, from, timer}} when is_integer(cid) ->
+            Process.cancel_timer(timer)
+            GenServer.reply(from, {:error, "the service's result was not valid JSON"})
+            dispatch(%{state | inflight: nil})
+
+          _ ->
+            state
+        end
+    end
+  end
+
+  defp number_field(line, key) do
+    case Regex.run(~r/"#{key}"\s*:\s*(\d{1,12})/, line) do
+      [_, n] -> String.to_integer(n)
+      nil -> nil
     end
   end
 
@@ -187,9 +254,21 @@ defmodule Universe.SDK.Conn do
   defp handle_msg(%{"op" => "put_file", "name" => name, "path" => path} = msg, state) do
     result =
       with {:ok, source} <- readable_source(state.worker, path),
-           {:ok, handle, meta} <- Handles.put_file(state.worker, name, source) do
-        event(state, "put", %{"handle" => handle, "kind" => "file", "summary" => meta["summary"]})
-        {:ok, handle}
+           {:ok, copy} <- sandboxed_copy(state.worker, source) do
+        try do
+          with {:ok, handle, meta} <-
+                 Handles.put_file(state.worker, name, copy, Path.basename(source)) do
+            event(state, "put", %{
+              "handle" => handle,
+              "kind" => "file",
+              "summary" => meta["summary"]
+            })
+
+            {:ok, handle}
+          end
+        after
+          File.rm(copy)
+        end
       end
 
     reply(state, msg["rid"], result)
@@ -199,7 +278,10 @@ defmodule Universe.SDK.Conn do
   defp handle_msg(%{"op" => "get", "handle" => handle} = msg, state) do
     result = Handles.get(handle)
     # Logged so the observer can draw handle → reader.
-    event(state, "get", %{"handle" => to_string(handle), "ok" => match?({:ok, _}, result)})
+    shown =
+      if is_binary(handle), do: String.slice(handle, 0, 200), else: inspect(handle, limit: 5)
+
+    event(state, "get", %{"handle" => shown, "ok" => match?({:ok, _}, result)})
     reply(state, msg["rid"], result)
     state
   end
@@ -270,11 +352,16 @@ defmodule Universe.SDK.Conn do
     if result == {:ok, true}, do: %{state | service: name}, else: state
   end
 
-  defp handle_msg(%{"op" => "result", "cid" => cid} = msg, %{inflight: {cid, from}} = state) do
+  defp handle_msg(
+         %{"op" => "result", "cid" => cid} = msg,
+         %{inflight: {cid, from, timer}} = state
+       ) do
+    Process.cancel_timer(timer)
+
     answer =
       if msg["ok"] == true,
         do: {:ok, msg["value"]},
-        else: {:error, to_string(msg["error"] || "service function failed")}
+        else: {:error, text(msg["error"] || "service function failed")}
 
     GenServer.reply(from, answer)
     dispatch(%{state | inflight: nil})
@@ -292,9 +379,12 @@ defmodule Universe.SDK.Conn do
   # Blocking work runs in a linked task; the connection keeps serving.
   defp async(state, rid, fun) do
     conn = self()
-    Task.start_link(fn -> send(conn, {:reply, rid, fun.()}) end)
-    state
+    {:ok, task} = Task.start_link(fn -> send(conn, {:reply, rid, fun.(), self()}) end)
+    %{state | tasks: MapSet.put(state.tasks, task)}
   end
+
+  defp text(v) when is_binary(v), do: v
+  defp text(v), do: inspect(v, limit: 50)
 
   defp dispatch(%{inflight: nil} = state) do
     case :queue.out(state.queue) do
@@ -315,7 +405,8 @@ defmodule Universe.SDK.Conn do
             "timeout_ms" => left
           })
 
-          %{state | queue: queue, inflight: {cid, from}, next_cid: cid + 1}
+          timer = Process.send_after(self(), {:invoke_timeout, cid}, left)
+          %{state | queue: queue, inflight: {cid, from, timer}, next_cid: cid + 1}
         end
 
       {:empty, _} ->
@@ -329,7 +420,7 @@ defmodule Universe.SDK.Conn do
     do: send_line(state, %{"rid" => rid, "ok" => true, "result" => result})
 
   defp reply(state, rid, {:error, reason}),
-    do: send_line(state, %{"rid" => rid, "ok" => false, "error" => to_string(reason)})
+    do: send_line(state, %{"rid" => rid, "ok" => false, "error" => text(reason)})
 
   defp send_line(state, map), do: :gen_tcp.send(state.sock, [Jason.encode_to_iodata!(map), ?\n])
 
@@ -367,4 +458,76 @@ defmodule Universe.SDK.Conn do
   end
 
   defp readable_source(_worker, _path), do: {:error, "path must be a string"}
+
+  # The copy runs inside the worker's own sandbox, never with the daemon's
+  # rights: if the worker swaps the checked path for a symlink to a secret,
+  # the sandbox refuses to read it. The reader opens without blocking and
+  # checks it got a regular file (a FIFO would hang a plain `head`).
+  defp sandboxed_copy(worker, source) do
+    root = Paths.project_root()
+    dir = Path.join(Paths.universe_dir(), "tmp")
+    File.mkdir_p!(dir)
+    copy = Path.join(dir, "put_file-#{worker}-#{System.unique_integer([:positive])}")
+
+    spec = %{
+      root: root,
+      run_dir: Worker.run_dir(worker),
+      writable: [],
+      network: :none,
+      profile: "#{worker}-put_file"
+    }
+
+    argv = Isolation.adapter().wrap(reader_argv(source), spec)
+
+    task =
+      Task.async(fn ->
+        System.cmd(hd(argv), tl(argv),
+          into: File.stream!(copy),
+          cd: root,
+          stderr_to_stdout: false
+        )
+      end)
+
+    case Task.yield(task, @copy_timeout_ms) || Task.shutdown(task, :brutal_kill) do
+      {:ok, {_, 0}} ->
+        if File.stat!(copy).size <= @max_file_bytes,
+          do: {:ok, copy},
+          else: discard(copy, "file is over 64 MB")
+
+      {:ok, {_, _code}} ->
+        discard(
+          copy,
+          "cannot read #{Path.relative_to(source, root)} (not a regular file, or not allowed)"
+        )
+
+      _ ->
+        discard(copy, "reading the file took over #{div(@copy_timeout_ms, 1000)}s")
+    end
+  end
+
+  defp discard(copy, reason) do
+    File.rm(copy)
+    {:error, reason}
+  end
+
+  @reader """
+  import os, stat, sys
+  fd = os.open(sys.argv[1], os.O_RDONLY | os.O_NONBLOCK)
+  if not stat.S_ISREG(os.fstat(fd).st_mode): sys.exit(3)
+  os.set_blocking(fd, True)
+  left = int(sys.argv[2])
+  while left > 0:
+      chunk = os.read(fd, min(1 << 20, left))
+      if not chunk: break
+      sys.stdout.buffer.write(chunk); left -= len(chunk)
+  """
+
+  defp reader_argv(source) do
+    limit = Integer.to_string(@max_file_bytes + 1)
+
+    case System.find_executable("python3") do
+      nil -> ["/usr/bin/head", "-c", limit, "--", source]
+      py -> [py, "-I", "-c", @reader, source, limit]
+    end
+  end
 end

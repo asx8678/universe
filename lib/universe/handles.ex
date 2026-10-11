@@ -22,7 +22,9 @@ defmodule Universe.Handles do
   @preview_lines 12
   @max_value_bytes 64 * 1024 * 1024
 
-  def valid_name?(name), do: is_binary(name) and Regex.match?(@name_re, name)
+  # "x.meta" would store its value in x.meta.json, which is handle x's meta.
+  def valid_name?(name),
+    do: is_binary(name) and Regex.match?(@name_re, name) and not String.ends_with?(name, ".meta")
 
   @doc "Parses `h:5/orders` into `{5, \"orders\"}`."
   def parse(handle) when is_binary(handle) do
@@ -44,31 +46,36 @@ defmodule Universe.Handles do
          :ok <- check_size(encoded) do
       dir = dir(id)
       File.mkdir_p!(dir)
-      File.write!(Path.join(dir, name <> ".json"), encoded)
+      atomic_write!(Path.join(dir, name <> ".json"), encoded)
       meta = meta(id, name, kind, value, byte_size(encoded))
-      File.write!(Path.join(dir, name <> ".meta.json"), Jason.encode!(meta))
+      atomic_write!(Path.join(dir, name <> ".meta.json"), Jason.encode!(meta))
       {:ok, handle(id, name), meta}
     end
   end
 
-  @doc "Copies a file into a `file` handle for worker `id`."
-  def put_file(id, name, source) do
+  @doc """
+  Moves a copied file into a `file` handle for worker `id`. `source` must be
+  a file the daemon made (see `Universe.SDK.Conn`'s sandboxed copy), never a
+  path a worker chose; `source_name` is what the meta shows.
+  """
+  def put_file(id, name, source, source_name \\ nil) do
     with :ok <- check_name(name),
          {:ok, %File.Stat{type: :regular, size: size}} <- File.stat(source),
          :ok <- if(size <= @max_value_bytes, do: :ok, else: {:error, "file is over 64 MB"}) do
       dir = dir(id)
       File.mkdir_p!(dir)
-      File.cp!(source, Path.join(dir, name <> ".bin"))
+      File.cp!(source, Path.join(dir, name <> ".bin.tmp"))
+      File.rename!(Path.join(dir, name <> ".bin.tmp"), Path.join(dir, name <> ".bin"))
 
       meta = %{
         "handle" => handle(id, name),
         "kind" => "file",
         "bytes" => size,
-        "source" => Path.basename(source),
+        "source" => source_name || Path.basename(source),
         "summary" => "file #{human_bytes(size)}"
       }
 
-      File.write!(Path.join(dir, name <> ".meta.json"), Jason.encode!(meta))
+      atomic_write!(Path.join(dir, name <> ".meta.json"), Jason.encode!(meta))
       {:ok, handle(id, name), meta}
     else
       {:ok, %File.Stat{}} -> {:error, "not a regular file"}
@@ -83,11 +90,28 @@ defmodule Universe.Handles do
          {:ok, meta} <- meta(handle) do
       case meta["kind"] do
         "file" ->
-          {:ok, %{"base64" => Base.encode64(File.read!(Path.join(dir(id), name <> ".bin")))}}
+          with {:ok, bin} <- read(handle, Path.join(dir(id), name <> ".bin")),
+               do: {:ok, %{"base64" => Base.encode64(bin)}}
 
         _ ->
-          {:ok, Jason.decode!(File.read!(Path.join(dir(id), name <> ".json")))}
+          with {:ok, text} <- read(handle, Path.join(dir(id), name <> ".json")),
+               {:ok, value} <- decode(handle, text),
+               do: {:ok, value}
       end
+    end
+  end
+
+  defp read(handle, path) do
+    case File.read(path) do
+      {:ok, bin} -> {:ok, bin}
+      {:error, reason} -> {:error, "cannot read #{handle}: #{reason}"}
+    end
+  end
+
+  defp decode(handle, text) do
+    case Jason.decode(text) do
+      {:ok, value} -> {:ok, value}
+      {:error, _} -> {:error, "#{handle} is damaged (not valid JSON)"}
     end
   end
 
@@ -95,7 +119,7 @@ defmodule Universe.Handles do
   def meta(handle) do
     with {:ok, {id, name}} <- parse_or_error(handle) do
       case File.read(Path.join(dir(id), name <> ".meta.json")) do
-        {:ok, text} -> {:ok, Jason.decode!(text)}
+        {:ok, text} -> decode(handle, text)
         {:error, _} -> {:error, "no handle #{handle}"}
       end
     end
@@ -105,13 +129,24 @@ defmodule Universe.Handles do
   def list do
     case File.ls(Paths.handles_dir()) do
       {:ok, ids} ->
+        # Anything unreadable or not a handle's meta is skipped, so one bad
+        # file can't break inspect or the observer for the whole project.
         ids
         |> Enum.flat_map(fn id ->
           Path.join([Paths.handles_dir(), id, "*.meta.json"])
           |> Path.wildcard()
-          |> Enum.map(&(&1 |> File.read!() |> Jason.decode!()))
+          |> Enum.flat_map(fn path ->
+            with {:ok, text} <- File.read(path),
+                 {:ok, %{"handle" => h} = meta} <- Jason.decode(text),
+                 {:ok, {hid, _}} <- parse(h) do
+              [{hid, meta}]
+            else
+              _ -> []
+            end
+          end)
         end)
-        |> Enum.sort_by(&elem(parse(&1["handle"]), 1))
+        |> Enum.sort_by(&elem(&1, 0))
+        |> Enum.map(&elem(&1, 1))
 
       {:error, _} ->
         []
@@ -129,17 +164,28 @@ defmodule Universe.Handles do
             ["source file: #{meta["source"]}", "read it in code with U.get(\"#{handle}\")"]
 
           _ ->
-            {:ok, value} = get(handle)
-            preview_body(meta["kind"], value)
+            case get(handle) do
+              {:ok, value} -> preview_body(meta["kind"], value)
+              {:error, reason} -> [reason]
+            end
         end
 
-      {:ok, Enum.join([head | body], "\n")}
+      # A value may contain a secret its worker could read (a service's own
+      # key): previews go to the model and the observer, so redact them.
+      {:ok, Universe.Redact.scrub(Enum.join([head | body], "\n"), Universe.Secrets.all())}
     end
   end
 
   ## Internals
 
   defp dir(id), do: Path.join(Paths.handles_dir(), Integer.to_string(id))
+
+  # Readers never see a half-written file: write aside, then rename.
+  defp atomic_write!(path, data) do
+    tmp = path <> ".tmp-#{System.unique_integer([:positive])}"
+    File.write!(tmp, data)
+    File.rename!(tmp, path)
+  end
 
   defp parse_or_error(handle) do
     case parse(handle) do
@@ -151,7 +197,9 @@ defmodule Universe.Handles do
   defp check_name(name) do
     if valid_name?(name),
       do: :ok,
-      else: {:error, "handle name must be 1-64 chars of letters, digits, _ . -"}
+      else:
+        {:error,
+         "handle name must be 1-64 chars of letters, digits, _ . - (and not end in .meta)"}
   end
 
   defp check_size(encoded) do

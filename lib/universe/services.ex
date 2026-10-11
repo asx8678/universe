@@ -2,10 +2,13 @@ defmodule Universe.Services do
   @moduledoc """
   Registry of live services and of SDK credentials.
 
-  Owns two public ETS tables:
+  Owns three public ETS tables:
     * tokens   - `token => {worker_id, tick}`; a worker's SDK connection proves
                  who it is with the token it got in `UNIVERSE_TOKEN`
-    * services - `name => %{id, conn, fns, describe, since_ms, last_call_ms}`
+    * services - `name => %{id, conn, fns, describe, since_ms}`, written only
+                 by this process (register, and removal when the conn dies)
+    * calls    - `name => last_call_ms`, written by callers; kept apart so a
+                 caller racing a dying service can never re-create its entry
 
   A service is registered by its SDK connection process (`U.serve`) and
   removed when that process exits, so a dead service can't be called.
@@ -15,6 +18,7 @@ defmodule Universe.Services do
 
   @tokens :universe_sdk_tokens
   @services :universe_services
+  @calls :universe_service_calls
 
   def start_link(opts \\ []), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)
 
@@ -46,18 +50,26 @@ defmodule Universe.Services do
     end
   end
 
-  def list,
-    do:
-      @services |> :ets.tab2list() |> Enum.map(fn {name, info} -> Map.put(info, :name, name) end)
+  def list do
+    for {name, info} <- :ets.tab2list(@services) do
+      last =
+        case :ets.lookup(@calls, name) do
+          [{^name, ms}] -> max(ms, info.since_ms)
+          [] -> info.since_ms
+        end
+
+      Map.merge(info, %{name: name, last_call_ms: last})
+    end
+  end
 
   @doc "Calls `fn` on service `name`. Returns `{:ok, value}` or `{:error, reason}`."
   def invoke(name, fun, args, timeout_ms) do
     case lookup(name) do
-      {:ok, %{conn: conn, fns: fns} = info} ->
+      {:ok, %{conn: conn, fns: fns}} ->
         if fns != [] and fun not in fns do
           {:error, "service #{name} has no function #{fun} (has: #{Enum.join(fns, ", ")})"}
         else
-          :ets.insert(@services, {name, %{info | last_call_ms: now()}})
+          :ets.insert(@calls, {name, now()})
           do_invoke(conn, fun, args, timeout_ms)
         end
 
@@ -80,6 +92,7 @@ defmodule Universe.Services do
   def init(_opts) do
     :ets.new(@tokens, [:set, :public, :named_table, read_concurrency: true])
     :ets.new(@services, [:set, :public, :named_table, read_concurrency: true])
+    :ets.new(@calls, [:set, :public, :named_table, write_concurrency: true])
     {:ok, %{monitors: %{}}}
   end
 
@@ -87,14 +100,27 @@ defmodule Universe.Services do
   def handle_call({:register, name, info}, _from, state) do
     case :ets.lookup(@services, name) do
       [{^name, %{conn: other}}] when other != info.conn ->
-        {:reply, {:error, "service name #{name} is taken"}, state}
+        # A dead holder whose removal hasn't run yet doesn't keep the name.
+        if Process.alive?(other) do
+          {:reply, {:error, "service name #{name} is taken"}, state}
+        else
+          {:reply, put_service(name, info), track(state, name, info.conn)}
+        end
 
       _ ->
-        info = Map.merge(info, %{since_ms: now(), last_call_ms: now()})
-        :ets.insert(@services, {name, info})
-        ref = Process.monitor(info.conn)
-        {:reply, :ok, %{state | monitors: Map.put(state.monitors, ref, name)}}
+        {:reply, put_service(name, info), track(state, name, info.conn)}
     end
+  end
+
+  defp put_service(name, info) do
+    :ets.insert(@services, {name, Map.put(info, :since_ms, now())})
+    :ets.delete(@calls, name)
+    :ok
+  end
+
+  defp track(state, name, conn) do
+    ref = Process.monitor(conn)
+    %{state | monitors: Map.put(state.monitors, ref, name)}
   end
 
   @impl true

@@ -11,7 +11,12 @@ defmodule Universe.Redact do
   def scrub(term, []), do: term
 
   def scrub(term, secrets) do
-    secrets = Enum.filter(secrets, fn {_name, value} -> byte_size(value) >= @min_length end)
+    # Longest first: a secret that contains another must be replaced whole.
+    secrets =
+      secrets
+      |> Enum.filter(fn {_name, value} -> byte_size(value) >= @min_length end)
+      |> Enum.sort_by(fn {_name, value} -> -byte_size(value) end)
+
     walk(term, secrets)
   end
 
@@ -22,7 +27,7 @@ defmodule Universe.Redact do
   end
 
   defp walk(map, secrets) when is_map(map) and not is_struct(map),
-    do: Map.new(map, fn {k, v} -> {k, walk(v, secrets)} end)
+    do: Map.new(map, fn {k, v} -> {walk(k, secrets), walk(v, secrets)} end)
 
   defp walk(list, secrets) when is_list(list), do: Enum.map(list, &walk(&1, secrets))
   defp walk(other, _secrets), do: other

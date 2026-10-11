@@ -101,6 +101,119 @@ defmodule Universe.ServicesTest do
     Enum.any?(Map.values(Universe.Tick.snapshot()), &(&1.id == event["id"] and &1.label == name))
   end
 
+  test "NaN can't hang a worker or wedge a service" do
+    name = uniq("nan")
+    code = "U.serve(#{inspect(name)}, {'nan': lambda: float('nan'), 'ok': lambda: 'fine'}, '')"
+
+    tick([%{"op" => "serve", "label" => name, "lang" => "python", "code" => code}], %{
+      "ids" => [name],
+      "timeout_s" => 10
+    })
+
+    [w, c1, c2] = Enum.map(~w(nanput nan1 nan2), &uniq/1)
+
+    call = fn label, f ->
+      %{"op" => "call", "label" => label, "service" => name, "fn" => f, "args" => nil}
+    end
+
+    result =
+      tick([py(w, "U.put('x', [float('nan')])"), call.(c1, "nan"), call.(c2, "ok")], %{
+        "timeout_s" => 20
+      })
+
+    assert status(result, w) == "failed"
+    assert result.text =~ "NaN or Infinity"
+    assert status(result, c1) == "failed"
+    assert status(result, c2) == "done"
+    kill(name)
+  end
+
+  test "a service call that never answers is failed; the next call still goes through" do
+    name = uniq("hang")
+
+    code =
+      "import time\nU.serve(#{inspect(name)}, {'slow': lambda: time.sleep(4), 'ok': lambda: 'fine'}, '')"
+
+    tick([%{"op" => "serve", "label" => name, "lang" => "python", "code" => code}], %{
+      "ids" => [name],
+      "timeout_s" => 10
+    })
+
+    [c1, c2] = Enum.map(~w(hang1 hang2), &uniq/1)
+
+    first =
+      tick(
+        [
+          %{
+            "op" => "call",
+            "label" => c1,
+            "service" => name,
+            "fn" => "slow",
+            "args" => nil,
+            "timeout_s" => 1
+          }
+        ],
+        %{"ids" => [c1], "timeout_s" => 10}
+      )
+
+    assert status(first, c1) == "failed"
+
+    # The service is still busy with the slow call; the next one queues behind
+    # it instead of being stuck forever.
+    second =
+      tick(
+        [
+          %{
+            "op" => "call",
+            "label" => c2,
+            "service" => name,
+            "fn" => "ok",
+            "args" => nil,
+            "timeout_s" => 10
+          }
+        ],
+        %{"ids" => [c2], "timeout_s" => 15}
+      )
+
+    assert status(second, c2) == "done"
+    kill(name)
+  end
+
+  test "put_file refuses a FIFO quickly instead of hanging" do
+    label = uniq("fifo")
+
+    code =
+      "import os\np = os.path.join(os.environ['TMPDIR'], 'pipe')\nos.mkfifo(p)\ntry:\n    U.put_file('p', p)\nexcept Exception as e:\n    print('refused:', e)"
+
+    d = py(label, code)
+    result = tick([d], %{"timeout_s" => 40})
+    assert status(result, label) == "done"
+    assert result.text =~ "refused"
+  end
+
+  test "put_file still copies an ordinary file" do
+    label = uniq("pf")
+
+    code =
+      "import os\np = os.path.join(os.environ['TMPDIR'], 'note.txt')\nopen(p, 'w').write('hello file')\nprint(U.put_file('note', p))"
+
+    result = tick([py(label, code)])
+    assert status(result, label) == "done"
+    id = id_of(result, label)
+    assert {:ok, %{"base64" => b64}} = Universe.Handles.get("h:#{id}/note")
+    assert Base.decode64!(b64) == "hello file"
+  end
+
+  test "an unauthenticated connection can't buffer more than 64 KB or linger" do
+    {:ok, sock} =
+      :gen_tcp.connect({:local, Universe.SDK.Listener.socket_path()}, 0, [:binary, active: false])
+
+    :ok = :gen_tcp.send(sock, :binary.copy("x", 100_000))
+    assert {:ok, reply} = :gen_tcp.recv(sock, 0, 5_000)
+    assert reply =~ "connection closed"
+    assert {:error, :closed} = :gen_tcp.recv(sock, 0, 5_000)
+  end
+
   test "U.put stores rows as a handle; the digest shows only its summary" do
     label = uniq("put")
 
