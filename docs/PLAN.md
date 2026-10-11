@@ -319,6 +319,29 @@ of the whole universe; the tick timeline moved to `/timeline`.
   crashed: :shutdown". Both fixed: a shutdown is now `killed · Universe shut
   down`.
 
+## 3b3. Visualising the universe (Oct 11, 2026)
+
+- **Per-tick flow** (`/timeline/:tick`): a server-rendered SVG sequence
+  diagram of everything from a tick to the model's next one. Lanes: model,
+  Universe, each worker, services and agents, handles. Built by
+  `UniverseWeb.Flow` from the event log; linked from each timeline card.
+- **Flow graph** (`/flow`): who talks to whom (`UniverseWeb.Topology`, the
+  same message mapping), edges counting messages over a 1/5/30-minute
+  window and animating for 2 s when traffic crosses them; at most 12 worker
+  nodes per column, live first.
+- **System** (`/system`): the live supervision tree with kinds,
+  strategies, roles, who-talks-to-whom, queue/memory/activity, SDK
+  connections and call tasks labelled with their workers, and each worker's
+  OS process tree from `ps`.
+- **LiveDashboard** (`/dashboard`, 0.9.1) for generic BEAM introspection.
+- **`docs/ARCHITECTURE.md`**: Mermaid diagrams of the tree and the flows.
+- New events so every arrow can be drawn: `get` (handle reads), `call`
+  with `via: tick|sdk`, `call_done`.
+- Hardening found on the way: every browser page now refuses non-loopback
+  peers and foreign `Host`/`Origin` (DNS rebinding); `force_ssl` removed
+  (it broke `http://[::1]`); recovered calls keep their target (a crash on
+  `/workers` after a restart).
+
 ## 3c. Linux adapter (Oct 11, 2026: written, not yet run on Linux)
 
 - `Universe.Isolation.Bubblewrap`, picked by default on Linux: `--unshare-all`

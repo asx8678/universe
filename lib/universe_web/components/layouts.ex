@@ -43,6 +43,7 @@ defmodule UniverseWeb.Layouts do
       <div class="flex-none flex items-center gap-2">
         <.link navigate="/" class="btn btn-ghost btn-sm">Now</.link>
         <.link navigate="/timeline" class="btn btn-ghost btn-sm">Timeline</.link>
+        <.link navigate="/flow" class="btn btn-ghost btn-sm">Flow</.link>
         <.link navigate="/workers" class="btn btn-ghost btn-sm">Workers</.link>
         <.link navigate="/system" class="btn btn-ghost btn-sm">System</.link>
         <.link navigate="/handles" class="btn btn-ghost btn-sm">Handles</.link>

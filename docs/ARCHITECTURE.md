@@ -7,9 +7,14 @@ GenServer in the daemon that owns one sandboxed OS process tree. Every step
 is appended to an **event log**, which also feeds the web observer.
 
 The diagrams below render on GitHub. Live versions of the same pictures are
-in the observer: `/` (Now), `/timeline/:tick` (a tick's flow as a sequence
-diagram) and `/dashboard` (LiveDashboard: supervision trees, processes,
-ports, ETS).
+in the observer:
+
+- `/system`: this supervision tree, live, with each process's role, queue,
+  memory and activity, and every worker's OS processes
+- `/flow`: who talks to whom as a graph; edges animate as messages cross
+- `/timeline/:tick`: one tick's flow as a sequence diagram
+- `/` (Now): agents, services, running work and every event as it happens
+- `/dashboard`: Phoenix LiveDashboard (generic processes, ports, ETS)
 
 ## 1. Supervision tree
 

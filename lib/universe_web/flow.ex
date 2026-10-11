@@ -82,27 +82,31 @@ defmodule UniverseWeb.Flow do
   def diagram(events, opts \\ []) do
     worker = Keyword.get(opts, :worker, &worker_info/1)
     owner = Keyword.get_lazy(opts, :owner, &owner_lookup/0)
+    # :infinity compares greater than any integer.
+    max_rows = Keyword.get(opts, :max_rows, @max_rows)
 
     acc = %{
       rows: [],
+      count: 0,
       lanes: %{},
       order: [],
       open: %{},
       info: %{},
       calls: %{},
-      after_digest: false
+      after_digest: false,
+      notes: Keyword.get(opts, :notes, true)
     }
 
     acc =
       Enum.reduce(events, acc, fn e, acc ->
-        if length(acc.rows) >= @max_rows, do: acc, else: step(e, acc, worker, owner)
+        if acc.count >= max_rows, do: acc, else: step(e, acc, worker, owner)
       end)
 
     rows = Enum.reverse(acc.rows)
     folded = rows |> Enum.filter(&(&1.type == :note)) |> Enum.map(&(&1.count - 1)) |> Enum.sum()
 
     rows =
-      if length(acc.rows) >= @max_rows,
+      if acc.count >= max_rows,
         do:
           rows ++
             [
@@ -286,8 +290,11 @@ defmodule UniverseWeb.Flow do
       seq: e["seq"]
     }
 
-    %{acc | rows: [row | acc.rows]}
+    push(acc, row)
   end
+
+  # The topology graph asks for messages only (notes: false).
+  defp note(%{notes: false} = acc, _e, _lane_key, _label, _tone), do: acc
 
   defp note(acc, e, lane_key, label, tone) do
     acc = lane(acc, lane_key)
@@ -303,10 +310,12 @@ defmodule UniverseWeb.Flow do
       fold: nil
     }
 
-    %{acc | rows: [row | acc.rows]}
+    push(acc, row)
   end
 
   # Output and progress fold into one note per lane until the lane talks.
+  defp fold(%{notes: false} = acc, _e, _lane_key, _kind, _text, _tone), do: acc
+
   defp fold(acc, e, lane_key, kind, text, tone) do
     acc = lane(acc, lane_key)
 
@@ -323,12 +332,12 @@ defmodule UniverseWeb.Flow do
           fold: kind
         }
 
-        idx = length(acc.rows)
-        %{acc | rows: [row | acc.rows], open: Map.put(acc.open, {lane_key, kind}, idx)}
+        idx = acc.count
+        %{push(acc, row) | open: Map.put(acc.open, {lane_key, kind}, idx)}
 
       idx ->
         # Rows are kept newest first; idx counts from the oldest.
-        pos = length(acc.rows) - 1 - idx
+        pos = acc.count - 1 - idx
         rows = List.update_at(acc.rows, pos, &%{&1 | label: clip(text), count: &1.count + 1})
         %{acc | rows: rows}
     end
@@ -337,8 +346,12 @@ defmodule UniverseWeb.Flow do
   defp close(acc, lane_key),
     do: %{acc | open: Map.reject(acc.open, fn {{l, _}, _} -> l == lane_key end)}
 
+  defp divider(%{notes: false} = acc, _e, _label), do: acc
+
   defp divider(acc, e, label),
-    do: %{acc | rows: [%{type: :divider, label: label, at: at(e), seq: e["seq"]} | acc.rows]}
+    do: push(acc, %{type: :divider, label: label, at: at(e), seq: e["seq"]})
+
+  defp push(acc, row), do: %{acc | rows: [row | acc.rows], count: acc.count + 1}
 
   ## Lanes
 

@@ -45,6 +45,7 @@ defmodule UniverseWeb.Router do
     live "/", NowLive
     live "/timeline", TimelineLive
     live "/timeline/:tick", TickFlowLive
+    live "/flow", FlowLive
     live "/workers", WorkersLive
     live "/system", SystemLive
     live "/workers/:id", WorkerLive

@@ -109,3 +109,15 @@
   from { opacity: 0; transform: translateY(-2px); }
   to { opacity: 1; transform: none; }
 }
+
+/* Flow graph: edges with fresh traffic march toward their target. */
+@keyframes flow-dash {
+  to { stroke-dashoffset: -24; }
+}
+.flow-dash {
+  stroke-dasharray: 8 4;
+  animation: flow-dash 0.7s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .flow-dash { animation: none; }
+}

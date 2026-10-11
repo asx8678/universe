@@ -213,6 +213,132 @@ defmodule UniverseWeb.FlowComponents do
     """
   end
 
+  attr :graph, :map, required: true
+  attr :active, :any, required: true, doc: "MapSet of {from, to} edges to animate"
+
+  @doc "The live who-talks-to-whom graph (see `UniverseWeb.Topology`)."
+  def topology(assigns) do
+    nodes = Map.new(assigns.graph.nodes, &{&1.key, &1})
+    {node_w, node_h} = UniverseWeb.Topology.node_size()
+
+    edges =
+      for e <- assigns.graph.edges,
+          from = nodes[e.from],
+          to = nodes[e.to],
+          not is_nil(from) and not is_nil(to) do
+        {mx, my} = UniverseWeb.Topology.midpoint(from, to)
+
+        Map.merge(e, %{
+          d: UniverseWeb.Topology.path(from, to),
+          mx: mx,
+          my: my,
+          active: MapSet.member?(assigns.active, {e.from, e.to})
+        })
+      end
+
+    assigns =
+      assign(assigns,
+        edges: edges,
+        width: UniverseWeb.Topology.width(),
+        node_w: node_w,
+        node_h: node_h
+      )
+
+    ~H"""
+    <svg
+      id="topology"
+      viewBox={"0 0 #{@width} #{@graph.height}"}
+      class="block h-auto w-full font-sans"
+      role="img"
+      aria-label="Who talks to whom"
+    >
+      <g id="edges">
+        <g
+          :for={e <- @edges}
+          id={"edge-" <> dom(e.from) <> "--" <> dom(e.to)}
+          class={["flow-edge", e.active && "flow-edge-active"]}
+        >
+          <title>{e.count} message(s) · last: {e.label}</title>
+          <path
+            d={e.d}
+            fill="none"
+            class={[tone_stroke(e.tone), not e.active && "opacity-35", e.active && "flow-dash"]}
+            stroke-width={edge_width(e.count)}
+            stroke-linecap="round"
+          />
+          <circle :if={e.active} r="4" class={tone_fill(e.tone)}>
+            <animateMotion dur="1.1s" repeatCount="indefinite" path={e.d} />
+          </circle>
+          <text
+            :if={e.active}
+            x={e.mx}
+            y={e.my - 14}
+            text-anchor="middle"
+            class={["text-[11px] font-medium", tone_fill(e.tone)]}
+          >
+            {fit(e.label, 240)} · {e.count}×
+          </text>
+        </g>
+      </g>
+
+      <g id="nodes">
+        <g :for={n <- @graph.nodes} id={"node-" <> dom(n.key)}>
+          <title>{n.label} · {n.sub}{if n.status, do: " · #{n.status}"}</title>
+          <%!-- An opaque base, so edges pass behind nodes instead of through them. --%>
+          <rect
+            x={n.x - @node_w / 2}
+            y={n.y - @node_h / 2}
+            width={@node_w}
+            height={@node_h}
+            rx="12"
+            class="fill-base-100"
+          />
+          <rect
+            x={n.x - @node_w / 2}
+            y={n.y - @node_h / 2}
+            width={@node_w}
+            height={@node_h}
+            rx="12"
+            class={[lane_class(n.kind), n.status == "gone" && "opacity-40"]}
+            stroke-width="1.3"
+          />
+          <circle
+            :if={n.status}
+            cx={n.x - @node_w / 2 + 12}
+            cy={n.y - 6}
+            r="3.5"
+            class={status_dot(n.status)}
+          />
+          <text
+            x={n.x}
+            y={n.y - 2}
+            text-anchor="middle"
+            class="fill-base-content text-[12px] font-semibold"
+          >
+            {fit(n.label, @node_w - 30)}
+          </text>
+          <text x={n.x} y={n.y + 13} text-anchor="middle" class="fill-base-content/60 text-[10px]">
+            {fit(
+              n.sub <> if(n.status && n.status != "gone", do: " · #{n.status}", else: ""),
+              @node_w - 16
+            )}
+          </text>
+        </g>
+      </g>
+    </svg>
+    """
+  end
+
+  defp dom(key), do: key |> String.replace(~r/[^A-Za-z0-9_-]+/, "-") |> String.trim("-")
+
+  defp edge_width(count), do: Float.round(1.4 + :math.log2(count) * 0.7, 1)
+
+  defp status_dot("serving"), do: "fill-success"
+  defp status_dot("asking"), do: "fill-warning"
+  defp status_dot(s) when s in ["running", "queued"], do: "fill-info animate-pulse"
+  defp status_dot("gone"), do: "fill-base-content/30"
+  defp status_dot(_), do: "fill-base-content/50"
+
   defp x(i, lw), do: @left + i * lw + lw / 2
 
   defp lane_width(n) when n > 0,
