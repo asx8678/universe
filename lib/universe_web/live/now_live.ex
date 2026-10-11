@@ -18,7 +18,7 @@ defmodule UniverseWeb.NowLive do
 
   use UniverseWeb, :live_view
 
-  alias Universe.{Digest, EventLog, Tick}
+  alias Universe.{Digest, EventLog, Services, Tick}
   alias UniverseWeb.Activity
 
   @feed_max 150
@@ -168,6 +168,8 @@ defmodule UniverseWeb.NowLive do
 
   defp agent_card(w, running_calls) do
     call = running_calls[w.service]
+    # A worker's U.call keeps an agent busy too, with no call directive.
+    sdk_busy? = call == nil and w.service != nil and Services.busy?(w.service)
 
     last =
       w.service &&
@@ -184,11 +186,12 @@ defmodule UniverseWeb.NowLive do
         cond do
           w.status == "asking" -> "asking"
           w.status != "serving" -> "starting"
-          call -> "busy"
+          call || sdk_busy? -> "busy"
           true -> "idle"
         end,
       question: w.question,
-      task: call && prompt_of(call.spec),
+      task:
+        if(sdk_busy?, do: "a task from a worker (U.call)", else: call && prompt_of(call.spec)),
       task_started: call && call.started_ms,
       progress: latest_progress(w.id),
       last: last

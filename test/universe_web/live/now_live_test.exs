@@ -87,6 +87,26 @@ defmodule UniverseWeb.NowLiveTest do
     tick([%{"op" => "kill", "target" => name}], %{"ids" => [name], "timeout_s" => 10})
   end
 
+  test "an agent on a worker's U.call is busy, not idle", %{conn: conn} do
+    name = uniq("sdkdash")
+    caller = "c-#{name}"
+    result = tick([%{"op" => "serve", "label" => name, "agent" => %{"purpose" => "Help."}}])
+    id = id_of(result, name)
+    {:ok, view, _html} = live(conn, ~p"/")
+
+    code = "print(U.call(#{inspect(name)}, 'task', {'prompt': 'WORK it'}, timeout_s=20))"
+
+    tick([%{"op" => "run", "label" => caller, "lang" => "python", "code" => code}], %{
+      "timeout_s" => 0
+    })
+
+    eventually(fn -> has_element?(view, "#agent-#{id}", "a task from a worker") end)
+    assert has_element?(view, "#agent-#{id}", "busy")
+
+    tick([], %{"ids" => [caller], "timeout_s" => 20})
+    tick([%{"op" => "kill", "target" => name}], %{"ids" => [name], "timeout_s" => 10})
+  end
+
   test "pause holds new events and counts them; resume shows them", %{conn: conn} do
     {:ok, view, _html} = live(conn, ~p"/")
     view |> element("#feed-pause") |> render_click()

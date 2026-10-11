@@ -105,4 +105,21 @@ defmodule UniverseWeb.FlowTest do
     assert [{"w:9", "boom"}] == for(%{type: :note} = r <- d.rows, do: {r.lane, r.label})
     assert Enum.find(d.lanes, &(&1.key == "w:9")).kind == :agent
   end
+
+  test "a steer is an arrow from the model to the agent, like a reply" do
+    events = [
+      ev(1, "spawn", 9, %{"label" => "rev", "kind" => "serve", "lang" => "agent"}),
+      ev(2, "steer", 9, %{"text" => "only lib/", "interrupt" => false}),
+      ev(3, "steer", 9, %{"text" => "stop", "interrupt" => true})
+    ]
+
+    d =
+      Flow.diagram(events,
+        worker: fn _ -> %{label: "rev", kind: "serve", lang: "agent"} end,
+        owner: fn _, _ -> nil end
+      )
+
+    assert {"model", "w:9", "steer: only lib/"} in msgs(d)
+    assert {"model", "w:9", "steer (interrupting): stop"} in msgs(d)
+  end
 end

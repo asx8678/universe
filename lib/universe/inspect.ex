@@ -13,7 +13,7 @@ defmodule Universe.Inspect do
   compile). Output stays under ~8,000 tokens.
   """
 
-  alias Universe.{Digest, EventLog, Handles, Paths, Tick, Worker}
+  alias Universe.{Digest, EventLog, Handles, Paths, Services, Tick, Worker}
 
   @max_chars 32_000
   @default_limit 200
@@ -56,7 +56,7 @@ defmodule Universe.Inspect do
     state =
       cond do
         status != "serving" -> status
-        MapSet.member?(busy, name) -> "busy"
+        MapSet.member?(busy, name) or Services.busy?(name) -> "busy"
         true -> "idle"
       end
 
@@ -64,6 +64,13 @@ defmodule Universe.Inspect do
   end
 
   defp agent_status(w, _busy, _name), do: w.status
+
+  # The services an agent may call as tools, so a new session can tell its
+  # agents apart.
+  defp can_call(%{spec: %{agent: %{services: [_ | _] = names}}}),
+    do: " · can call: #{Enum.join(names, ", ")}"
+
+  defp can_call(_w), do: ""
 
   @doc "The manifest as plain text (also served to the SessionStart hook)."
   def manifest do
@@ -92,7 +99,7 @@ defmodule Universe.Inspect do
         fns = if w.fns == [], do: "", else: " · fns: #{Enum.join(w.fns, ", ")}"
         desc = if w.describe in [nil, ""], do: "", else: " · #{w.describe}"
         name = w.service || w.spec.service
-        "  #{name} (##{w.id}, #{agent_status(w, busy, name)})#{fns}#{desc}"
+        "  #{name} (##{w.id}, #{agent_status(w, busy, name)})#{fns}#{can_call(w)}#{desc}"
       end)
 
     lines =

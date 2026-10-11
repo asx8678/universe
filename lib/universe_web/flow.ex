@@ -182,6 +182,11 @@ defmodule UniverseWeb.Flow do
       "reply" ->
         msg(acc, e, "model", w(id), "reply: #{d["text"]}", :model)
 
+      # Logged on the agent the steer reached, also when aimed at its task.
+      "steer" ->
+        how = if d["interrupt"], do: "steer (interrupting)", else: "steer"
+        msg(acc, e, "model", w(id), "#{how}: #{d["text"]}", :model)
+
       # An agent's busy/idle progress and per-task log lines repeat what its
       # task and answer arrows already show.
       t when t in ["progress", "stdout"] and is_integer(id) ->

@@ -10,6 +10,9 @@ defmodule Universe.Services do
                  only by this process (register, and removal when the conn dies)
     * calls    - `name => last_call_ms`, written by callers; kept apart so a
                  caller racing a dying service can never re-create its entry
+    * busy     - `conn` pids with an invocation in flight, written by the
+                 connection itself; whoever called (a call directive or a
+                 worker's `U.call`), so an agent shows busy either way
 
   A service is registered by the Tick once it approves a connection's
   `U.serve` (so a refused serve is never routable), and removed when that
@@ -21,6 +24,7 @@ defmodule Universe.Services do
   @tokens :universe_sdk_tokens
   @services :universe_services
   @calls :universe_service_calls
+  @busy :universe_service_busy
 
   def start_link(opts \\ []), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)
 
@@ -85,6 +89,18 @@ defmodule Universe.Services do
     end
   end
 
+  @doc "Set by a connection when an invocation starts and when it ends."
+  def mark_busy(conn, true), do: :ets.insert(@busy, {conn})
+  def mark_busy(conn, false), do: :ets.delete(@busy, conn)
+
+  @doc "Whether service `name` is working on an invocation now."
+  def busy?(name) do
+    case lookup(name) do
+      {:ok, %{conn: conn}} -> :ets.member(@busy, conn)
+      :error -> false
+    end
+  end
+
   defp do_invoke(conn, request, timeout_ms) do
     # The connection gets the timeout too, to pass it on to the service.
     GenServer.call(conn, request, timeout_ms + 1_000)
@@ -100,6 +116,7 @@ defmodule Universe.Services do
     :ets.new(@tokens, [:set, :public, :named_table, read_concurrency: true])
     :ets.new(@services, [:set, :public, :named_table, read_concurrency: true])
     :ets.new(@calls, [:set, :public, :named_table, write_concurrency: true])
+    :ets.new(@busy, [:set, :public, :named_table, write_concurrency: true])
     {:ok, %{monitors: %{}}}
   end
 
@@ -133,6 +150,8 @@ defmodule Universe.Services do
   @impl true
   def handle_info({:DOWN, ref, :process, pid, _reason}, state) do
     {name, monitors} = Map.pop(state.monitors, ref)
+    # A connection killed mid-invocation never cleared its own mark.
+    :ets.delete(@busy, pid)
 
     case name && :ets.lookup(@services, name) do
       [{^name, %{conn: ^pid}}] -> :ets.delete(@services, name)

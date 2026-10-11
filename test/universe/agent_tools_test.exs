@@ -163,6 +163,10 @@ defmodule Universe.AgentToolsTest do
                                  |> Jason.decode!())["permissions"]["allow"]
 
       assert arg(args, "--system-prompt") =~ "mcp__services__"
+
+      # A new session sees which agent has which tools.
+      manifest = API.inspect(%{"target" => "manifest"}).text
+      assert manifest =~ ~r/#{name} \(#\d+, agent, idle\) · fns: task · can call: #{svc} ·/
       # The file names the token file, never the token.
       refute File.read!(Path.join(run_dir, "mcp.json")) =~ File.read!(Path.join(run_dir, "token"))
 
@@ -502,6 +506,41 @@ defmodule Universe.AgentToolsTest do
       end)
 
       kill(name)
+    end
+
+    test "an agent on a worker's U.call shows busy, and a pool task goes to a free peer" do
+      pool = uniq("upool")
+      [a, b] = [uniq("ua"), uniq("ub")]
+      caller = "c-#{a}"
+
+      tick([agent(a, %{"pool" => pool}), agent(b, %{"pool" => pool})], %{
+        "ids" => [a, b],
+        "timeout_s" => 15
+      })
+
+      code = "print(U.call(#{inspect(a)}, 'task', {'prompt': 'WORK it'}, timeout_s=20))"
+
+      tick([%{"op" => "run", "label" => caller, "lang" => "python", "code" => code}], %{
+        "timeout_s" => 0
+      })
+
+      eventually(fn -> Services.busy?(a) end)
+      manifest = API.inspect(%{"target" => "manifest"}).text
+      assert manifest =~ ~r/#{a} \(#\d+, agent, pool #{pool}, busy\)/
+      assert manifest =~ ~r/#{b} \(#\d+, agent, pool #{pool}, idle\)/
+
+      # `a` has the lower ID but is busy, so the pool picks `b`.
+      t = "t-#{pool}"
+      result = tick([task(t, pool, "hello")], %{"ids" => [t]})
+      call = EventLog.for_id(id_of(result, t)) |> Enum.find(&(&1["type"] == "call"))
+      assert call["data"]["service"] == b
+
+      tick([], %{"ids" => [caller], "timeout_s" => 20})
+      refute Services.busy?(a)
+      manifest = API.inspect(%{"target" => "manifest"}).text
+      assert manifest =~ ~r/#{a} \(#\d+, agent, pool #{pool}, idle\)/
+      kill(a)
+      kill(b)
     end
 
     test "an interrupting steer still waiting when the task times out is reported as dropped" do

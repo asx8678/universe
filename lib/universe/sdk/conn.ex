@@ -154,7 +154,7 @@ defmodule Universe.SDK.Conn do
   # A service that didn't answer in time: fail that call, serve the next.
   def handle_info({:invoke_timeout, cid}, %{inflight: {cid, from, _timer, _caller}} = state) do
     GenServer.reply(from, {:error, "service did not answer in time"})
-    {:noreply, state |> drop_steers() |> Map.put(:inflight, nil) |> dispatch()}
+    {:noreply, finish(state)}
   end
 
   def handle_info({:invoke_timeout, _cid}, state), do: {:noreply, state}
@@ -254,7 +254,7 @@ defmodule Universe.SDK.Conn do
           {cid, {cid, from, timer, _caller}} when is_integer(cid) ->
             Process.cancel_timer(timer)
             GenServer.reply(from, {:error, "the service's result was not valid JSON"})
-            state |> drop_steers() |> Map.put(:inflight, nil) |> dispatch()
+            finish(state)
 
           _ ->
             state
@@ -438,7 +438,7 @@ defmodule Universe.SDK.Conn do
         else: {:error, text(msg["error"] || "service function failed")}
 
     GenServer.reply(from, answer)
-    state |> drop_steers() |> Map.put(:inflight, nil) |> dispatch()
+    finish(state)
   end
 
   defp handle_msg(%{"op" => "result"}, state), do: state
@@ -606,6 +606,7 @@ defmodule Universe.SDK.Conn do
           })
 
           timer = Process.send_after(self(), {:invoke_timeout, cid}, left)
+          Services.mark_busy(self(), true)
           %{state | queue: queue, inflight: {cid, from, timer, caller}, next_cid: cid + 1}
         end
 
@@ -615,6 +616,12 @@ defmodule Universe.SDK.Conn do
   end
 
   defp dispatch(state), do: state
+
+  # The invocation in flight is over (answered, failed or timed out).
+  defp finish(state) do
+    Services.mark_busy(self(), false)
+    state |> drop_steers() |> Map.put(:inflight, nil) |> dispatch()
+  end
 
   defp reply(state, rid, {:ok, result}),
     do: send_line(state, %{"rid" => rid, "ok" => true, "result" => result})

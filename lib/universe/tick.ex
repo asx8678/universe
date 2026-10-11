@@ -894,7 +894,9 @@ defmodule Universe.Tick do
         do: w
   end
 
-  # A serving pool member with no call running on it, lowest ID first.
+  # A serving pool member with no call running on it, lowest ID first. One
+  # busy with a worker's U.call is picked last: the Tick hears nothing when
+  # that ends, so it can't wait for it, but the task would queue behind it.
   defp free_member(state, members) do
     busy =
       for {_, %{kind: "call", status: "running"} = c} <- state.workers,
@@ -903,7 +905,7 @@ defmodule Universe.Tick do
 
     members
     |> Enum.filter(&(&1.status == "serving" and not MapSet.member?(busy, &1.service)))
-    |> Enum.min_by(& &1.id, fn -> nil end)
+    |> Enum.min_by(&{Services.busy?(&1.service), &1.id}, fn -> nil end)
   end
 
   defp start(state, %{kind: "call"} = w) do

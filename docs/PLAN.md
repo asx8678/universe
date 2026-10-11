@@ -378,10 +378,10 @@ service, and `reply` reached only an agent that was asking.
   credentialed resource shared by agents; thresholds fixed first, the same
   helper model in both setups (the M6 confound).
 - Saved tools (`.universe/tools/`), `ask` as a tool, agent-to-agent calls.
-- The manifest line for an agent doesn't list its `services`, so a new
-  session (SessionStart hook) can't see which agent has which tools.
-- A `steer` draws no Model → agent arrow in `/flow` and the tick diagrams
-  (a `reply` does).
+- ~~The manifest line for an agent doesn't list its `services`~~ done
+  Oct 11, 2026: `· can call: db, search`.
+- ~~A `steer` draws no Model → agent arrow in `/flow` and the tick
+  diagrams~~ done Oct 11, 2026, like a `reply`.
 
 ---
 
@@ -434,8 +434,12 @@ Fixed, with regressions in `review_fixes_test.exs`, `agent_tools_test.exs`,
   read every event of the selected worker (and lost an old worker's spawn)
   and every handle's meta on each refresh; one `inspect` re-read the
   secrets files three times.
-- Left as is: the `inspect` manifest's agent busy/idle still counts only
-  call directives, so an agent on a worker's `U.call` shows idle there.
+- ~~Left as is: the `inspect` manifest's agent busy/idle still counts only
+  call directives, so an agent on a worker's `U.call` shows idle there.~~
+  Fixed Oct 11, 2026: a connection marks itself busy while an invocation
+  is in flight (`Services.busy?/1`); the manifest and Now read it, and a
+  pool task picks such an agent last (the Tick isn't told when a `U.call`
+  ends, so it can't wait for one).
 
 ## 3b. Carry-forward notes (from the M1 review)
 
