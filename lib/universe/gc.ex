@@ -6,6 +6,7 @@ defmodule Universe.GC do
       over its `mem_mb` is killed with status `budget`
     * idle services: a service with no calls for `ttl_idle_s` is stopped
     * run directories older than 7 days (of settled workers) are deleted
+    * rotated event logs (`events-*.jsonl`) older than 30 days are deleted
 
   Every stop is a `gc` event, so the digest and the observer show it.
   """
@@ -18,6 +19,7 @@ defmodule Universe.GC do
   @mem_ms 1_000
   @sweep_ms 15_000
   @run_dir_days 7
+  @log_archive_days 30
 
   def start_link(opts \\ []), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)
 
@@ -111,8 +113,25 @@ defmodule Universe.GC do
   defp sweep do
     %{
       idle: guarded(:idle, &reap_idle_services/0),
-      run_dirs: guarded(:run_dirs, &prune_run_dirs/0)
+      run_dirs: guarded(:run_dirs, &prune_run_dirs/0),
+      logs: guarded(:logs, &prune_rotated_logs/0)
     }
+  end
+
+  # Full logs moved aside by Universe.EventLog.Rotation; the live log is
+  # never one of them.
+  defp prune_rotated_logs do
+    days = Application.get_env(:universe, :log_archive_days, @log_archive_days)
+    cutoff = System.os_time(:second) - days * 86_400
+
+    for path <- Path.wildcard(Path.join(Paths.log_dir(), "events-*.jsonl")),
+        {:ok, %File.Stat{mtime: mtime}} <- [File.stat(path, time: :posix)],
+        mtime < cutoff,
+        :ok <- [File.rm(path)] do
+      name = Path.basename(path)
+      EventLog.append("gc", data: %{"action" => "prune_log", "file" => name})
+      name
+    end
   end
 
   defp reap_idle_services do

@@ -1,7 +1,9 @@
 defmodule UniverseWeb.ReplayLive do
   @moduledoc """
-  Offline replay of any saved event log in `.universe/log/` (`*.jsonl`):
-  the same tick cards as the live timeline, read from the file alone.
+  Offline replay of any saved event log in `.universe/log/`: the live
+  `events.jsonl` and the rotated `events-<first>-<last>.jsonl` files (not the
+  raw MCP log). The same tick cards as the live timeline, read from the file
+  alone.
   """
 
   use UniverseWeb, :live_view
@@ -47,10 +49,13 @@ defmodule UniverseWeb.ReplayLive do
 
   defp log_files do
     case File.ls(Paths.log_dir()) do
-      {:ok, files} -> files |> Enum.filter(&String.ends_with?(&1, ".jsonl")) |> Enum.sort()
+      {:ok, files} -> files |> Enum.filter(&event_log?/1) |> Enum.sort()
       _ -> []
     end
   end
+
+  defp event_log?(file),
+    do: String.ends_with?(file, ".jsonl") and String.starts_with?(file, "events")
 
   # Streams the file and keeps only tick_in/tick_out events: a replay never
   # holds a whole log in the LiveView's memory.

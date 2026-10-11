@@ -35,7 +35,7 @@ Each request carries a `rid`, which the reply echoes:
 |---|---|---|
 | `put` | `name`, `value`, optional `kind` (`table`, `json`, `text`) | handle `h:<id>/<name>` |
 | `put_file` | `name`, `path` (in the project or the worker's run dir) | handle |
-| `get` | `handle` | the value; file handles as `{"base64": "..."}` |
+| `get` | `handle` | the value; file handles as `{"base64": "..."}`. Any worker may read any handle |
 | `progress` | `text` | `null`; sets the worker's digest line |
 | `ask` | `question` | the model's answer (blocks until a `reply` directive) |
 | `call` | `service`, `fn`, `args`, optional `timeout_s` (default 60, max 1800) | the function's return value |

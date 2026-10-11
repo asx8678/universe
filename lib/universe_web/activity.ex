@@ -269,7 +269,14 @@ defmodule UniverseWeb.Activity do
   defp line("gc", %{"action" => "stop_idle"} = d),
     do: {:muted, "stopped idle service #{d["service"]} after #{d["idle_s"]}s"}
 
+  defp line("gc", %{"action" => "prune_log"} = d),
+    do: {:muted, "deleted rotated event log #{d["file"]}"}
+
   defp line("gc", d), do: {:muted, "gc: #{d["action"]}"}
+
+  defp line("log_rotated", d),
+    do: {:muted, "event log rotated: full log in #{d["archive"]}, #{d["kept"]} events kept"}
+
   defp line("stop_all", d), do: {:warn, "stop all: #{Enum.join(List.wrap(d["ids"]), ", ")}"}
 
   defp line("lease", %{"action" => "wait", "note" => note}), do: {:warn, note}

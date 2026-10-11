@@ -2,7 +2,9 @@ defmodule Universe.EventLog do
   @moduledoc """
   The append-only record of everything: one JSON object per line in
   `.universe/log/events.jsonl`. The digest, `inspect` and the web pages are
-  all views over this log.
+  all views over this log. Past a size limit it is rotated at boot
+  (`Universe.EventLog.Rotation`): the full file is kept for `/replay` and the
+  live log keeps what recovery needs.
 
   One process owns the file, so `seq` is strictly increasing. An ETS table
   (rebuilt from the file at boot) answers queries without going through the
@@ -139,6 +141,10 @@ defmodule Universe.EventLog do
 
     path = Path.join(Universe.Paths.log_dir(), "events.jsonl")
     File.mkdir_p!(Path.dirname(path))
+
+    with {:rotated, archive} <- Universe.EventLog.Rotation.maybe_rotate(path),
+         do: Logger.info("event log rotated; the full log is #{Path.basename(archive)}")
+
     seq = load(path)
     end_torn_line(path)
     {:ok, io} = File.open(path, [:append, :binary, :raw, :delayed_write])

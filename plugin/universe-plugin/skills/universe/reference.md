@@ -11,7 +11,8 @@
 ```
 
 - `wait.until`: `all` (default) or `any` of the watched IDs settled. Watched IDs
-  default to the ones this tick created (then steps join automatically); with
+  default to the ones this tick created (then steps join automatically, so
+  `all` waits for the whole chain; `any` wakes when the parent ends); with
   none, every live ID. `serving` and `asking` count as settled.
 - Universe also wakes you early when a failed or asking worker has waited 20 s
   unreported, and at `timeout_s` (default 60, max 90).
@@ -65,7 +66,9 @@ U.inbox()                          # in a service function: steers for this call
 ```
 
 Errors raise `U.UniverseError`. Service functions should return handles for
-large results: `return U.put("rows", rows)`. Secrets for a service live in
+large results: `return U.put("rows", rows)`. Any worker can read any handle
+with `U.get`, so never store a secret in one (previews redact secrets, `get`
+doesn't). Secrets for a service live in
 `.universe/secrets/<service>.env` and reach only that service. `U.serve` sends
 each function's parameters and the first paragraph of its docstring: an agent
 given the service sees them as its tool's schema, so name parameters well.
