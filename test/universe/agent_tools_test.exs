@@ -666,6 +666,24 @@ defmodule Universe.AgentToolsTest do
       kill(b)
     end
 
+    test "a steer given to a task that didn't finish carries over to the next task" do
+      name = uniq("carry")
+      t = "c-#{name}"
+
+      tick([agent(name), Map.put(task(t, name, "STUBBORN"), "timeout_s", 3)], %{
+        "ids" => [name],
+        "timeout_s" => 15
+      })
+
+      tick([steer(t, "only lib/")], %{"ids" => [t], "timeout_s" => 15})
+
+      next =
+        tick([task("n-#{name}", name, "continue")], %{"ids" => ["n-#{name}"], "timeout_s" => 20})
+
+      assert next.text =~ "only lib/"
+      kill(name)
+    end
+
     test "an interrupting steer still waiting when the task times out is reported as dropped" do
       name = uniq("stubborn")
       t = "sb-#{name}"

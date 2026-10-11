@@ -478,3 +478,11 @@ Run 2: the orchestrator gave the review the default 60 s call timeout, so
 the reviewer stopped mid-way; the "continue" task it sent next didn't carry
 the change, and the later web/ files got reviewed. Turns fell from 14–23 to
 11–12, orchestrator cost from $0.61–1.25 to $0.25–0.29.
+
+**Fixture v2 (code only, Oct 11, 2026; text not yet written):** after v1's
+88.7 % script result, `gen_claims.py` adds an unrelated order of the same
+customer mentioned in 161 of 300 claims, problems described without their
+usual words in half, and stated exceptions only reading catches (7 gifts
+sent elsewhere, 10 self-caused defects, both denied). v1's text and answers
+were removed. Next: `write_claims.py` (spends Claude usage), then
+`audit_claims.py`, then the benchmark — each only when asked.

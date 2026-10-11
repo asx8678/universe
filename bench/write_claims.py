@@ -38,6 +38,16 @@ Write one claim per spec below. Rules:
   the type's name as a label), clearly that type and no other.
 - Refer to the order exactly as `order_ref` gives it: an order number, or a loose
   product description and a rough date. Don't invent order numbers.
+- If `other_order` is set, also mention that order in passing (it went fine, or
+  it is a past purchase), clearly not the subject of the claim.
+- If `indirect` is true, never use the obvious words for the problem (late,
+  delayed, broken, faulty, defect, charged twice, duplicate, wrong item, never
+  arrived, missing): describe what happened instead ("it turned up the day after
+  the party", "two identical lines on my statement").
+- If `exception` is "gift": the customer mentions, in passing, that they had it
+  sent to a friend's or relative's address. If "customer_caused": they admit in
+  passing that it broke after they dropped or misused it. Never state either as
+  a reason to refuse; it is just part of their story.
 - Don't state exact delivery or promised dates, amounts or addresses: the shop
   checks those in its records. Feelings, context and a request (refund, replacement)
   are fine. Some customers mention side details (a gift, a trip, a past order).

@@ -163,7 +163,10 @@ def save_session_id(sid):
 
 # "cost": the session's total_cost_usd as claude last reported it (it is
 # cumulative per session); a task's cost is how much it grew.
-state = {"tasks": 0, "ctx": 0, "crashes": [], "calls": {}, "cost": 0.0, "cost_at_start": 0.0}
+# "steers": what the model added to the task in hand; "carry": those of a
+# task that didn't finish, handed to the next task (often "continue").
+state = {"tasks": 0, "ctx": 0, "crashes": [], "calls": {}, "cost": 0.0, "cost_at_start": 0.0,
+         "steers": [], "carry": []}
 session = {}
 MEMORY = cfg.get("memory") or "session"
 # How long a resumed session gets to fail at boot ("No conversation found"
@@ -287,7 +290,10 @@ def fetch_steers(pending, stopping):
         if steer.get("interrupt") or stopping:
             stopping.append(text)
         else:
+            # Written into the session now: the agent has it (a dropped
+            # steer, still waiting at the end, is reported, not carried).
             write_steer(text, pending)
+            state["steers"].append(text)
         U.progress(f"busy · task {state['tasks']} · steered: {text[:80]}")
 
 
@@ -462,6 +468,11 @@ def task(prompt=None):
     note_deadline()
     state["calls"] = {}
     state["cost_at_start"] = state["cost"]
+    state["steers"] = []
+    if state["carry"]:
+        prompt = ("Instructions the orchestrator gave during your previous task, which did not "
+                  "finish; they still apply:\n- " + "\n- ".join(state["carry"]) + "\n\n" + prompt)
+        state["carry"] = []
     ok = False
     state["tasks"] += 1
     n, started = state["tasks"], time.time()
@@ -494,6 +505,8 @@ def task(prompt=None):
             ok = True
             return text
     finally:
+        if not ok:
+            state["carry"] = state["steers"]
         log_usage(n, started, ok)
         line = idle_line()
         if MEMORY == "task":

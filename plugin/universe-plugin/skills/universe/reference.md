@@ -167,7 +167,7 @@ earlier answers; `"task"`: a fresh session per task, for independent tasks,
 whose context would otherwise grow with every task). An agent runs one task
 at a time: a task for a busy agent waits in `queued` ("waits behind N
 tasks"), and its `timeout_s` starts when it does. A task past its call's
-`timeout_s` (default 60, max 1800) is interrupted and the agent is free
+`timeout_s` (default 900 for a task, max 1800) is interrupted and the agent is free
 again; if its session crashes, the next task resumes it.
 
 A service result over 8,000 characters reaches the agent as a handle and its

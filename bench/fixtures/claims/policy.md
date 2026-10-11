@@ -22,7 +22,13 @@ order number, or describes the product and roughly when they ordered it
      from the ordered SKU; deny otherwise.
    - **not_received** (it never arrived): approve if the shipment is not
      `delivered`, or was delivered to an address other than the customer's;
-     deny if delivered to their address.
+     deny if delivered to their address. Also deny when the customer says
+     they had it sent somewhere else on purpose (a gift, a friend's address).
+   - A **defect** the customer says they caused (dropped it, misused it) is
+     denied whatever the dates.
+
+Customers often mention other orders in passing; decide only the one the
+claim is about.
 
 Write `decisions.md` with one line per claim, in claim id order:
 

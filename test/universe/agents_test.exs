@@ -191,6 +191,7 @@ defmodule Universe.AgentsTest do
     args = args_of(id_of(first, name))
     assert ["--restricted", "--strict-mcp-config"] -- args == []
     assert Enum.at(args, Enum.find_index(args, &(&1 == "--model")) + 1) == "haiku"
+    refute "--max-budget-usd" in args
     assert Enum.at(args, Enum.find_index(args, &(&1 == "--tools")) + 1) == "Read,Grep,Glob"
 
     assert Enum.at(args, Enum.find_index(args, &(&1 == "--system-prompt")) + 1) =~
@@ -360,6 +361,14 @@ defmodule Universe.AgentsTest do
 
     freed = tick([%{"op" => "kill", "target" => name}, Map.put(run, "label", uniq("w2"))])
     refute freed.text =~ "held by"
+  end
+
+  test "an agent's budget_usd reaches claude as --max-budget-usd" do
+    name = uniq("capped")
+    result = tick([agent(name, %{"budget_usd" => 2.5}), task("t-#{name}", name, "hi")])
+    args = args_of(id_of(result, name))
+    assert Enum.at(args, Enum.find_index(args, &(&1 == "--max-budget-usd")) + 1) == "2.5"
+    kill(name)
   end
 
   test "kill with a pool name stops every member" do

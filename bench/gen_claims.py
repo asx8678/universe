@@ -29,6 +29,11 @@ SPECS = BENCH / "graders" / "claims_specs.json"
 BODIES = BENCH / "graders" / "claims_bodies.json"
 
 SEED = 23
+# Version 2 (Oct 11, 2026): a regex-and-SQL script decided 88.7 % of v1's
+# claims. v2 adds what only reading settles: another order mentioned in
+# passing, the problem described without its usual words, and exceptions
+# the customer states (a gift sent elsewhere, damage they caused).
+VERSION = 2
 TODAY = dt.date(2026, 10, 1)
 N_CUSTOMERS = 2000
 N_CLAIMS = 300
@@ -137,6 +142,18 @@ def main():
         kw["refunded"] = truth == "escalate"
         order = add_order(cid, product, placed, **kw)
         by_number = r.random() < 0.5
+        # Another order of theirs, mentioned in passing (by number half the time).
+        past = [o for o in by_customer.get(cid, []) if o != order]
+        other = None
+        if past and r.random() < 0.6:
+            o = orders[r.choice(past) - 300001]
+            other = f"order #{o[0]}" if r.random() < 0.5 else f"an earlier {o[3].lower()}"
+        # Exceptions the customer states, which the records can't show.
+        exception = None
+        if truth == "approve" and ctype == "not_received" and kw.get("addr") and r.random() < 0.5:
+            exception, truth = "gift", "deny"
+        elif truth == "approve" and ctype == "defect" and r.random() < 0.25:
+            exception, truth = "customer_caused", "deny"
         specs[str(cid_claim)] = {
             "type": ctype,
             "order_ref": f"order #{order}" if by_number else
@@ -144,9 +161,12 @@ def main():
             "first_name": customers[cid - 1][1].split()[0],
             "persona": r.choice(PERSONAS),
             "length": r.choice([300, 450, 600, 750, 900]),
+            "other_order": other,
+            "indirect": r.random() < 0.5,
+            "exception": exception,
         }
         answers[str(cid_claim)] = {"decision": truth, "type": ctype, "order": order, "customer": cid,
-                                   "by_number": by_number}
+                                   "by_number": by_number, "exception": exception}
 
     SPECS.write_text(json.dumps(specs, indent=1, ensure_ascii=False) + "\n")
     bodies = json.loads(BODIES.read_text()) if BODIES.exists() else {}
@@ -209,7 +229,13 @@ order number, or describes the product and roughly when they ordered it
      from the ordered SKU; deny otherwise.
    - **not_received** (it never arrived): approve if the shipment is not
      `delivered`, or was delivered to an address other than the customer's;
-     deny if delivered to their address.
+     deny if delivered to their address. Also deny when the customer says
+     they had it sent somewhere else on purpose (a gift, a friend's address).
+   - A **defect** the customer says they caused (dropped it, misused it) is
+     denied whatever the dates.
+
+Customers often mention other orders in passing; decide only the one the
+claim is about.
 
 Write `decisions.md` with one line per claim, in claim id order:
 

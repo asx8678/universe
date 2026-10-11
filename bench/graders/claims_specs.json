@@ -1,2102 +1,3002 @@
 {
  "9001": {
   "type": "defect",
-  "order_ref": "the scarf, ordered around 2 September",
+  "order_ref": "the wool scarf, ordered around 1 September",
   "first_name": "Marta",
-  "persona": "a terse customer writing in fragments",
-  "length": 900
+  "persona": "an apologetic first-time customer",
+  "length": 900,
+  "other_order": "an earlier desk lamp",
+  "indirect": false,
+  "exception": null
  },
  "9002": {
-  "type": "defect",
-  "order_ref": "the flask, ordered around 23 July",
+  "type": "duplicate",
+  "order_ref": "order #305424",
   "first_name": "Grace",
-  "persona": "someone writing for an elderly relative",
-  "length": 900
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 600,
+  "other_order": "an earlier backpack",
+  "indirect": false,
+  "exception": null
  },
  "9003": {
-  "type": "duplicate",
-  "order_ref": "my mat, ordered around 15 September",
+  "type": "defect",
+  "order_ref": "the cast iron, ordered around 2 September",
   "first_name": "Ana",
-  "persona": "someone writing for an elderly relative",
-  "length": 450
+  "persona": "a terse customer writing in fragments",
+  "length": 300,
+  "other_order": "order #302499",
+  "indirect": true,
+  "exception": null
  },
  "9004": {
-  "type": "wrong_item",
-  "order_ref": "the linen shirt, ordered around 10 August",
+  "type": "not_received",
+  "order_ref": "the headphones, ordered around 1 September",
   "first_name": "Lena",
   "persona": "an engineer, precise and detailed",
-  "length": 450
+  "length": 750,
+  "other_order": "order #304588",
+  "indirect": true,
+  "exception": null
  },
  "9005": {
-  "type": "wrong_item",
-  "order_ref": "the pan, ordered around 2 September",
+  "type": "not_received",
+  "order_ref": "the rain jacket, ordered around 17 September",
   "first_name": "Fatima",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 600
+  "persona": "someone writing for an elderly relative",
+  "length": 750,
+  "other_order": "order #302173",
+  "indirect": true,
+  "exception": null
  },
  "9006": {
-  "type": "late",
-  "order_ref": "order #305428",
+  "type": "not_received",
+  "order_ref": "the backpack, ordered around 24 August",
   "first_name": "Wei",
-  "persona": "a student, casual, lowercase",
-  "length": 300
+  "persona": "a small-business owner, brisk",
+  "length": 600,
+  "other_order": null,
+  "indirect": false,
+  "exception": "gift"
  },
  "9007": {
-  "type": "duplicate",
-  "order_ref": "the headphones, ordered around 22 August",
+  "type": "not_received",
+  "order_ref": "order #305429",
   "first_name": "Kofi",
-  "persona": "an engineer, precise and detailed",
-  "length": 750
+  "persona": "a busy parent on a phone, short sentences",
+  "length": 900,
+  "other_order": "order #301190",
+  "indirect": false,
+  "exception": null
  },
  "9008": {
-  "type": "duplicate",
-  "order_ref": "order #305430",
+  "type": "not_received",
+  "order_ref": "the trail shoes, ordered around 6 August",
   "first_name": "Tara",
-  "persona": "someone writing for an elderly relative",
-  "length": 900
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 300,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9009": {
-  "type": "duplicate",
+  "type": "late",
   "order_ref": "order #305431",
   "first_name": "Nils",
   "persona": "an apologetic first-time customer",
-  "length": 300
+  "length": 300,
+  "other_order": "an earlier desk lamp",
+  "indirect": true,
+  "exception": null
  },
  "9010": {
-  "type": "duplicate",
+  "type": "defect",
   "order_ref": "order #305432",
   "first_name": "Dev",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 900
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 450,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9011": {
-  "type": "duplicate",
-  "order_ref": "order #305433",
+  "type": "not_received",
+  "order_ref": "the bike light, ordered around 13 September",
   "first_name": "Eitan",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 900
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9012": {
-  "type": "late",
-  "order_ref": "my trainers, ordered around 14 September",
+  "type": "duplicate",
+  "order_ref": "my front light, ordered around 9 August",
   "first_name": "Omar",
-  "persona": "a small-business owner, brisk",
-  "length": 300
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 300,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9013": {
-  "type": "defect",
-  "order_ref": "the scarf, ordered around 9 September",
+  "type": "duplicate",
+  "order_ref": "order #305435",
   "first_name": "Kofi",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 750
+  "persona": "someone writing for an elderly relative",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9014": {
-  "type": "late",
+  "type": "defect",
   "order_ref": "order #305436",
   "first_name": "Grace",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 750
+  "persona": "a small-business owner, brisk",
+  "length": 900,
+  "other_order": "an earlier cast iron pan",
+  "indirect": true,
+  "exception": "customer_caused"
  },
  "9015": {
-  "type": "late",
+  "type": "defect",
   "order_ref": "order #305437",
   "first_name": "Grace",
-  "persona": "a small-business owner, brisk",
-  "length": 600
+  "persona": "an engineer, precise and detailed",
+  "length": 450,
+  "other_order": "order #305204",
+  "indirect": false,
+  "exception": null
  },
  "9016": {
-  "type": "late",
-  "order_ref": "my trainers, ordered around 31 July",
+  "type": "wrong_item",
+  "order_ref": "order #305438",
   "first_name": "Wei",
-  "persona": "a student, casual, lowercase",
-  "length": 900
+  "persona": "a small-business owner, brisk",
+  "length": 750,
+  "other_order": "an earlier headphones",
+  "indirect": false,
+  "exception": null
  },
  "9017": {
   "type": "not_received",
   "order_ref": "order #305439",
   "first_name": "Sven",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 300
+  "persona": "a small-business owner, brisk",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9018": {
-  "type": "not_received",
-  "order_ref": "the reading lamp, ordered around 10 September",
+  "type": "wrong_item",
+  "order_ref": "the lamp for my bike, ordered around 14 August",
   "first_name": "Ben",
-  "persona": "an engineer, precise and detailed",
-  "length": 450
+  "persona": "a small-business owner, brisk",
+  "length": 450,
+  "other_order": "order #304831",
+  "indirect": false,
+  "exception": null
  },
  "9019": {
-  "type": "duplicate",
+  "type": "not_received",
   "order_ref": "order #305441",
   "first_name": "Yara",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 900
+  "persona": "an engineer, precise and detailed",
+  "length": 300,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9020": {
-  "type": "wrong_item",
-  "order_ref": "the summer shirt, ordered around 6 August",
+  "type": "duplicate",
+  "order_ref": "order #305442",
   "first_name": "Dev",
-  "persona": "a terse customer writing in fragments",
-  "length": 600
+  "persona": "an engineer, precise and detailed",
+  "length": 900,
+  "other_order": "order #300674",
+  "indirect": false,
+  "exception": null
  },
  "9021": {
-  "type": "defect",
-  "order_ref": "order #305443",
+  "type": "wrong_item",
+  "order_ref": "my trainers, ordered around 27 August",
   "first_name": "Tara",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 450
+  "persona": "an engineer, precise and detailed",
+  "length": 300,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9022": {
-  "type": "late",
-  "order_ref": "order #305444",
+  "type": "duplicate",
+  "order_ref": "my rucksack, ordered around 15 September",
   "first_name": "Rosa",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 600
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 450,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9023": {
-  "type": "late",
+  "type": "defect",
   "order_ref": "order #305445",
   "first_name": "Eitan",
-  "persona": "someone writing for an elderly relative",
-  "length": 300
+  "persona": "a student, casual, lowercase",
+  "length": 750,
+  "other_order": null,
+  "indirect": false,
+  "exception": "customer_caused"
  },
  "9024": {
   "type": "wrong_item",
   "order_ref": "order #305446",
   "first_name": "Wei",
-  "persona": "a small-business owner, brisk",
-  "length": 300
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 300,
+  "other_order": "an earlier linen shirt",
+  "indirect": false,
+  "exception": null
  },
  "9025": {
-  "type": "not_received",
-  "order_ref": "my water bottle, ordered around 1 September",
+  "type": "wrong_item",
+  "order_ref": "the headphones, ordered around 9 August",
   "first_name": "Kofi",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 900
+  "persona": "a student, casual, lowercase",
+  "length": 300,
+  "other_order": "an earlier backpack",
+  "indirect": true,
+  "exception": null
  },
  "9026": {
   "type": "wrong_item",
-  "order_ref": "the summer shirt, ordered around 17 September",
+  "order_ref": "order #305448",
   "first_name": "Ines",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 450
+  "persona": "an apologetic first-time customer",
+  "length": 750,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9027": {
   "type": "late",
-  "order_ref": "order #305449",
+  "order_ref": "the burr grinder, ordered around 10 August",
   "first_name": "Ben",
-  "persona": "an engineer, precise and detailed",
-  "length": 300
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 300,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9028": {
-  "type": "defect",
-  "order_ref": "order #305450",
+  "type": "wrong_item",
+  "order_ref": "the lamp, ordered around 23 September",
   "first_name": "Nils",
-  "persona": "an engineer, precise and detailed",
-  "length": 900
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 750,
+  "other_order": "order #302225",
+  "indirect": true,
+  "exception": null
  },
  "9029": {
-  "type": "wrong_item",
-  "order_ref": "the lamp, ordered around 6 August",
+  "type": "not_received",
+  "order_ref": "the waterproof, ordered around 19 August",
   "first_name": "Quinn",
   "persona": "an apologetic first-time customer",
-  "length": 900
+  "length": 600,
+  "other_order": "an earlier coffee grinder",
+  "indirect": false,
+  "exception": null
  },
  "9030": {
-  "type": "late",
+  "type": "duplicate",
   "order_ref": "order #305452",
   "first_name": "Ana",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 300
+  "persona": "a student, casual, lowercase",
+  "length": 750,
+  "other_order": "an earlier bike light",
+  "indirect": true,
+  "exception": null
  },
  "9031": {
-  "type": "wrong_item",
+  "type": "duplicate",
   "order_ref": "order #305453",
   "first_name": "Ben",
-  "persona": "a small-business owner, brisk",
-  "length": 300
+  "persona": "someone writing for an elderly relative",
+  "length": 750,
+  "other_order": "an earlier desk lamp",
+  "indirect": true,
+  "exception": null
  },
  "9032": {
-  "type": "duplicate",
-  "order_ref": "order #305454",
+  "type": "defect",
+  "order_ref": "the pan, ordered around 22 September",
   "first_name": "Grace",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 450
+  "persona": "someone writing for an elderly relative",
+  "length": 900,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9033": {
-  "type": "defect",
-  "order_ref": "the pan, ordered around 18 September",
+  "type": "late",
+  "order_ref": "order #305455",
   "first_name": "Marta",
-  "persona": "a small-business owner, brisk",
-  "length": 750
+  "persona": "an apologetic first-time customer",
+  "length": 450,
+  "other_order": "an earlier water bottle",
+  "indirect": true,
+  "exception": null
  },
  "9034": {
   "type": "late",
-  "order_ref": "that knitted scarf, ordered around 10 September",
+  "order_ref": "order #305456",
   "first_name": "Tara",
   "persona": "an apologetic first-time customer",
-  "length": 900
+  "length": 750,
+  "other_order": "order #301547",
+  "indirect": false,
+  "exception": null
  },
  "9035": {
-  "type": "late",
-  "order_ref": "order #305457",
+  "type": "duplicate",
+  "order_ref": "my skillet, ordered around 10 August",
   "first_name": "Quinn",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 750
+  "persona": "a small-business owner, brisk",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9036": {
-  "type": "late",
-  "order_ref": "order #305458",
+  "type": "wrong_item",
+  "order_ref": "the summer shirt, ordered around 17 September",
   "first_name": "Nils",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 300
+  "persona": "an apologetic first-time customer",
+  "length": 750,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9037": {
-  "type": "defect",
-  "order_ref": "the burr grinder, ordered around 22 September",
+  "type": "wrong_item",
+  "order_ref": "order #305459",
   "first_name": "Marta",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 300
+  "persona": "an engineer, precise and detailed",
+  "length": 300,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9038": {
   "type": "late",
-  "order_ref": "that shirt, ordered around 24 September",
+  "order_ref": "the flask, ordered around 11 September",
   "first_name": "Rosa",
-  "persona": "someone writing for an elderly relative",
-  "length": 600
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 900,
+  "other_order": "order #301449",
+  "indirect": true,
+  "exception": null
  },
  "9039": {
-  "type": "wrong_item",
-  "order_ref": "the linen shirt, ordered around 5 August",
+  "type": "defect",
+  "order_ref": "the lamp for my bike, ordered around 13 September",
   "first_name": "Sven",
   "persona": "an apologetic first-time customer",
-  "length": 900
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9040": {
   "type": "late",
   "order_ref": "order #305462",
   "first_name": "Hiro",
   "persona": "someone writing for an elderly relative",
-  "length": 300
+  "length": 750,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9041": {
-  "type": "duplicate",
-  "order_ref": "my mat, ordered around 14 September",
+  "type": "defect",
+  "order_ref": "order #305463",
   "first_name": "Ines",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 450
+  "persona": "someone writing for an elderly relative",
+  "length": 300,
+  "other_order": "an earlier linen shirt",
+  "indirect": false,
+  "exception": "customer_caused"
  },
  "9042": {
-  "type": "not_received",
-  "order_ref": "the linen shirt, ordered around 15 September",
+  "type": "wrong_item",
+  "order_ref": "the pan, ordered around 4 September",
   "first_name": "Omar",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 600
+  "persona": "a terse customer writing in fragments",
+  "length": 300,
+  "other_order": "order #302731",
+  "indirect": true,
+  "exception": null
  },
  "9043": {
-  "type": "duplicate",
-  "order_ref": "order #305465",
+  "type": "not_received",
+  "order_ref": "my trainers, ordered around 1 September",
   "first_name": "Grace",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 900
+  "persona": "a small-business owner, brisk",
+  "length": 900,
+  "other_order": "order #304959",
+  "indirect": false,
+  "exception": null
  },
  "9044": {
-  "type": "late",
-  "order_ref": "my skillet, ordered around 6 September",
+  "type": "duplicate",
+  "order_ref": "order #305466",
   "first_name": "Fatima",
-  "persona": "an apologetic first-time customer",
-  "length": 300
+  "persona": "a busy parent on a phone, short sentences",
+  "length": 900,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9045": {
-  "type": "duplicate",
+  "type": "late",
   "order_ref": "order #305467",
   "first_name": "Rosa",
-  "persona": "someone writing for an elderly relative",
-  "length": 900
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 900,
+  "other_order": "an earlier rain jacket",
+  "indirect": true,
+  "exception": null
  },
  "9046": {
-  "type": "defect",
+  "type": "not_received",
   "order_ref": "order #305468",
   "first_name": "Rosa",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 300
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 750,
+  "other_order": "an earlier desk lamp",
+  "indirect": true,
+  "exception": null
  },
  "9047": {
-  "type": "duplicate",
-  "order_ref": "the pan, ordered around 9 September",
+  "type": "not_received",
+  "order_ref": "order #305469",
   "first_name": "Yara",
-  "persona": "an apologetic first-time customer",
-  "length": 450
+  "persona": "a busy parent on a phone, short sentences",
+  "length": 750,
+  "other_order": null,
+  "indirect": true,
+  "exception": "gift"
  },
  "9048": {
-  "type": "defect",
-  "order_ref": "order #305470",
+  "type": "not_received",
+  "order_ref": "the scarf, ordered around 6 August",
   "first_name": "Rosa",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 750
+  "persona": "someone writing for an elderly relative",
+  "length": 900,
+  "other_order": "order #305331",
+  "indirect": false,
+  "exception": null
  },
  "9049": {
-  "type": "wrong_item",
-  "order_ref": "the wool scarf, ordered around 2 August",
+  "type": "late",
+  "order_ref": "the burr grinder, ordered around 20 August",
   "first_name": "Ben",
   "persona": "a busy parent on a phone, short sentences",
-  "length": 300
+  "length": 450,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9050": {
   "type": "duplicate",
-  "order_ref": "my trainers, ordered around 5 August",
+  "order_ref": "order #305472",
   "first_name": "Jonas",
-  "persona": "a student, casual, lowercase",
-  "length": 900
+  "persona": "a small-business owner, brisk",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9051": {
-  "type": "defect",
-  "order_ref": "the yoga mat, ordered around 24 September",
+  "type": "late",
+  "order_ref": "order #305473",
   "first_name": "Sven",
-  "persona": "an engineer, precise and detailed",
-  "length": 450
+  "persona": "someone writing for an elderly relative",
+  "length": 900,
+  "other_order": "order #305312",
+  "indirect": true,
+  "exception": null
  },
  "9052": {
-  "type": "late",
-  "order_ref": "order #305474",
+  "type": "not_received",
+  "order_ref": "my desk light, ordered around 9 August",
   "first_name": "Ana",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 450
+  "persona": "an apologetic first-time customer",
+  "length": 450,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9053": {
-  "type": "not_received",
+  "type": "defect",
   "order_ref": "order #305475",
   "first_name": "Sven",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 600
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 900,
+  "other_order": "an earlier trail running shoes",
+  "indirect": false,
+  "exception": null
  },
  "9054": {
-  "type": "late",
-  "order_ref": "my front light, ordered around 5 August",
+  "type": "not_received",
+  "order_ref": "order #305476",
   "first_name": "Hiro",
-  "persona": "someone writing for an elderly relative",
-  "length": 750
+  "persona": "an engineer, precise and detailed",
+  "length": 450,
+  "other_order": "an earlier desk lamp",
+  "indirect": false,
+  "exception": null
  },
  "9055": {
-  "type": "defect",
+  "type": "wrong_item",
   "order_ref": "order #305477",
   "first_name": "Kofi",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 750
+  "persona": "an apologetic first-time customer",
+  "length": 900,
+  "other_order": "order #302972",
+  "indirect": false,
+  "exception": null
  },
  "9056": {
-  "type": "defect",
-  "order_ref": "that shirt, ordered around 5 September",
+  "type": "duplicate",
+  "order_ref": "the headphones, ordered around 9 September",
   "first_name": "Chloé",
   "persona": "a terse customer writing in fragments",
-  "length": 300
+  "length": 750,
+  "other_order": "order #305104",
+  "indirect": true,
+  "exception": null
  },
  "9057": {
   "type": "defect",
   "order_ref": "order #305479",
   "first_name": "Ines",
-  "persona": "a small-business owner, brisk",
-  "length": 300
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 600,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9058": {
-  "type": "defect",
+  "type": "late",
   "order_ref": "order #305480",
   "first_name": "Sven",
-  "persona": "an engineer, precise and detailed",
-  "length": 600
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 600,
+  "other_order": "order #304538",
+  "indirect": true,
+  "exception": null
  },
  "9059": {
-  "type": "late",
-  "order_ref": "order #305481",
+  "type": "wrong_item",
+  "order_ref": "my trainers, ordered around 15 August",
   "first_name": "Wei",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 300
+  "persona": "a student, casual, lowercase",
+  "length": 900,
+  "other_order": "an earlier yoga mat",
+  "indirect": true,
+  "exception": null
  },
  "9060": {
-  "type": "wrong_item",
+  "type": "not_received",
   "order_ref": "order #305482",
   "first_name": "Wei",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 750
+  "persona": "a busy parent on a phone, short sentences",
+  "length": 600,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9061": {
-  "type": "duplicate",
-  "order_ref": "my coffee grinder, ordered around 13 August",
+  "type": "wrong_item",
+  "order_ref": "order #305483",
   "first_name": "Dev",
-  "persona": "a small-business owner, brisk",
-  "length": 900
+  "persona": "an apologetic first-time customer",
+  "length": 600,
+  "other_order": "an earlier water bottle",
+  "indirect": true,
+  "exception": null
  },
  "9062": {
-  "type": "wrong_item",
-  "order_ref": "order #305484",
+  "type": "defect",
+  "order_ref": "the scarf, ordered around 22 September",
   "first_name": "Rosa",
-  "persona": "a small-business owner, brisk",
-  "length": 300
+  "persona": "someone writing for an elderly relative",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": "customer_caused"
  },
  "9063": {
   "type": "duplicate",
-  "order_ref": "order #305485",
-  "first_name": "Tara",
-  "persona": "someone writing for an elderly relative",
-  "length": 900
- },
- "9064": {
-  "type": "wrong_item",
-  "order_ref": "order #305486",
-  "first_name": "Rosa",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 750
- },
- "9065": {
-  "type": "duplicate",
-  "order_ref": "order #305487",
+  "order_ref": "the cast iron, ordered around 7 August",
   "first_name": "Tara",
   "persona": "a student, casual, lowercase",
-  "length": 600
+  "length": 300,
+  "other_order": "order #301412",
+  "indirect": true,
+  "exception": null
+ },
+ "9064": {
+  "type": "late",
+  "order_ref": "order #305486",
+  "first_name": "Rosa",
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 300,
+  "other_order": "an earlier coffee grinder",
+  "indirect": true,
+  "exception": null
+ },
+ "9065": {
+  "type": "late",
+  "order_ref": "order #305487",
+  "first_name": "Tara",
+  "persona": "a busy parent on a phone, short sentences",
+  "length": 450,
+  "other_order": "an earlier wool scarf",
+  "indirect": false,
+  "exception": null
  },
  "9066": {
-  "type": "duplicate",
-  "order_ref": "the lamp, ordered around 3 September",
+  "type": "not_received",
+  "order_ref": "my desk light, ordered around 9 September",
   "first_name": "Sven",
-  "persona": "someone writing for an elderly relative",
-  "length": 900
+  "persona": "a terse customer writing in fragments",
+  "length": 900,
+  "other_order": "order #301281",
+  "indirect": false,
+  "exception": null
  },
  "9067": {
-  "type": "duplicate",
+  "type": "late",
   "order_ref": "order #305489",
   "first_name": "Ines",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 450
+  "persona": "a small-business owner, brisk",
+  "length": 750,
+  "other_order": "an earlier yoga mat",
+  "indirect": true,
+  "exception": null
  },
  "9068": {
-  "type": "late",
-  "order_ref": "order #305490",
+  "type": "duplicate",
+  "order_ref": "the bottle, ordered around 1 August",
   "first_name": "Ines",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 450
+  "persona": "a terse customer writing in fragments",
+  "length": 600,
+  "other_order": "order #302444",
+  "indirect": false,
+  "exception": null
  },
  "9069": {
-  "type": "late",
-  "order_ref": "the yoga mat, ordered around 3 August",
+  "type": "duplicate",
+  "order_ref": "order #305491",
   "first_name": "Sven",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 450
+  "persona": "a small-business owner, brisk",
+  "length": 750,
+  "other_order": "an earlier headphones",
+  "indirect": false,
+  "exception": null
  },
  "9070": {
-  "type": "late",
-  "order_ref": "the scarf, ordered around 22 September",
+  "type": "wrong_item",
+  "order_ref": "order #305492",
   "first_name": "Hiro",
-  "persona": "someone writing for an elderly relative",
-  "length": 750
+  "persona": "an apologetic first-time customer",
+  "length": 750,
+  "other_order": "an earlier rain jacket",
+  "indirect": true,
+  "exception": null
  },
  "9071": {
-  "type": "not_received",
-  "order_ref": "the wool scarf, ordered around 30 August",
+  "type": "duplicate",
+  "order_ref": "the cast iron, ordered around 12 August",
   "first_name": "Ana",
-  "persona": "an apologetic first-time customer",
-  "length": 450
+  "persona": "a student, casual, lowercase",
+  "length": 600,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9072": {
   "type": "duplicate",
-  "order_ref": "my desk light, ordered around 24 August",
+  "order_ref": "my desk light, ordered around 11 September",
   "first_name": "Ben",
-  "persona": "someone writing for an elderly relative",
-  "length": 900
+  "persona": "a small-business owner, brisk",
+  "length": 900,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9073": {
-  "type": "duplicate",
-  "order_ref": "the burr grinder, ordered around 8 September",
+  "type": "wrong_item",
+  "order_ref": "order #305495",
   "first_name": "Eitan",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 750
+  "persona": "an apologetic first-time customer",
+  "length": 900,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9074": {
   "type": "defect",
-  "order_ref": "the earphones, ordered around 13 September",
+  "order_ref": "order #305496",
   "first_name": "Sven",
   "persona": "a terse customer writing in fragments",
-  "length": 600
+  "length": 750,
+  "other_order": "order #303439",
+  "indirect": true,
+  "exception": null
  },
  "9075": {
-  "type": "defect",
+  "type": "not_received",
   "order_ref": "order #305497",
   "first_name": "Rosa",
-  "persona": "an apologetic first-time customer",
-  "length": 300
+  "persona": "someone writing for an elderly relative",
+  "length": 750,
+  "other_order": "order #304857",
+  "indirect": false,
+  "exception": null
  },
  "9076": {
-  "type": "wrong_item",
+  "type": "not_received",
   "order_ref": "order #305498",
   "first_name": "Marta",
   "persona": "someone writing for an elderly relative",
-  "length": 900
+  "length": 750,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9077": {
-  "type": "not_received",
-  "order_ref": "my raincoat, ordered around 6 August",
+  "type": "defect",
+  "order_ref": "the rain jacket, ordered around 8 September",
   "first_name": "Ben",
-  "persona": "a terse customer writing in fragments",
-  "length": 450
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 900,
+  "other_order": null,
+  "indirect": true,
+  "exception": "customer_caused"
  },
  "9078": {
-  "type": "defect",
-  "order_ref": "order #305500",
+  "type": "not_received",
+  "order_ref": "the rain jacket, ordered around 14 September",
   "first_name": "Ines",
-  "persona": "an apologetic first-time customer",
-  "length": 300
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 300,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9079": {
-  "type": "duplicate",
+  "type": "not_received",
   "order_ref": "order #305501",
   "first_name": "Fatima",
-  "persona": "someone writing for an elderly relative",
-  "length": 750
+  "persona": "a student, casual, lowercase",
+  "length": 750,
+  "other_order": "order #303041",
+  "indirect": true,
+  "exception": null
  },
  "9080": {
-  "type": "duplicate",
+  "type": "late",
   "order_ref": "order #305502",
   "first_name": "Grace",
   "persona": "someone writing for an elderly relative",
-  "length": 600
+  "length": 900,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9081": {
-  "type": "wrong_item",
-  "order_ref": "the pan, ordered around 18 August",
+  "type": "duplicate",
+  "order_ref": "the backpack, ordered around 9 September",
   "first_name": "Tara",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 750
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 900,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9082": {
-  "type": "not_received",
-  "order_ref": "order #305504",
+  "type": "wrong_item",
+  "order_ref": "the grinder, ordered around 3 September",
   "first_name": "Rosa",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 600
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 300,
+  "other_order": "order #304591",
+  "indirect": false,
+  "exception": null
  },
  "9083": {
-  "type": "defect",
-  "order_ref": "my front light, ordered around 30 July",
+  "type": "not_received",
+  "order_ref": "order #305505",
   "first_name": "Nils",
-  "persona": "a small-business owner, brisk",
-  "length": 900
+  "persona": "a student, casual, lowercase",
+  "length": 450,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9084": {
-  "type": "duplicate",
+  "type": "wrong_item",
   "order_ref": "order #305506",
   "first_name": "Lena",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 750
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 450,
+  "other_order": "order #303669",
+  "indirect": false,
+  "exception": null
  },
  "9085": {
-  "type": "late",
-  "order_ref": "the waterproof, ordered around 21 September",
+  "type": "duplicate",
+  "order_ref": "my mat, ordered around 21 August",
   "first_name": "Lena",
-  "persona": "an apologetic first-time customer",
-  "length": 300
+  "persona": "a student, casual, lowercase",
+  "length": 750,
+  "other_order": "an earlier wool scarf",
+  "indirect": false,
+  "exception": null
  },
  "9086": {
-  "type": "duplicate",
+  "type": "wrong_item",
   "order_ref": "order #305508",
   "first_name": "Ana",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 900
+  "persona": "an engineer, precise and detailed",
+  "length": 450,
+  "other_order": "an earlier linen shirt",
+  "indirect": false,
+  "exception": null
  },
  "9087": {
-  "type": "late",
-  "order_ref": "order #305509",
+  "type": "duplicate",
+  "order_ref": "the linen shirt, ordered around 10 August",
   "first_name": "Rosa",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 900
+  "persona": "an engineer, precise and detailed",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9088": {
-  "type": "duplicate",
-  "order_ref": "order #305510",
+  "type": "defect",
+  "order_ref": "the lamp, ordered around 15 September",
   "first_name": "Marta",
-  "persona": "a small-business owner, brisk",
-  "length": 900
+  "persona": "a student, casual, lowercase",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": "customer_caused"
  },
  "9089": {
-  "type": "not_received",
-  "order_ref": "the flask, ordered around 19 August",
+  "type": "duplicate",
+  "order_ref": "order #305511",
   "first_name": "Wei",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 450
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 450,
+  "other_order": "an earlier headphones",
+  "indirect": true,
+  "exception": null
  },
  "9090": {
-  "type": "not_received",
-  "order_ref": "my raincoat, ordered around 13 September",
+  "type": "wrong_item",
+  "order_ref": "my skillet, ordered around 25 August",
   "first_name": "Nils",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 750
+  "persona": "a terse customer writing in fragments",
+  "length": 600,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9091": {
-  "type": "wrong_item",
+  "type": "defect",
   "order_ref": "order #305513",
   "first_name": "Rosa",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 450
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 600,
+  "other_order": "order #300892",
+  "indirect": false,
+  "exception": null
  },
  "9092": {
   "type": "late",
-  "order_ref": "order #305514",
+  "order_ref": "the burr grinder, ordered around 10 September",
   "first_name": "Grace",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 600
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 450,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9093": {
-  "type": "wrong_item",
-  "order_ref": "the lamp, ordered around 8 September",
+  "type": "defect",
+  "order_ref": "my rucksack, ordered around 6 September",
   "first_name": "Rosa",
-  "persona": "a student, casual, lowercase",
-  "length": 300
+  "persona": "a terse customer writing in fragments",
+  "length": 300,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9094": {
-  "type": "not_received",
-  "order_ref": "the backpack, ordered around 11 September",
+  "type": "duplicate",
+  "order_ref": "the linen shirt, ordered around 27 August",
   "first_name": "Kofi",
-  "persona": "a small-business owner, brisk",
-  "length": 300
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 300,
+  "other_order": "an earlier cast iron pan",
+  "indirect": true,
+  "exception": null
  },
  "9095": {
-  "type": "wrong_item",
+  "type": "duplicate",
   "order_ref": "order #305517",
   "first_name": "Eitan",
-  "persona": "an apologetic first-time customer",
-  "length": 900
+  "persona": "an engineer, precise and detailed",
+  "length": 450,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9096": {
-  "type": "wrong_item",
+  "type": "duplicate",
   "order_ref": "order #305518",
   "first_name": "Omar",
-  "persona": "an engineer, precise and detailed",
-  "length": 600
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 450,
+  "other_order": "an earlier wool scarf",
+  "indirect": true,
+  "exception": null
  },
  "9097": {
-  "type": "wrong_item",
-  "order_ref": "the cast iron, ordered around 30 August",
+  "type": "duplicate",
+  "order_ref": "order #305519",
   "first_name": "Ines",
-  "persona": "a student, casual, lowercase",
-  "length": 600
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 450,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9098": {
-  "type": "duplicate",
-  "order_ref": "the backpack, ordered around 20 September",
+  "type": "not_received",
+  "order_ref": "order #305520",
   "first_name": "Tara",
-  "persona": "an engineer, precise and detailed",
-  "length": 750
+  "persona": "a student, casual, lowercase",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9099": {
-  "type": "late",
-  "order_ref": "order #305521",
+  "type": "duplicate",
+  "order_ref": "my rucksack, ordered around 22 August",
   "first_name": "Marta",
-  "persona": "an apologetic first-time customer",
-  "length": 900
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 300,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9100": {
   "type": "wrong_item",
-  "order_ref": "my headset, ordered around 21 September",
+  "order_ref": "the running shoes, ordered around 10 August",
   "first_name": "Ben",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 750
+  "persona": "an apologetic first-time customer",
+  "length": 900,
+  "other_order": "an earlier backpack",
+  "indirect": false,
+  "exception": null
  },
  "9101": {
-  "type": "late",
-  "order_ref": "the headphones, ordered around 4 August",
+  "type": "defect",
+  "order_ref": "my rucksack, ordered around 30 August",
   "first_name": "Fatima",
-  "persona": "a terse customer writing in fragments",
-  "length": 450
+  "persona": "an engineer, precise and detailed",
+  "length": 750,
+  "other_order": "order #303649",
+  "indirect": true,
+  "exception": null
  },
  "9102": {
-  "type": "wrong_item",
-  "order_ref": "order #305524",
+  "type": "late",
+  "order_ref": "the backpack, ordered around 13 August",
   "first_name": "Kofi",
-  "persona": "someone writing for an elderly relative",
-  "length": 600
+  "persona": "a student, casual, lowercase",
+  "length": 600,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9103": {
-  "type": "not_received",
-  "order_ref": "order #305525",
+  "type": "wrong_item",
+  "order_ref": "the trail shoes, ordered around 2 September",
   "first_name": "Yara",
-  "persona": "an apologetic first-time customer",
-  "length": 300
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 750,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9104": {
   "type": "not_received",
   "order_ref": "order #305526",
   "first_name": "Priya",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 450
+  "persona": "someone writing for an elderly relative",
+  "length": 300,
+  "other_order": "order #300970",
+  "indirect": false,
+  "exception": null
  },
  "9105": {
-  "type": "late",
+  "type": "duplicate",
   "order_ref": "order #305527",
   "first_name": "Eitan",
-  "persona": "a small-business owner, brisk",
-  "length": 600
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 750,
+  "other_order": "an earlier water bottle",
+  "indirect": true,
+  "exception": null
  },
  "9106": {
-  "type": "wrong_item",
-  "order_ref": "the exercise mat, ordered around 8 September",
+  "type": "late",
+  "order_ref": "order #305528",
   "first_name": "Marta",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 300
+  "persona": "a busy parent on a phone, short sentences",
+  "length": 750,
+  "other_order": "an earlier rain jacket",
+  "indirect": false,
+  "exception": null
  },
  "9107": {
-  "type": "defect",
-  "order_ref": "order #305529",
+  "type": "duplicate",
+  "order_ref": "my desk light, ordered around 28 August",
   "first_name": "Ana",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 300
+  "persona": "an engineer, precise and detailed",
+  "length": 300,
+  "other_order": "an earlier headphones",
+  "indirect": false,
+  "exception": null
  },
  "9108": {
-  "type": "defect",
-  "order_ref": "the yoga mat, ordered around 14 September",
+  "type": "not_received",
+  "order_ref": "the running shoes, ordered around 31 August",
   "first_name": "Hiro",
-  "persona": "a student, casual, lowercase",
-  "length": 900
+  "persona": "a small-business owner, brisk",
+  "length": 750,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9109": {
-  "type": "not_received",
-  "order_ref": "the backpack, ordered around 31 August",
+  "type": "duplicate",
+  "order_ref": "the yoga mat, ordered around 6 August",
   "first_name": "Grace",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 900
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 450,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9110": {
-  "type": "defect",
+  "type": "late",
   "order_ref": "order #305532",
   "first_name": "Dev",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 300
+  "persona": "a small-business owner, brisk",
+  "length": 750,
+  "other_order": "an earlier coffee grinder",
+  "indirect": true,
+  "exception": null
  },
  "9111": {
-  "type": "duplicate",
-  "order_ref": "the lamp, ordered around 6 August",
+  "type": "late",
+  "order_ref": "order #305533",
   "first_name": "Hiro",
-  "persona": "a terse customer writing in fragments",
-  "length": 750
+  "persona": "a small-business owner, brisk",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9112": {
-  "type": "defect",
-  "order_ref": "order #305534",
+  "type": "duplicate",
+  "order_ref": "the trail shoes, ordered around 17 September",
   "first_name": "Wei",
-  "persona": "a student, casual, lowercase",
-  "length": 750
+  "persona": "an engineer, precise and detailed",
+  "length": 750,
+  "other_order": "order #302351",
+  "indirect": false,
+  "exception": null
  },
  "9113": {
-  "type": "duplicate",
-  "order_ref": "order #305535",
+  "type": "defect",
+  "order_ref": "the bottle, ordered around 18 August",
   "first_name": "Ben",
-  "persona": "someone writing for an elderly relative",
-  "length": 600
+  "persona": "a small-business owner, brisk",
+  "length": 300,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9114": {
   "type": "defect",
-  "order_ref": "my front light, ordered around 4 September",
+  "order_ref": "my front light, ordered around 18 July",
   "first_name": "Ben",
-  "persona": "a small-business owner, brisk",
-  "length": 900
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 900,
+  "other_order": "order #301657",
+  "indirect": true,
+  "exception": null
  },
  "9115": {
-  "type": "late",
-  "order_ref": "order #305537",
+  "type": "duplicate",
+  "order_ref": "my desk light, ordered around 8 September",
   "first_name": "Chloé",
-  "persona": "an apologetic first-time customer",
-  "length": 600
+  "persona": "an engineer, precise and detailed",
+  "length": 450,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9116": {
-  "type": "duplicate",
-  "order_ref": "the pan, ordered around 12 August",
+  "type": "wrong_item",
+  "order_ref": "my headset, ordered around 20 August",
   "first_name": "Hiro",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 600
+  "persona": "a student, casual, lowercase",
+  "length": 750,
+  "other_order": "an earlier coffee grinder",
+  "indirect": true,
+  "exception": null
  },
  "9117": {
-  "type": "defect",
-  "order_ref": "the scarf, ordered around 17 July",
+  "type": "late",
+  "order_ref": "my water bottle, ordered around 16 August",
   "first_name": "Quinn",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 600
+  "persona": "a terse customer writing in fragments",
+  "length": 750,
+  "other_order": "an earlier cast iron pan",
+  "indirect": false,
+  "exception": null
  },
  "9118": {
-  "type": "not_received",
-  "order_ref": "the scarf, ordered around 12 August",
+  "type": "duplicate",
+  "order_ref": "order #305540",
   "first_name": "Wei",
-  "persona": "a terse customer writing in fragments",
-  "length": 450
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 450,
+  "other_order": "an earlier headphones",
+  "indirect": false,
+  "exception": null
  },
  "9119": {
-  "type": "defect",
-  "order_ref": "order #305541",
+  "type": "late",
+  "order_ref": "the daypack, ordered around 21 August",
   "first_name": "Fatima",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 450
+  "persona": "a student, casual, lowercase",
+  "length": 600,
+  "other_order": "order #305379",
+  "indirect": false,
+  "exception": null
  },
  "9120": {
-  "type": "defect",
+  "type": "wrong_item",
   "order_ref": "order #305542",
   "first_name": "Rosa",
-  "persona": "a student, casual, lowercase",
-  "length": 750
+  "persona": "a small-business owner, brisk",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9121": {
-  "type": "wrong_item",
-  "order_ref": "the running shoes, ordered around 4 August",
+  "type": "defect",
+  "order_ref": "order #305543",
   "first_name": "Ben",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 900
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 450,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9122": {
-  "type": "defect",
+  "type": "wrong_item",
   "order_ref": "order #305544",
   "first_name": "Ana",
   "persona": "a student, casual, lowercase",
-  "length": 900
+  "length": 450,
+  "other_order": "order #302334",
+  "indirect": true,
+  "exception": null
  },
  "9123": {
-  "type": "not_received",
-  "order_ref": "my water bottle, ordered around 5 August",
+  "type": "duplicate",
+  "order_ref": "order #305545",
   "first_name": "Ana",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 600
+  "persona": "a terse customer writing in fragments",
+  "length": 300,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9124": {
-  "type": "not_received",
+  "type": "defect",
   "order_ref": "order #305546",
   "first_name": "Chloé",
-  "persona": "someone writing for an elderly relative",
-  "length": 600
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 750,
+  "other_order": null,
+  "indirect": true,
+  "exception": "customer_caused"
  },
  "9125": {
-  "type": "late",
-  "order_ref": "the lamp for my bike, ordered around 13 August",
+  "type": "defect",
+  "order_ref": "order #305547",
   "first_name": "Marta",
-  "persona": "an engineer, precise and detailed",
-  "length": 600
+  "persona": "a busy parent on a phone, short sentences",
+  "length": 600,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9126": {
-  "type": "wrong_item",
-  "order_ref": "the running shoes, ordered around 25 August",
+  "type": "defect",
+  "order_ref": "order #305548",
   "first_name": "Rosa",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 300
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9127": {
-  "type": "wrong_item",
+  "type": "defect",
   "order_ref": "order #305549",
   "first_name": "Kofi",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 300
+  "persona": "someone writing for an elderly relative",
+  "length": 300,
+  "other_order": "order #300681",
+  "indirect": false,
+  "exception": null
  },
  "9128": {
-  "type": "duplicate",
-  "order_ref": "my desk light, ordered around 19 August",
+  "type": "wrong_item",
+  "order_ref": "order #305550",
   "first_name": "Priya",
-  "persona": "a student, casual, lowercase",
-  "length": 300
+  "persona": "an engineer, precise and detailed",
+  "length": 450,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9129": {
-  "type": "late",
-  "order_ref": "order #305551",
+  "type": "wrong_item",
+  "order_ref": "my coffee grinder, ordered around 22 August",
   "first_name": "Chloé",
-  "persona": "someone writing for an elderly relative",
-  "length": 750
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 750,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9130": {
-  "type": "not_received",
-  "order_ref": "my mat, ordered around 2 September",
+  "type": "duplicate",
+  "order_ref": "the rain jacket, ordered around 20 August",
   "first_name": "Omar",
-  "persona": "someone writing for an elderly relative",
-  "length": 450
+  "persona": "an engineer, precise and detailed",
+  "length": 450,
+  "other_order": "order #305180",
+  "indirect": true,
+  "exception": null
  },
  "9131": {
-  "type": "not_received",
-  "order_ref": "the summer shirt, ordered around 11 September",
+  "type": "wrong_item",
+  "order_ref": "the linen shirt, ordered around 19 August",
   "first_name": "Rosa",
-  "persona": "a student, casual, lowercase",
-  "length": 900
+  "persona": "someone writing for an elderly relative",
+  "length": 300,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9132": {
   "type": "late",
-  "order_ref": "the daypack, ordered around 19 August",
+  "order_ref": "order #305554",
   "first_name": "Tara",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 750
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 300,
+  "other_order": "order #301720",
+  "indirect": true,
+  "exception": null
  },
  "9133": {
   "type": "late",
-  "order_ref": "order #305555",
+  "order_ref": "my rucksack, ordered around 16 August",
   "first_name": "Dev",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 900
+  "persona": "someone writing for an elderly relative",
+  "length": 900,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9134": {
-  "type": "defect",
+  "type": "late",
   "order_ref": "order #305556",
   "first_name": "Rosa",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 300
+  "persona": "a student, casual, lowercase",
+  "length": 300,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9135": {
-  "type": "wrong_item",
-  "order_ref": "order #305557",
+  "type": "defect",
+  "order_ref": "my trainers, ordered around 10 September",
   "first_name": "Wei",
-  "persona": "an engineer, precise and detailed",
-  "length": 450
+  "persona": "a small-business owner, brisk",
+  "length": 900,
+  "other_order": "order #304287",
+  "indirect": true,
+  "exception": null
  },
  "9136": {
-  "type": "duplicate",
+  "type": "wrong_item",
   "order_ref": "order #305558",
   "first_name": "Jonas",
-  "persona": "a small-business owner, brisk",
-  "length": 900
+  "persona": "a terse customer writing in fragments",
+  "length": 600,
+  "other_order": "an earlier backpack",
+  "indirect": false,
+  "exception": null
  },
  "9137": {
-  "type": "not_received",
-  "order_ref": "order #305559",
+  "type": "wrong_item",
+  "order_ref": "the earphones, ordered around 31 August",
   "first_name": "Yara",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 300
+  "persona": "an apologetic first-time customer",
+  "length": 600,
+  "other_order": "order #303239",
+  "indirect": true,
+  "exception": null
  },
  "9138": {
   "type": "duplicate",
-  "order_ref": "my raincoat, ordered around 6 August",
+  "order_ref": "order #305560",
   "first_name": "Omar",
-  "persona": "someone writing for an elderly relative",
-  "length": 750
+  "persona": "a small-business owner, brisk",
+  "length": 900,
+  "other_order": "an earlier yoga mat",
+  "indirect": false,
+  "exception": null
  },
  "9139": {
-  "type": "not_received",
-  "order_ref": "order #305561",
+  "type": "duplicate",
+  "order_ref": "the running shoes, ordered around 20 September",
   "first_name": "Kofi",
-  "persona": "an apologetic first-time customer",
-  "length": 600
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 600,
+  "other_order": "an earlier rain jacket",
+  "indirect": false,
+  "exception": null
  },
  "9140": {
-  "type": "defect",
-  "order_ref": "order #305562",
+  "type": "wrong_item",
+  "order_ref": "the earphones, ordered around 25 August",
   "first_name": "Rosa",
-  "persona": "a small-business owner, brisk",
-  "length": 900
+  "persona": "a terse customer writing in fragments",
+  "length": 600,
+  "other_order": "an earlier bike light",
+  "indirect": true,
+  "exception": null
  },
  "9141": {
-  "type": "duplicate",
-  "order_ref": "the pan, ordered around 21 September",
+  "type": "late",
+  "order_ref": "order #305563",
   "first_name": "Kofi",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 750
+  "persona": "a terse customer writing in fragments",
+  "length": 750,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9142": {
-  "type": "wrong_item",
-  "order_ref": "the lamp for my bike, ordered around 24 August",
+  "type": "duplicate",
+  "order_ref": "my mat, ordered around 24 August",
   "first_name": "Quinn",
-  "persona": "someone writing for an elderly relative",
-  "length": 450
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 600,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9143": {
-  "type": "late",
-  "order_ref": "the earphones, ordered around 15 August",
+  "type": "wrong_item",
+  "order_ref": "the yoga mat, ordered around 31 August",
   "first_name": "Rosa",
-  "persona": "an engineer, precise and detailed",
-  "length": 300
+  "persona": "an apologetic first-time customer",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9144": {
-  "type": "defect",
-  "order_ref": "that knitted scarf, ordered around 25 July",
+  "type": "not_received",
+  "order_ref": "my rucksack, ordered around 16 August",
   "first_name": "Wei",
-  "persona": "a small-business owner, brisk",
-  "length": 300
+  "persona": "someone writing for an elderly relative",
+  "length": 750,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9145": {
-  "type": "wrong_item",
-  "order_ref": "order #305567",
+  "type": "late",
+  "order_ref": "the yoga mat, ordered around 14 August",
   "first_name": "Jonas",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 750
+  "persona": "someone writing for an elderly relative",
+  "length": 900,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9146": {
-  "type": "duplicate",
-  "order_ref": "my trainers, ordered around 2 August",
+  "type": "late",
+  "order_ref": "the wool scarf, ordered around 2 September",
   "first_name": "Grace",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 300
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 450,
+  "other_order": "an earlier desk lamp",
+  "indirect": true,
+  "exception": null
  },
  "9147": {
-  "type": "not_received",
-  "order_ref": "order #305569",
+  "type": "duplicate",
+  "order_ref": "the running shoes, ordered around 5 August",
   "first_name": "Dev",
-  "persona": "a small-business owner, brisk",
-  "length": 450
+  "persona": "someone writing for an elderly relative",
+  "length": 900,
+  "other_order": "order #302873",
+  "indirect": true,
+  "exception": null
  },
  "9148": {
-  "type": "duplicate",
-  "order_ref": "the backpack, ordered around 15 August",
+  "type": "wrong_item",
+  "order_ref": "order #305570",
   "first_name": "Hiro",
-  "persona": "an apologetic first-time customer",
-  "length": 450
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 750,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9149": {
   "type": "wrong_item",
-  "order_ref": "the waterproof, ordered around 16 August",
+  "order_ref": "order #305571",
   "first_name": "Ben",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 900
+  "persona": "a small-business owner, brisk",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9150": {
-  "type": "defect",
-  "order_ref": "the lamp for my bike, ordered around 20 August",
+  "type": "late",
+  "order_ref": "the flask, ordered around 16 August",
   "first_name": "Nils",
-  "persona": "a student, casual, lowercase",
-  "length": 600
+  "persona": "an apologetic first-time customer",
+  "length": 750,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9151": {
-  "type": "late",
-  "order_ref": "my raincoat, ordered around 10 September",
+  "type": "duplicate",
+  "order_ref": "the grinder, ordered around 12 August",
   "first_name": "Hiro",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 900
+  "persona": "a student, casual, lowercase",
+  "length": 450,
+  "other_order": "order #303718",
+  "indirect": true,
+  "exception": null
  },
  "9152": {
-  "type": "not_received",
-  "order_ref": "the bottle, ordered around 7 August",
+  "type": "late",
+  "order_ref": "order #305574",
   "first_name": "Quinn",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 600
+  "persona": "a small-business owner, brisk",
+  "length": 300,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9153": {
-  "type": "not_received",
-  "order_ref": "order #305575",
+  "type": "late",
+  "order_ref": "my rucksack, ordered around 8 September",
   "first_name": "Nils",
   "persona": "someone writing for an elderly relative",
-  "length": 750
+  "length": 900,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9154": {
   "type": "wrong_item",
   "order_ref": "order #305576",
   "first_name": "Eitan",
-  "persona": "a student, casual, lowercase",
-  "length": 750
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 300,
+  "other_order": "an earlier yoga mat",
+  "indirect": true,
+  "exception": null
  },
  "9155": {
-  "type": "late",
-  "order_ref": "the pan, ordered around 15 August",
+  "type": "duplicate",
+  "order_ref": "my headset, ordered around 9 September",
   "first_name": "Marta",
-  "persona": "someone writing for an elderly relative",
-  "length": 750
+  "persona": "a small-business owner, brisk",
+  "length": 300,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9156": {
-  "type": "duplicate",
-  "order_ref": "the bike light, ordered around 27 August",
+  "type": "not_received",
+  "order_ref": "my water bottle, ordered around 6 August",
   "first_name": "Kofi",
-  "persona": "an apologetic first-time customer",
-  "length": 900
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 450,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9157": {
-  "type": "defect",
-  "order_ref": "the lamp, ordered around 8 September",
+  "type": "duplicate",
+  "order_ref": "order #305579",
   "first_name": "Eitan",
-  "persona": "a small-business owner, brisk",
-  "length": 750
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 300,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9158": {
-  "type": "wrong_item",
+  "type": "duplicate",
   "order_ref": "order #305580",
   "first_name": "Hiro",
-  "persona": "an engineer, precise and detailed",
-  "length": 450
+  "persona": "a terse customer writing in fragments",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9159": {
-  "type": "duplicate",
-  "order_ref": "the daypack, ordered around 5 August",
+  "type": "defect",
+  "order_ref": "order #305581",
   "first_name": "Wei",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 600
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 600,
+  "other_order": null,
+  "indirect": true,
+  "exception": "customer_caused"
  },
  "9160": {
   "type": "late",
-  "order_ref": "my headset, ordered around 5 August",
+  "order_ref": "order #305582",
   "first_name": "Kofi",
-  "persona": "an apologetic first-time customer",
-  "length": 750
+  "persona": "a busy parent on a phone, short sentences",
+  "length": 750,
+  "other_order": "an earlier coffee grinder",
+  "indirect": false,
+  "exception": null
  },
  "9161": {
-  "type": "late",
-  "order_ref": "order #305583",
+  "type": "defect",
+  "order_ref": "my rucksack, ordered around 6 September",
   "first_name": "Ines",
-  "persona": "a small-business owner, brisk",
-  "length": 750
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 450,
+  "other_order": "order #304019",
+  "indirect": true,
+  "exception": null
  },
  "9162": {
-  "type": "late",
-  "order_ref": "the waterproof, ordered around 12 September",
+  "type": "defect",
+  "order_ref": "that shirt, ordered around 13 September",
   "first_name": "Omar",
-  "persona": "a student, casual, lowercase",
-  "length": 450
+  "persona": "a small-business owner, brisk",
+  "length": 600,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9163": {
-  "type": "defect",
-  "order_ref": "the yoga mat, ordered around 16 September",
+  "type": "wrong_item",
+  "order_ref": "order #305585",
   "first_name": "Rosa",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 900
+  "persona": "a small-business owner, brisk",
+  "length": 450,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9164": {
-  "type": "late",
-  "order_ref": "the scarf, ordered around 13 September",
+  "type": "wrong_item",
+  "order_ref": "order #305586",
   "first_name": "Grace",
-  "persona": "someone writing for an elderly relative",
-  "length": 750
+  "persona": "a busy parent on a phone, short sentences",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9165": {
-  "type": "defect",
-  "order_ref": "order #305587",
+  "type": "duplicate",
+  "order_ref": "the burr grinder, ordered around 30 August",
   "first_name": "Priya",
-  "persona": "a small-business owner, brisk",
-  "length": 300
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9166": {
-  "type": "defect",
-  "order_ref": "my water bottle, ordered around 6 September",
+  "type": "late",
+  "order_ref": "that shirt, ordered around 9 September",
   "first_name": "Priya",
   "persona": "a small-business owner, brisk",
-  "length": 450
+  "length": 450,
+  "other_order": "an earlier wool scarf",
+  "indirect": false,
+  "exception": null
  },
  "9167": {
   "type": "duplicate",
   "order_ref": "order #305589",
   "first_name": "Wei",
-  "persona": "a small-business owner, brisk",
-  "length": 750
+  "persona": "someone writing for an elderly relative",
+  "length": 300,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9168": {
-  "type": "late",
+  "type": "defect",
   "order_ref": "order #305590",
   "first_name": "Fatima",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 450
+  "persona": "someone writing for an elderly relative",
+  "length": 450,
+  "other_order": "an earlier yoga mat",
+  "indirect": false,
+  "exception": null
  },
  "9169": {
-  "type": "defect",
+  "type": "wrong_item",
   "order_ref": "order #305591",
   "first_name": "Nils",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 300
+  "persona": "a small-business owner, brisk",
+  "length": 750,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9170": {
-  "type": "late",
-  "order_ref": "my desk light, ordered around 31 August",
+  "type": "not_received",
+  "order_ref": "order #305592",
   "first_name": "Grace",
-  "persona": "a student, casual, lowercase",
-  "length": 300
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 600,
+  "other_order": "an earlier cast iron pan",
+  "indirect": false,
+  "exception": "gift"
  },
  "9171": {
-  "type": "duplicate",
-  "order_ref": "order #305593",
+  "type": "wrong_item",
+  "order_ref": "the reading lamp, ordered around 6 August",
   "first_name": "Dev",
   "persona": "an apologetic first-time customer",
-  "length": 600
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9172": {
   "type": "defect",
-  "order_ref": "order #305594",
+  "order_ref": "the daypack, ordered around 6 September",
   "first_name": "Marta",
-  "persona": "an engineer, precise and detailed",
-  "length": 450
+  "persona": "a terse customer writing in fragments",
+  "length": 750,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9173": {
   "type": "wrong_item",
-  "order_ref": "my water bottle, ordered around 17 September",
+  "order_ref": "order #305595",
   "first_name": "Omar",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 300
+  "persona": "someone writing for an elderly relative",
+  "length": 750,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9174": {
   "type": "duplicate",
-  "order_ref": "the rain jacket, ordered around 6 September",
+  "order_ref": "order #305596",
   "first_name": "Nils",
-  "persona": "an apologetic first-time customer",
-  "length": 600
+  "persona": "a terse customer writing in fragments",
+  "length": 450,
+  "other_order": "order #301598",
+  "indirect": false,
+  "exception": null
  },
  "9175": {
   "type": "late",
-  "order_ref": "the trail shoes, ordered around 17 August",
+  "order_ref": "the grinder, ordered around 6 August",
   "first_name": "Yara",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 300
+  "persona": "a student, casual, lowercase",
+  "length": 750,
+  "other_order": "order #300288",
+  "indirect": false,
+  "exception": null
  },
  "9176": {
-  "type": "not_received",
-  "order_ref": "the flask, ordered around 21 August",
+  "type": "defect",
+  "order_ref": "my raincoat, ordered around 22 September",
   "first_name": "Hiro",
-  "persona": "an apologetic first-time customer",
-  "length": 900
+  "persona": "an engineer, precise and detailed",
+  "length": 300,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9177": {
   "type": "wrong_item",
-  "order_ref": "the running shoes, ordered around 30 August",
+  "order_ref": "order #305599",
   "first_name": "Hiro",
   "persona": "a terse customer writing in fragments",
-  "length": 450
+  "length": 600,
+  "other_order": "an earlier linen shirt",
+  "indirect": false,
+  "exception": null
  },
  "9178": {
-  "type": "not_received",
+  "type": "defect",
   "order_ref": "order #305600",
   "first_name": "Nils",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 450
+  "persona": "an apologetic first-time customer",
+  "length": 900,
+  "other_order": "an earlier rain jacket",
+  "indirect": false,
+  "exception": null
  },
  "9179": {
   "type": "wrong_item",
-  "order_ref": "order #305601",
+  "order_ref": "the bike light, ordered around 23 August",
   "first_name": "Chloé",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 600
+  "persona": "an engineer, precise and detailed",
+  "length": 750,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9180": {
-  "type": "late",
-  "order_ref": "my trainers, ordered around 28 August",
+  "type": "duplicate",
+  "order_ref": "order #305602",
   "first_name": "Lena",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 450
+  "persona": "a student, casual, lowercase",
+  "length": 300,
+  "other_order": "order #300737",
+  "indirect": true,
+  "exception": null
  },
  "9181": {
-  "type": "wrong_item",
-  "order_ref": "the lamp for my bike, ordered around 13 August",
+  "type": "duplicate",
+  "order_ref": "my front light, ordered around 16 September",
   "first_name": "Ines",
-  "persona": "an engineer, precise and detailed",
-  "length": 450
+  "persona": "a student, casual, lowercase",
+  "length": 300,
+  "other_order": "an earlier yoga mat",
+  "indirect": true,
+  "exception": null
  },
  "9182": {
-  "type": "duplicate",
-  "order_ref": "the scarf, ordered around 12 August",
+  "type": "wrong_item",
+  "order_ref": "order #305604",
   "first_name": "Wei",
-  "persona": "a student, casual, lowercase",
-  "length": 750
+  "persona": "a small-business owner, brisk",
+  "length": 450,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9183": {
   "type": "wrong_item",
   "order_ref": "order #305605",
   "first_name": "Lena",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 300
+  "persona": "an apologetic first-time customer",
+  "length": 300,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9184": {
   "type": "not_received",
-  "order_ref": "my headset, ordered around 17 September",
+  "order_ref": "order #305606",
   "first_name": "Nils",
-  "persona": "someone writing for an elderly relative",
-  "length": 750
+  "persona": "a busy parent on a phone, short sentences",
+  "length": 750,
+  "other_order": null,
+  "indirect": false,
+  "exception": "gift"
  },
  "9185": {
   "type": "wrong_item",
-  "order_ref": "my rucksack, ordered around 17 August",
+  "order_ref": "order #305607",
   "first_name": "Omar",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 450
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 900,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9186": {
-  "type": "late",
-  "order_ref": "order #305608",
+  "type": "wrong_item",
+  "order_ref": "the scarf, ordered around 10 September",
   "first_name": "Ines",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 900
+  "persona": "an engineer, precise and detailed",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9187": {
-  "type": "wrong_item",
-  "order_ref": "the exercise mat, ordered around 12 August",
+  "type": "duplicate",
+  "order_ref": "order #305609",
   "first_name": "Yara",
-  "persona": "a terse customer writing in fragments",
-  "length": 600
+  "persona": "an apologetic first-time customer",
+  "length": 600,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9188": {
-  "type": "wrong_item",
-  "order_ref": "the exercise mat, ordered around 12 August",
+  "type": "late",
+  "order_ref": "my front light, ordered around 3 August",
   "first_name": "Wei",
-  "persona": "a small-business owner, brisk",
-  "length": 300
+  "persona": "someone writing for an elderly relative",
+  "length": 750,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9189": {
-  "type": "wrong_item",
-  "order_ref": "the lamp for my bike, ordered around 12 August",
+  "type": "defect",
+  "order_ref": "order #305611",
   "first_name": "Ines",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 900
+  "persona": "an apologetic first-time customer",
+  "length": 300,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9190": {
-  "type": "duplicate",
-  "order_ref": "that shirt, ordered around 15 August",
+  "type": "defect",
+  "order_ref": "the exercise mat, ordered around 5 September",
   "first_name": "Kofi",
-  "persona": "a small-business owner, brisk",
-  "length": 600
+  "persona": "an apologetic first-time customer",
+  "length": 300,
+  "other_order": "an earlier rain jacket",
+  "indirect": false,
+  "exception": null
  },
  "9191": {
-  "type": "wrong_item",
-  "order_ref": "the lamp, ordered around 10 August",
+  "type": "not_received",
+  "order_ref": "order #305613",
   "first_name": "Tara",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 900
+  "persona": "someone writing for an elderly relative",
+  "length": 900,
+  "other_order": "order #303920",
+  "indirect": true,
+  "exception": null
  },
  "9192": {
   "type": "not_received",
-  "order_ref": "the running shoes, ordered around 6 September",
+  "order_ref": "my front light, ordered around 11 September",
   "first_name": "Omar",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 750
+  "persona": "an apologetic first-time customer",
+  "length": 300,
+  "other_order": "order #303760",
+  "indirect": true,
+  "exception": null
  },
  "9193": {
-  "type": "late",
+  "type": "duplicate",
   "order_ref": "order #305615",
   "first_name": "Kofi",
   "persona": "a busy parent on a phone, short sentences",
-  "length": 600
+  "length": 750,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9194": {
   "type": "late",
-  "order_ref": "my raincoat, ordered around 4 August",
+  "order_ref": "my desk light, ordered around 4 August",
   "first_name": "Ines",
-  "persona": "someone writing for an elderly relative",
-  "length": 750
+  "persona": "a terse customer writing in fragments",
+  "length": 300,
+  "other_order": "order #301371",
+  "indirect": true,
+  "exception": null
  },
  "9195": {
   "type": "late",
   "order_ref": "order #305617",
   "first_name": "Sven",
   "persona": "a small-business owner, brisk",
-  "length": 450
+  "length": 750,
+  "other_order": "order #305290",
+  "indirect": true,
+  "exception": null
  },
  "9196": {
   "type": "wrong_item",
   "order_ref": "order #305618",
   "first_name": "Yara",
   "persona": "a small-business owner, brisk",
-  "length": 900
+  "length": 750,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9197": {
-  "type": "late",
-  "order_ref": "the exercise mat, ordered around 16 August",
+  "type": "duplicate",
+  "order_ref": "order #305619",
   "first_name": "Kofi",
-  "persona": "an apologetic first-time customer",
-  "length": 750
+  "persona": "a busy parent on a phone, short sentences",
+  "length": 600,
+  "other_order": "an earlier cast iron pan",
+  "indirect": true,
+  "exception": null
  },
  "9198": {
-  "type": "defect",
-  "order_ref": "the burr grinder, ordered around 5 August",
+  "type": "not_received",
+  "order_ref": "the backpack, ordered around 3 August",
   "first_name": "Quinn",
   "persona": "a non-native English speaker, simple phrasing",
-  "length": 600
+  "length": 600,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9199": {
   "type": "late",
-  "order_ref": "order #305621",
+  "order_ref": "the trail shoes, ordered around 20 September",
   "first_name": "Ines",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 900
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 600,
+  "other_order": "an earlier rain jacket",
+  "indirect": true,
+  "exception": null
  },
  "9200": {
-  "type": "late",
-  "order_ref": "order #305622",
+  "type": "defect",
+  "order_ref": "my mat, ordered around 14 September",
   "first_name": "Hiro",
-  "persona": "a small-business owner, brisk",
-  "length": 300
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 750,
+  "other_order": "an earlier rain jacket",
+  "indirect": true,
+  "exception": null
  },
  "9201": {
-  "type": "late",
-  "order_ref": "my rucksack, ordered around 10 September",
+  "type": "duplicate",
+  "order_ref": "order #305623",
   "first_name": "Fatima",
   "persona": "an angry long-time customer, sarcastic",
-  "length": 900
+  "length": 300,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9202": {
-  "type": "not_received",
+  "type": "duplicate",
   "order_ref": "order #305624",
   "first_name": "Wei",
   "persona": "an engineer, precise and detailed",
-  "length": 450
+  "length": 600,
+  "other_order": "an earlier yoga mat",
+  "indirect": true,
+  "exception": null
  },
  "9203": {
-  "type": "defect",
-  "order_ref": "the daypack, ordered around 20 September",
+  "type": "late",
+  "order_ref": "order #305625",
   "first_name": "Quinn",
-  "persona": "a student, casual, lowercase",
-  "length": 450
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 450,
+  "other_order": "an earlier rain jacket",
+  "indirect": true,
+  "exception": null
  },
  "9204": {
-  "type": "not_received",
-  "order_ref": "order #305626",
+  "type": "defect",
+  "order_ref": "the summer shirt, ordered around 20 September",
   "first_name": "Rosa",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 300
+  "persona": "someone writing for an elderly relative",
+  "length": 450,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9205": {
-  "type": "wrong_item",
-  "order_ref": "the rain jacket, ordered around 4 August",
+  "type": "not_received",
+  "order_ref": "the exercise mat, ordered around 23 September",
   "first_name": "Yara",
-  "persona": "an engineer, precise and detailed",
-  "length": 900
+  "persona": "someone writing for an elderly relative",
+  "length": 450,
+  "other_order": "an earlier backpack",
+  "indirect": false,
+  "exception": null
  },
  "9206": {
-  "type": "not_received",
-  "order_ref": "the wool scarf, ordered around 30 August",
+  "type": "duplicate",
+  "order_ref": "order #305628",
   "first_name": "Tara",
-  "persona": "a small-business owner, brisk",
-  "length": 300
+  "persona": "a busy parent on a phone, short sentences",
+  "length": 600,
+  "other_order": "order #303629",
+  "indirect": false,
+  "exception": null
  },
  "9207": {
-  "type": "late",
+  "type": "duplicate",
   "order_ref": "order #305629",
   "first_name": "Dev",
   "persona": "an angry long-time customer, sarcastic",
-  "length": 900
+  "length": 600,
+  "other_order": "an earlier backpack",
+  "indirect": false,
+  "exception": null
  },
  "9208": {
-  "type": "defect",
+  "type": "late",
   "order_ref": "order #305630",
   "first_name": "Dev",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 300
+  "persona": "a terse customer writing in fragments",
+  "length": 750,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9209": {
   "type": "late",
-  "order_ref": "order #305631",
+  "order_ref": "the running shoes, ordered around 20 September",
   "first_name": "Kofi",
-  "persona": "a small-business owner, brisk",
-  "length": 600
+  "persona": "a terse customer writing in fragments",
+  "length": 450,
+  "other_order": "order #305296",
+  "indirect": false,
+  "exception": null
  },
  "9210": {
-  "type": "late",
+  "type": "duplicate",
   "order_ref": "order #305632",
   "first_name": "Sven",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 450
+  "persona": "an engineer, precise and detailed",
+  "length": 450,
+  "other_order": "order #302536",
+  "indirect": true,
+  "exception": null
  },
  "9211": {
-  "type": "defect",
+  "type": "wrong_item",
   "order_ref": "order #305633",
   "first_name": "Ines",
-  "persona": "someone writing for an elderly relative",
-  "length": 450
+  "persona": "a terse customer writing in fragments",
+  "length": 300,
+  "other_order": "an earlier rain jacket",
+  "indirect": false,
+  "exception": null
  },
  "9212": {
-  "type": "late",
-  "order_ref": "my skillet, ordered around 18 August",
+  "type": "duplicate",
+  "order_ref": "order #305634",
   "first_name": "Fatima",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 900
+  "persona": "a small-business owner, brisk",
+  "length": 900,
+  "other_order": "order #304415",
+  "indirect": true,
+  "exception": null
  },
  "9213": {
-  "type": "late",
-  "order_ref": "the pan, ordered around 27 August",
+  "type": "defect",
+  "order_ref": "the wool scarf, ordered around 20 September",
   "first_name": "Priya",
-  "persona": "a student, casual, lowercase",
-  "length": 600
+  "persona": "a small-business owner, brisk",
+  "length": 750,
+  "other_order": null,
+  "indirect": true,
+  "exception": "customer_caused"
  },
  "9214": {
-  "type": "late",
+  "type": "not_received",
   "order_ref": "order #305636",
   "first_name": "Priya",
   "persona": "someone writing for an elderly relative",
-  "length": 450
+  "length": 300,
+  "other_order": "an earlier wool scarf",
+  "indirect": true,
+  "exception": null
  },
  "9215": {
-  "type": "defect",
-  "order_ref": "order #305637",
+  "type": "late",
+  "order_ref": "the running shoes, ordered around 21 August",
   "first_name": "Wei",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 900
+  "persona": "an engineer, precise and detailed",
+  "length": 300,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9216": {
   "type": "defect",
-  "order_ref": "the flask, ordered around 20 September",
+  "order_ref": "order #305638",
   "first_name": "Grace",
-  "persona": "a small-business owner, brisk",
-  "length": 450
+  "persona": "a terse customer writing in fragments",
+  "length": 900,
+  "other_order": "an earlier wool scarf",
+  "indirect": true,
+  "exception": null
  },
  "9217": {
-  "type": "duplicate",
-  "order_ref": "the daypack, ordered around 20 September",
+  "type": "not_received",
+  "order_ref": "the bottle, ordered around 6 September",
   "first_name": "Jonas",
-  "persona": "a small-business owner, brisk",
-  "length": 450
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 750,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9218": {
-  "type": "not_received",
-  "order_ref": "order #305640",
+  "type": "defect",
+  "order_ref": "the exercise mat, ordered around 23 July",
   "first_name": "Ines",
-  "persona": "a terse customer writing in fragments",
-  "length": 900
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 450,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9219": {
-  "type": "late",
-  "order_ref": "my raincoat, ordered around 10 September",
+  "type": "not_received",
+  "order_ref": "order #305641",
   "first_name": "Hiro",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 450
+  "persona": "a terse customer writing in fragments",
+  "length": 750,
+  "other_order": "an earlier yoga mat",
+  "indirect": false,
+  "exception": "gift"
  },
  "9220": {
-  "type": "late",
-  "order_ref": "the cast iron, ordered around 21 August",
+  "type": "not_received",
+  "order_ref": "order #305642",
   "first_name": "Rosa",
-  "persona": "an engineer, precise and detailed",
-  "length": 600
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 750,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9221": {
-  "type": "duplicate",
-  "order_ref": "order #305643",
+  "type": "wrong_item",
+  "order_ref": "my trainers, ordered around 21 September",
   "first_name": "Omar",
-  "persona": "a student, casual, lowercase",
-  "length": 900
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 600,
+  "other_order": "order #300583",
+  "indirect": true,
+  "exception": null
  },
  "9222": {
   "type": "duplicate",
   "order_ref": "order #305644",
   "first_name": "Marta",
-  "persona": "a small-business owner, brisk",
-  "length": 750
+  "persona": "a student, casual, lowercase",
+  "length": 600,
+  "other_order": "order #300096",
+  "indirect": true,
+  "exception": null
  },
  "9223": {
-  "type": "defect",
+  "type": "not_received",
   "order_ref": "order #305645",
   "first_name": "Hiro",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 450
+  "persona": "an engineer, precise and detailed",
+  "length": 750,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9224": {
-  "type": "late",
+  "type": "duplicate",
   "order_ref": "order #305646",
   "first_name": "Ana",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 900
+  "persona": "an engineer, precise and detailed",
+  "length": 900,
+  "other_order": "an earlier cast iron pan",
+  "indirect": true,
+  "exception": null
  },
  "9225": {
-  "type": "defect",
-  "order_ref": "the waterproof, ordered around 9 September",
+  "type": "duplicate",
+  "order_ref": "order #305647",
   "first_name": "Lena",
-  "persona": "a terse customer writing in fragments",
-  "length": 750
+  "persona": "a student, casual, lowercase",
+  "length": 600,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9226": {
   "type": "not_received",
-  "order_ref": "order #305648",
+  "order_ref": "the daypack, ordered around 25 August",
   "first_name": "Yara",
-  "persona": "a small-business owner, brisk",
-  "length": 900
+  "persona": "an engineer, precise and detailed",
+  "length": 300,
+  "other_order": "order #301233",
+  "indirect": true,
+  "exception": null
  },
  "9227": {
-  "type": "wrong_item",
-  "order_ref": "order #305649",
+  "type": "late",
+  "order_ref": "the running shoes, ordered around 10 August",
   "first_name": "Grace",
-  "persona": "a student, casual, lowercase",
-  "length": 900
+  "persona": "a terse customer writing in fragments",
+  "length": 300,
+  "other_order": "an earlier backpack",
+  "indirect": true,
+  "exception": null
  },
  "9228": {
-  "type": "defect",
-  "order_ref": "order #305650",
+  "type": "late",
+  "order_ref": "that shirt, ordered around 23 August",
   "first_name": "Dev",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 300
+  "persona": "a small-business owner, brisk",
+  "length": 900,
+  "other_order": "order #305361",
+  "indirect": false,
+  "exception": null
  },
  "9229": {
-  "type": "wrong_item",
-  "order_ref": "order #305651",
+  "type": "not_received",
+  "order_ref": "the rain jacket, ordered around 14 September",
   "first_name": "Hiro",
-  "persona": "a student, casual, lowercase",
-  "length": 750
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 900,
+  "other_order": "order #304493",
+  "indirect": true,
+  "exception": null
  },
  "9230": {
   "type": "defect",
-  "order_ref": "that knitted scarf, ordered around 21 September",
+  "order_ref": "the headphones, ordered around 6 August",
   "first_name": "Hiro",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 600
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 900,
+  "other_order": "order #300323",
+  "indirect": false,
+  "exception": null
  },
  "9231": {
-  "type": "late",
-  "order_ref": "the backpack, ordered around 23 August",
+  "type": "duplicate",
+  "order_ref": "order #305653",
   "first_name": "Ben",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 450
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 750,
+  "other_order": "an earlier yoga mat",
+  "indirect": false,
+  "exception": null
  },
  "9232": {
-  "type": "duplicate",
-  "order_ref": "order #305654",
+  "type": "defect",
+  "order_ref": "the waterproof, ordered around 18 July",
   "first_name": "Rosa",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 450
+  "persona": "a terse customer writing in fragments",
+  "length": 900,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9233": {
-  "type": "late",
-  "order_ref": "order #305655",
+  "type": "not_received",
+  "order_ref": "the trail shoes, ordered around 7 August",
   "first_name": "Sven",
-  "persona": "an apologetic first-time customer",
-  "length": 900
+  "persona": "someone writing for an elderly relative",
+  "length": 450,
+  "other_order": null,
+  "indirect": false,
+  "exception": "gift"
  },
  "9234": {
-  "type": "defect",
-  "order_ref": "the lamp for my bike, ordered around 19 September",
+  "type": "duplicate",
+  "order_ref": "order #305656",
   "first_name": "Wei",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 300
+  "persona": "a terse customer writing in fragments",
+  "length": 600,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9235": {
-  "type": "late",
+  "type": "wrong_item",
   "order_ref": "order #305657",
   "first_name": "Marta",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 300
+  "persona": "an engineer, precise and detailed",
+  "length": 600,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9236": {
-  "type": "wrong_item",
-  "order_ref": "my trainers, ordered around 21 August",
+  "type": "late",
+  "order_ref": "the waterproof, ordered around 11 September",
   "first_name": "Kofi",
-  "persona": "a small-business owner, brisk",
-  "length": 600
+  "persona": "an apologetic first-time customer",
+  "length": 450,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9237": {
-  "type": "defect",
-  "order_ref": "my trainers, ordered around 18 September",
+  "type": "duplicate",
+  "order_ref": "the cast iron, ordered around 8 September",
   "first_name": "Tara",
-  "persona": "someone writing for an elderly relative",
-  "length": 300
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 750,
+  "other_order": "order #300519",
+  "indirect": false,
+  "exception": null
  },
  "9238": {
-  "type": "duplicate",
+  "type": "defect",
   "order_ref": "order #305660",
   "first_name": "Ana",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 750
+  "persona": "a small-business owner, brisk",
+  "length": 750,
+  "other_order": "an earlier cast iron pan",
+  "indirect": false,
+  "exception": null
  },
  "9239": {
-  "type": "wrong_item",
-  "order_ref": "the summer shirt, ordered around 29 August",
+  "type": "defect",
+  "order_ref": "my raincoat, ordered around 19 August",
   "first_name": "Fatima",
   "persona": "an apologetic first-time customer",
-  "length": 450
+  "length": 750,
+  "other_order": "an earlier coffee grinder",
+  "indirect": true,
+  "exception": null
  },
  "9240": {
-  "type": "wrong_item",
-  "order_ref": "that shirt, ordered around 12 September",
+  "type": "late",
+  "order_ref": "order #305662",
   "first_name": "Wei",
-  "persona": "an apologetic first-time customer",
-  "length": 300
+  "persona": "a busy parent on a phone, short sentences",
+  "length": 600,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9241": {
-  "type": "wrong_item",
-  "order_ref": "the headphones, ordered around 7 September",
+  "type": "late",
+  "order_ref": "order #305663",
   "first_name": "Marta",
-  "persona": "an engineer, precise and detailed",
-  "length": 600
+  "persona": "a small-business owner, brisk",
+  "length": 300,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9242": {
   "type": "wrong_item",
-  "order_ref": "order #305664",
+  "order_ref": "the waterproof, ordered around 3 August",
   "first_name": "Sven",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 900
+  "persona": "a small-business owner, brisk",
+  "length": 450,
+  "other_order": "order #302827",
+  "indirect": true,
+  "exception": null
  },
  "9243": {
-  "type": "wrong_item",
-  "order_ref": "the waterproof, ordered around 12 August",
+  "type": "duplicate",
+  "order_ref": "the running shoes, ordered around 20 August",
   "first_name": "Fatima",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 900
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 900,
+  "other_order": "order #300185",
+  "indirect": false,
+  "exception": null
  },
  "9244": {
-  "type": "duplicate",
-  "order_ref": "my raincoat, ordered around 21 September",
+  "type": "not_received",
+  "order_ref": "order #305666",
   "first_name": "Rosa",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 300
+  "persona": "someone writing for an elderly relative",
+  "length": 600,
+  "other_order": "order #300207",
+  "indirect": false,
+  "exception": null
  },
  "9245": {
-  "type": "wrong_item",
-  "order_ref": "my water bottle, ordered around 11 September",
+  "type": "duplicate",
+  "order_ref": "order #305667",
   "first_name": "Kofi",
   "persona": "someone writing for an elderly relative",
-  "length": 750
+  "length": 300,
+  "other_order": "order #303292",
+  "indirect": true,
+  "exception": null
  },
  "9246": {
-  "type": "late",
-  "order_ref": "order #305668",
+  "type": "duplicate",
+  "order_ref": "the daypack, ordered around 23 August",
   "first_name": "Ben",
-  "persona": "someone writing for an elderly relative",
-  "length": 600
+  "persona": "a busy parent on a phone, short sentences",
+  "length": 900,
+  "other_order": "an earlier trail running shoes",
+  "indirect": true,
+  "exception": null
  },
  "9247": {
-  "type": "wrong_item",
+  "type": "late",
   "order_ref": "order #305669",
   "first_name": "Tara",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 750
+  "persona": "an engineer, precise and detailed",
+  "length": 300,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9248": {
-  "type": "defect",
+  "type": "not_received",
   "order_ref": "order #305670",
   "first_name": "Grace",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 900
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 900,
+  "other_order": "an earlier trail running shoes",
+  "indirect": false,
+  "exception": null
  },
  "9249": {
-  "type": "defect",
+  "type": "wrong_item",
   "order_ref": "order #305671",
   "first_name": "Chloé",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 900
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 450,
+  "other_order": "order #303060",
+  "indirect": true,
+  "exception": null
  },
  "9250": {
-  "type": "not_received",
-  "order_ref": "the headphones, ordered around 10 September",
+  "type": "defect",
+  "order_ref": "order #305672",
   "first_name": "Kofi",
   "persona": "a terse customer writing in fragments",
-  "length": 750
+  "length": 300,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9251": {
-  "type": "not_received",
-  "order_ref": "the exercise mat, ordered around 22 August",
+  "type": "late",
+  "order_ref": "the bike light, ordered around 14 September",
   "first_name": "Dev",
-  "persona": "a small-business owner, brisk",
-  "length": 750
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 600,
+  "other_order": "an earlier trail running shoes",
+  "indirect": true,
+  "exception": null
  },
  "9252": {
   "type": "wrong_item",
   "order_ref": "order #305674",
   "first_name": "Grace",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 900
+  "persona": "an engineer, precise and detailed",
+  "length": 450,
+  "other_order": "order #301031",
+  "indirect": true,
+  "exception": null
  },
  "9253": {
   "type": "duplicate",
-  "order_ref": "order #305675",
+  "order_ref": "the reading lamp, ordered around 7 September",
   "first_name": "Lena",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 450
+  "persona": "an engineer, precise and detailed",
+  "length": 300,
+  "other_order": "an earlier bike light",
+  "indirect": false,
+  "exception": null
  },
  "9254": {
-  "type": "duplicate",
-  "order_ref": "the linen shirt, ordered around 13 September",
+  "type": "late",
+  "order_ref": "order #305676",
   "first_name": "Ben",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 300
+  "persona": "an engineer, precise and detailed",
+  "length": 900,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9255": {
-  "type": "late",
-  "order_ref": "order #305677",
+  "type": "wrong_item",
+  "order_ref": "my desk light, ordered around 22 August",
   "first_name": "Ana",
   "persona": "a non-native English speaker, simple phrasing",
-  "length": 300
+  "length": 450,
+  "other_order": "an earlier cast iron pan",
+  "indirect": true,
+  "exception": null
  },
  "9256": {
-  "type": "defect",
-  "order_ref": "the pan, ordered around 7 September",
+  "type": "wrong_item",
+  "order_ref": "order #305678",
   "first_name": "Wei",
   "persona": "a busy parent on a phone, short sentences",
-  "length": 900
+  "length": 300,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9257": {
-  "type": "duplicate",
-  "order_ref": "my water bottle, ordered around 12 September",
+  "type": "wrong_item",
+  "order_ref": "order #305679",
   "first_name": "Kofi",
-  "persona": "a student, casual, lowercase",
-  "length": 300
+  "persona": "a busy parent on a phone, short sentences",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9258": {
-  "type": "defect",
-  "order_ref": "order #305680",
+  "type": "wrong_item",
+  "order_ref": "my desk light, ordered around 4 August",
   "first_name": "Tara",
-  "persona": "a terse customer writing in fragments",
-  "length": 300
+  "persona": "a student, casual, lowercase",
+  "length": 750,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9259": {
-  "type": "not_received",
+  "type": "late",
   "order_ref": "order #305681",
   "first_name": "Ben",
-  "persona": "someone writing for an elderly relative",
-  "length": 300
+  "persona": "a small-business owner, brisk",
+  "length": 750,
+  "other_order": "order #304203",
+  "indirect": true,
+  "exception": null
  },
  "9260": {
-  "type": "duplicate",
+  "type": "late",
   "order_ref": "order #305682",
   "first_name": "Wei",
-  "persona": "an engineer, precise and detailed",
-  "length": 300
+  "persona": "a busy parent on a phone, short sentences",
+  "length": 750,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9261": {
-  "type": "wrong_item",
-  "order_ref": "order #305683",
+  "type": "late",
+  "order_ref": "the running shoes, ordered around 15 September",
   "first_name": "Sven",
-  "persona": "an apologetic first-time customer",
-  "length": 750
+  "persona": "a small-business owner, brisk",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9262": {
-  "type": "duplicate",
-  "order_ref": "my skillet, ordered around 26 August",
+  "type": "late",
+  "order_ref": "my rucksack, ordered around 2 August",
   "first_name": "Marta",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 750
+  "persona": "an engineer, precise and detailed",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9263": {
-  "type": "duplicate",
-  "order_ref": "my headset, ordered around 12 August",
+  "type": "not_received",
+  "order_ref": "order #305685",
   "first_name": "Ana",
-  "persona": "a small-business owner, brisk",
-  "length": 600
+  "persona": "an engineer, precise and detailed",
+  "length": 450,
+  "other_order": "order #303555",
+  "indirect": true,
+  "exception": null
  },
  "9264": {
-  "type": "wrong_item",
-  "order_ref": "the exercise mat, ordered around 20 August",
+  "type": "late",
+  "order_ref": "that shirt, ordered around 13 August",
   "first_name": "Eitan",
-  "persona": "someone writing for an elderly relative",
-  "length": 900
+  "persona": "a small-business owner, brisk",
+  "length": 600,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9265": {
-  "type": "not_received",
-  "order_ref": "the bottle, ordered around 2 August",
+  "type": "duplicate",
+  "order_ref": "the rain jacket, ordered around 11 August",
   "first_name": "Chloé",
-  "persona": "an engineer, precise and detailed",
-  "length": 600
+  "persona": "a student, casual, lowercase",
+  "length": 300,
+  "other_order": "an earlier trail running shoes",
+  "indirect": false,
+  "exception": null
  },
  "9266": {
-  "type": "duplicate",
-  "order_ref": "the running shoes, ordered around 18 August",
+  "type": "wrong_item",
+  "order_ref": "my headset, ordered around 27 August",
   "first_name": "Eitan",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 300
+  "persona": "an apologetic first-time customer",
+  "length": 300,
+  "other_order": "an earlier water bottle",
+  "indirect": false,
+  "exception": null
  },
  "9267": {
   "type": "defect",
-  "order_ref": "the linen shirt, ordered around 16 August",
+  "order_ref": "the trail shoes, ordered around 13 September",
   "first_name": "Grace",
-  "persona": "someone writing for an elderly relative",
-  "length": 450
+  "persona": "a terse customer writing in fragments",
+  "length": 300,
+  "other_order": "order #301740",
+  "indirect": false,
+  "exception": "customer_caused"
  },
  "9268": {
   "type": "late",
   "order_ref": "order #305690",
   "first_name": "Dev",
   "persona": "a retiree, polite, tells some backstory",
-  "length": 450
+  "length": 750,
+  "other_order": "order #305376",
+  "indirect": false,
+  "exception": null
  },
  "9269": {
   "type": "wrong_item",
-  "order_ref": "order #305691",
+  "order_ref": "my skillet, ordered around 10 August",
   "first_name": "Wei",
-  "persona": "a student, casual, lowercase",
-  "length": 300
+  "persona": "someone writing for an elderly relative",
+  "length": 900,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9270": {
-  "type": "not_received",
-  "order_ref": "order #305692",
+  "type": "duplicate",
+  "order_ref": "my headset, ordered around 5 September",
   "first_name": "Chloé",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 600
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 750,
+  "other_order": "order #305388",
+  "indirect": false,
+  "exception": null
  },
  "9271": {
-  "type": "late",
+  "type": "defect",
   "order_ref": "my rucksack, ordered around 16 August",
   "first_name": "Yara",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 300
+  "persona": "a busy parent on a phone, short sentences",
+  "length": 300,
+  "other_order": "order #302970",
+  "indirect": true,
+  "exception": null
  },
  "9272": {
   "type": "defect",
-  "order_ref": "the pan, ordered around 18 September",
+  "order_ref": "my rucksack, ordered around 6 September",
   "first_name": "Rosa",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 600
+  "persona": "a terse customer writing in fragments",
+  "length": 600,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9273": {
-  "type": "wrong_item",
-  "order_ref": "the headphones, ordered around 8 August",
+  "type": "late",
+  "order_ref": "order #305695",
   "first_name": "Hiro",
-  "persona": "a small-business owner, brisk",
-  "length": 300
+  "persona": "a busy parent on a phone, short sentences",
+  "length": 450,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9274": {
-  "type": "wrong_item",
+  "type": "late",
   "order_ref": "order #305696",
   "first_name": "Priya",
-  "persona": "a terse customer writing in fragments",
-  "length": 450
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 900,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9275": {
-  "type": "not_received",
-  "order_ref": "the burr grinder, ordered around 9 September",
+  "type": "late",
+  "order_ref": "the burr grinder, ordered around 21 August",
   "first_name": "Sven",
-  "persona": "a terse customer writing in fragments",
-  "length": 750
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 750,
+  "other_order": "order #302578",
+  "indirect": false,
+  "exception": null
  },
  "9276": {
-  "type": "defect",
+  "type": "late",
   "order_ref": "order #305698",
   "first_name": "Marta",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 600
+  "persona": "someone writing for an elderly relative",
+  "length": 600,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9277": {
   "type": "late",
-  "order_ref": "that knitted scarf, ordered around 3 August",
+  "order_ref": "the backpack, ordered around 11 September",
   "first_name": "Yara",
-  "persona": "a terse customer writing in fragments",
-  "length": 600
+  "persona": "a small-business owner, brisk",
+  "length": 900,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9278": {
-  "type": "duplicate",
-  "order_ref": "order #305700",
+  "type": "not_received",
+  "order_ref": "the lamp for my bike, ordered around 30 August",
   "first_name": "Kofi",
-  "persona": "a small-business owner, brisk",
-  "length": 900
+  "persona": "someone writing for an elderly relative",
+  "length": 900,
+  "other_order": "an earlier backpack",
+  "indirect": true,
+  "exception": null
  },
  "9279": {
-  "type": "wrong_item",
-  "order_ref": "the lamp, ordered around 8 September",
+  "type": "late",
+  "order_ref": "order #305701",
   "first_name": "Lena",
-  "persona": "an angry long-time customer, sarcastic",
-  "length": 450
+  "persona": "a student, casual, lowercase",
+  "length": 450,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9280": {
-  "type": "defect",
-  "order_ref": "the bike light, ordered around 25 July",
+  "type": "wrong_item",
+  "order_ref": "order #305702",
   "first_name": "Lena",
-  "persona": "a terse customer writing in fragments",
-  "length": 300
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 750,
+  "other_order": "an earlier desk lamp",
+  "indirect": false,
+  "exception": null
  },
  "9281": {
   "type": "not_received",
-  "order_ref": "the running shoes, ordered around 5 August",
+  "order_ref": "my trainers, ordered around 10 August",
   "first_name": "Lena",
-  "persona": "someone writing for an elderly relative",
-  "length": 300
+  "persona": "a busy parent on a phone, short sentences",
+  "length": 450,
+  "other_order": "order #304438",
+  "indirect": true,
+  "exception": "gift"
  },
  "9282": {
   "type": "defect",
   "order_ref": "order #305704",
   "first_name": "Jonas",
   "persona": "a small-business owner, brisk",
-  "length": 300
+  "length": 750,
+  "other_order": "order #300002",
+  "indirect": true,
+  "exception": null
  },
  "9283": {
-  "type": "duplicate",
-  "order_ref": "order #305705",
+  "type": "not_received",
+  "order_ref": "the rain jacket, ordered around 25 August",
   "first_name": "Grace",
-  "persona": "a small-business owner, brisk",
-  "length": 750
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 900,
+  "other_order": "order #304211",
+  "indirect": true,
+  "exception": null
  },
  "9284": {
-  "type": "not_received",
-  "order_ref": "that knitted scarf, ordered around 24 August",
+  "type": "wrong_item",
+  "order_ref": "order #305706",
   "first_name": "Rosa",
-  "persona": "a terse customer writing in fragments",
-  "length": 600
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 600,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9285": {
-  "type": "wrong_item",
-  "order_ref": "order #305707",
+  "type": "not_received",
+  "order_ref": "my skillet, ordered around 14 August",
   "first_name": "Jonas",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 750
+  "persona": "an apologetic first-time customer",
+  "length": 600,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9286": {
-  "type": "late",
-  "order_ref": "order #305708",
+  "type": "wrong_item",
+  "order_ref": "my water bottle, ordered around 6 August",
   "first_name": "Lena",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 900
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 600,
+  "other_order": "order #303962",
+  "indirect": false,
+  "exception": null
  },
  "9287": {
-  "type": "duplicate",
+  "type": "not_received",
   "order_ref": "order #305709",
   "first_name": "Yara",
-  "persona": "a student, casual, lowercase",
-  "length": 900
+  "persona": "someone writing for an elderly relative",
+  "length": 600,
+  "other_order": "an earlier headphones",
+  "indirect": true,
+  "exception": null
  },
  "9288": {
-  "type": "wrong_item",
-  "order_ref": "order #305710",
+  "type": "late",
+  "order_ref": "the lamp for my bike, ordered around 10 September",
   "first_name": "Wei",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 900
+  "persona": "someone writing for an elderly relative",
+  "length": 900,
+  "other_order": "order #301311",
+  "indirect": true,
+  "exception": null
  },
  "9289": {
   "type": "defect",
-  "order_ref": "the backpack, ordered around 19 September",
+  "order_ref": "order #305711",
   "first_name": "Nils",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 900
+  "persona": "a retiree, polite, tells some backstory",
+  "length": 750,
+  "other_order": "order #305044",
+  "indirect": true,
+  "exception": null
  },
  "9290": {
-  "type": "late",
-  "order_ref": "my front light, ordered around 24 August",
+  "type": "duplicate",
+  "order_ref": "that shirt, ordered around 1 September",
   "first_name": "Rosa",
-  "persona": "a small-business owner, brisk",
-  "length": 300
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 750,
+  "other_order": "order #300116",
+  "indirect": false,
+  "exception": null
  },
  "9291": {
-  "type": "late",
+  "type": "wrong_item",
   "order_ref": "order #305713",
   "first_name": "Dev",
-  "persona": "an apologetic first-time customer",
-  "length": 600
+  "persona": "a student, casual, lowercase",
+  "length": 600,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9292": {
-  "type": "duplicate",
-  "order_ref": "order #305714",
+  "type": "late",
+  "order_ref": "the cast iron, ordered around 31 August",
   "first_name": "Chloé",
-  "persona": "a non-native English speaker, simple phrasing",
-  "length": 750
+  "persona": "a terse customer writing in fragments",
+  "length": 900,
+  "other_order": null,
+  "indirect": true,
+  "exception": null
  },
  "9293": {
-  "type": "defect",
-  "order_ref": "my raincoat, ordered around 2 September",
+  "type": "wrong_item",
+  "order_ref": "the summer shirt, ordered around 1 September",
   "first_name": "Nils",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 900
+  "persona": "a small-business owner, brisk",
+  "length": 900,
+  "other_order": "order #302457",
+  "indirect": true,
+  "exception": null
  },
  "9294": {
-  "type": "late",
-  "order_ref": "my headset, ordered around 26 August",
+  "type": "duplicate",
+  "order_ref": "the reading lamp, ordered around 22 September",
   "first_name": "Quinn",
   "persona": "an apologetic first-time customer",
-  "length": 900
+  "length": 450,
+  "other_order": null,
+  "indirect": false,
+  "exception": null
  },
  "9295": {
-  "type": "defect",
-  "order_ref": "that knitted scarf, ordered around 16 September",
+  "type": "late",
+  "order_ref": "order #305717",
   "first_name": "Rosa",
-  "persona": "an engineer, precise and detailed",
-  "length": 450
+  "persona": "a terse customer writing in fragments",
+  "length": 900,
+  "other_order": "an earlier rain jacket",
+  "indirect": true,
+  "exception": null
  },
  "9296": {
-  "type": "wrong_item",
+  "type": "not_received",
   "order_ref": "order #305718",
   "first_name": "Quinn",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 900
+  "persona": "a busy parent on a phone, short sentences",
+  "length": 300,
+  "other_order": "order #302663",
+  "indirect": true,
+  "exception": null
  },
  "9297": {
-  "type": "duplicate",
-  "order_ref": "order #305719",
+  "type": "late",
+  "order_ref": "my mat, ordered around 19 September",
   "first_name": "Marta",
-  "persona": "an engineer, precise and detailed",
-  "length": 600
+  "persona": "a non-native English speaker, simple phrasing",
+  "length": 450,
+  "other_order": "an earlier desk lamp",
+  "indirect": true,
+  "exception": null
  },
  "9298": {
-  "type": "late",
-  "order_ref": "the linen shirt, ordered around 17 September",
+  "type": "duplicate",
+  "order_ref": "order #305720",
   "first_name": "Lena",
-  "persona": "a retiree, polite, tells some backstory",
-  "length": 450
+  "persona": "someone writing for an elderly relative",
+  "length": 900,
+  "other_order": "order #305012",
+  "indirect": true,
+  "exception": null
  },
  "9299": {
   "type": "wrong_item",
-  "order_ref": "the rain jacket, ordered around 31 July",
+  "order_ref": "order #305721",
   "first_name": "Ana",
-  "persona": "a busy parent on a phone, short sentences",
-  "length": 300
+  "persona": "a small-business owner, brisk",
+  "length": 300,
+  "other_order": "order #301057",
+  "indirect": false,
+  "exception": null
  },
  "9300": {
-  "type": "wrong_item",
+  "type": "defect",
   "order_ref": "order #305722",
   "first_name": "Rosa",
   "persona": "an apologetic first-time customer",
-  "length": 300
+  "length": 300,
+  "other_order": "order #301399",
+  "indirect": true,
+  "exception": null
  }
 }

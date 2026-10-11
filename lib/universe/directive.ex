@@ -54,6 +54,7 @@ defmodule Universe.Directive do
   @agent_write_tools ~w(Edit Write NotebookEdit)
   @default_agent_tools ~w(Read Grep Glob)
   @max_purpose_bytes 16 * 1024
+  @agent_task_timeout_s 900
   @max_agent_services 16
   @kill_fields ~w(op label target)
   @reply_fields ~w(op label target text)
@@ -329,7 +330,9 @@ defmodule Universe.Directive do
          {:ok, label} <- label(d["label"], true),
          {:ok, service} <- service_name(d["service"]),
          {:ok, fun, args} <- call_target(d),
-         {:ok, timeout} <- int_field(d["timeout_s"], "timeout_s", 1, @max_call_timeout_s, 60),
+         # An agent task reads and reasons for minutes; a function call is quick.
+         default = if(Map.has_key?(d, "prompt"), do: @agent_task_timeout_s, else: 60),
+         {:ok, timeout} <- int_field(d["timeout_s"], "timeout_s", 1, @max_call_timeout_s, default),
          {:ok, after_refs} <- after_refs(d["after"], false),
          {:ok, quiet} <- quiet(d["quiet"]) do
       {:ok,
