@@ -210,6 +210,43 @@ defmodule Universe.ResilienceTest do
     refute File.exists?(dir)
   end
 
+  test "gc deletes a run directory a worker locked with chmod 000" do
+    dir = Path.join(Paths.runs_dir(), "654322")
+    File.mkdir_p!(Path.join(dir, "tmp/locked/inner"))
+    File.chmod!(Path.join(dir, "tmp/locked"), 0o000)
+    File.touch!(dir, System.os_time(:second) - 8 * 86_400)
+    gc = Process.whereis(Universe.GC)
+
+    assert %{run_dirs: pruned} = Universe.GC.sweep_now()
+    assert 654_322 in pruned
+    refute File.exists?(dir)
+    assert Process.whereis(Universe.GC) == gc
+  end
+
+  test "a GC restart keeps the memory budgets of running workers" do
+    label = uniq("memgc")
+    code = "import time\ntime.sleep(2)\nb = b'x' * (400 * 1024 * 1024)\ntime.sleep(20)"
+
+    d = %{
+      "op" => "run",
+      "label" => label,
+      "lang" => "python",
+      "code" => code,
+      "budget" => %{"mem_mb" => 100}
+    }
+
+    tick([d], %{"timeout_s" => 0})
+
+    # GC dies (and its watch table with it) while the worker is still small.
+    Process.sleep(500)
+    old = Process.whereis(Universe.GC)
+    Process.exit(old, :kill)
+    wait_until(fn -> Process.whereis(Universe.GC) not in [nil, old] end)
+
+    result = tick([], %{"ids" => [label], "timeout_s" => 30})
+    assert status(result, label) == "budget"
+  end
+
   test "the daemon lock refuses a second live daemon and takes over a stale file" do
     path = Universe.Lock.pid_file()
     File.mkdir_p!(Path.dirname(path))
@@ -237,6 +274,22 @@ defmodule Universe.ResilienceTest do
            ]
 
     assert SandboxExec.ancestors("/x") == []
+  end
+
+  test "the sandbox profile denies starting or scripting other apps, and lives outside the run dir" do
+    alias Universe.Isolation.SandboxExec
+    root = Paths.project_root()
+    run_dir = Path.join(Paths.runs_dir(), "777001")
+    File.mkdir_p!(run_dir)
+    spec = %{root: root, run_dir: run_dir, writable: [], network: :none}
+
+    profile = SandboxExec.profile(spec)
+    assert profile =~ ~s{(deny mach-lookup (global-name "com.apple.coreservices.launchservicesd")}
+    assert profile =~ "com.apple.coreservices.appleevents"
+
+    ["/usr/bin/sandbox-exec", "-f", path | _] = SandboxExec.wrap(["true"], spec)
+    assert Path.dirname(path) == Paths.sandbox_dir()
+    refute File.exists?(Path.join(run_dir, "sandbox.sb"))
   end
 
   test "path-resolving tools like SQLite work inside the sandbox" do

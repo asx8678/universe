@@ -18,9 +18,11 @@ defmodule Universe.Worker do
   instead: no code-running tools, file tools confined to the project, writes
   only to its leases (permission rules), and `.universe/` denied.
 
-  Files in `.universe/runs/<id>/`: the code file, `stdout`, `stderr`,
-  `sandbox.sb`, `token`. Output goes to disk in full; events carry it only up
-  to the `out_kb` budget per stream.
+  Files in `.universe/runs/<id>/`: the code file, `stdout`, `stderr`, `token`
+  (the sandbox profile is in `.universe/sandbox/<id>.sb`, where the worker
+  can't edit it). Output goes to disk up to `max_output_bytes` per stream
+  (64 MB by default; the BEAM writes these files, so the launcher's file-size
+  limit doesn't cover them); events carry it only up to the `out_kb` budget.
 
   When the process ends the worker appends an `exit` event, then sends
   `{:worker_exit, id, summary}` to its `:notify` pid.
@@ -43,6 +45,7 @@ defmodule Universe.Worker do
   @line_max 300
   # Output events: a partial line waits this long, or up to this size.
   @flush_ms 200
+  @max_output_bytes 64 * 1024 * 1024
   @pending_max 4096
   @default_fsize 1_073_741_824
 
@@ -131,6 +134,11 @@ defmodule Universe.Worker do
       kill_reason: nil,
       files: %{},
       emitted: %{stdout: 0, stderr: 0},
+      # Bytes written to the stdout/stderr files; :full once over the cap.
+      written: %{stdout: 0, stderr: 0},
+      disk_cap:
+        Map.get(spec, :max_output_bytes) ||
+          Application.get_env(:universe, :max_output_bytes, @max_output_bytes),
       truncated: %{stdout: false, stderr: false},
       partial: %{stdout: "", stderr: ""},
       # Output not yet logged: events carry whole lines (see output/3).
@@ -193,23 +201,43 @@ defmodule Universe.Worker do
           socket: Universe.SDK.Listener.socket_path()
         }
 
-        argv = if state.lang == "agent", do: argv, else: Isolation.adapter().wrap(argv, spec)
+        case Isolation.check_writable(spec) do
+          {:error, reason} ->
+            finish(state, %{
+              "status" => "failed",
+              "code" => nil,
+              "signal" => nil,
+              "reason" => reason
+            })
 
-        args =
-          ["--fsize", Integer.to_string(fsize()), "--grace", Integer.to_string(@grace_ms), "--"] ++
-            env_args(state) ++ argv
+          :ok ->
+            argv = if state.lang == "agent", do: argv, else: Isolation.adapter().wrap(argv, spec)
 
-        port =
-          Port.open({:spawn_executable, launcher()}, [
-            :binary,
-            {:packet, 4},
-            :use_stdio,
-            args: args,
-            cd: root
-          ])
+            args =
+              [
+                "--fsize",
+                Integer.to_string(fsize()),
+                "--grace",
+                Integer.to_string(@grace_ms),
+                "--"
+              ] ++
+                argv
 
-        if state.wall_s, do: Process.send_after(self(), :wall_budget, state.wall_s * 1000)
-        {:noreply, %{state | port: port}}
+            # The environment goes through the port, not the command line, so
+            # secrets never show in `ps`.
+            port =
+              Port.open({:spawn_executable, launcher()}, [
+                :binary,
+                {:packet, 4},
+                :use_stdio,
+                args: args,
+                cd: root,
+                env: port_env(state)
+              ])
+
+            if state.wall_s, do: Process.send_after(self(), :wall_budget, state.wall_s * 1000)
+            {:noreply, %{state | port: port}}
+        end
     end
   end
 
@@ -235,6 +263,13 @@ defmodule Universe.Worker do
   def handle_info({port, {:data, <<"P", pid::32>>}}, %{port: port} = state) do
     if state.mem_mb, do: Universe.GC.watch_memory(state.id, pid, state.mem_mb)
     {:noreply, %{state | os_pid: pid}}
+  end
+
+  # GC restarted (and lost its table): register this worker's group again.
+  def handle_info(:rewatch_memory, %{os_pid: pid, mem_mb: mb, done: false} = state)
+      when is_integer(pid) and is_integer(mb) do
+    Universe.GC.watch_memory(state.id, pid, mb)
+    {:noreply, state}
   end
 
   def handle_info({port, {:data, <<"O", chunk::binary>>}}, %{port: port} = state),
@@ -316,33 +351,43 @@ defmodule Universe.Worker do
     end
   end
 
-  defp env_args(state) do
+  # Exactly the worker's variables: everything the daemon inherited is
+  # unset (as `env -i` did), then the worker's own are set.
+  defp port_env(state) do
+    own = env_pairs(state)
+    keep = MapSet.new(own, &elem(&1, 0))
+
+    unset =
+      for {k, _} <- System.get_env(),
+          not MapSet.member?(keep, k),
+          do: {String.to_charlist(k), false}
+
+    unset ++ Enum.map(own, fn {k, v} -> {String.to_charlist(k), String.to_charlist(v)} end)
+  end
+
+  defp env_pairs(state) do
     secrets = if state.kind == "serve" and state.service, do: Secrets.env(state.service), else: []
 
     # claude finds your login through HOME and USER (keychain).
     home =
       if state.lang == "agent",
         do: [
-          "HOME=#{System.user_home!()}",
-          "USER=#{System.get_env("USER", "")}",
-          "UNIVERSE_AGENT_CONFIG=#{Path.join(state.run_dir, "agent.json")}"
+          {"HOME", System.user_home!()},
+          {"USER", System.get_env("USER", "")},
+          {"UNIVERSE_AGENT_CONFIG", Path.join(state.run_dir, "agent.json")}
         ],
-        else: ["HOME=#{Path.join(state.run_dir, "home")}"]
+        else: [{"HOME", Path.join(state.run_dir, "home")}]
 
-    [
-      "/usr/bin/env",
-      "-i",
-      "PATH=#{System.get_env("PATH", "/usr/bin:/bin")}"
-    ] ++
+    [{"PATH", System.get_env("PATH", "/usr/bin:/bin")}] ++
       home ++
       [
-        "TMPDIR=#{Path.join(state.run_dir, "tmp")}",
-        "LANG=en_US.UTF-8",
-        "UNIVERSE_ID=#{state.id}",
-        "UNIVERSE_RUN_DIR=#{state.run_dir}",
-        "UNIVERSE_SOCK=#{Universe.SDK.Listener.socket_path()}",
-        "UNIVERSE_TOKEN_FILE=#{Path.join(state.run_dir, "token")}"
-      ] ++ Enum.map(secrets, fn {k, v} -> "#{k}=#{v}" end)
+        {"TMPDIR", Path.join(state.run_dir, "tmp")},
+        {"LANG", "en_US.UTF-8"},
+        {"UNIVERSE_ID", Integer.to_string(state.id)},
+        {"UNIVERSE_RUN_DIR", state.run_dir},
+        {"UNIVERSE_SOCK", Universe.SDK.Listener.socket_path()},
+        {"UNIVERSE_TOKEN_FILE", Path.join(state.run_dir, "token")}
+      ] ++ secrets
   end
 
   ## Output
@@ -353,7 +398,7 @@ defmodule Universe.Worker do
   # partial line is held one round and then logged anyway, so a prompt with
   # no newline still shows. Everything left is flushed before exit.
   defp output(state, stream, chunk) do
-    :ok = :file.write(state.files[stream], chunk)
+    state = write_disk(state, stream, chunk)
     state = track_lines(state, stream, chunk)
     state = update_in(state.pending[stream], &(&1 <> chunk))
 
@@ -366,6 +411,41 @@ defmodule Universe.Worker do
       do: state,
       else:
         put_in(state.flush_timer[stream], Process.send_after(self(), {:flush, stream}, @flush_ms))
+  end
+
+  # The output files stop at max_output_bytes per stream (or at the first
+  # write error, a full disk): one note, then nothing more is written.
+  defp write_disk(%{written: written} = state, stream, chunk) do
+    case written[stream] do
+      :full ->
+        state
+
+      n ->
+        cap = state.disk_cap
+        part = binary_part(chunk, 0, max(min(byte_size(chunk), cap - n), 0))
+
+        result = if part == "", do: :ok, else: :file.write(state.files[stream], part)
+
+        cond do
+          result != :ok ->
+            disk_note(state, stream, "could not write #{stream} to disk (#{inspect(result)})")
+
+          byte_size(part) < byte_size(chunk) ->
+            disk_note(
+              state,
+              stream,
+              "#{stream} past #{div(cap, 1_048_576)} MB is not kept on disk"
+            )
+
+          true ->
+            put_in(state.written[stream], n + byte_size(part))
+        end
+    end
+  end
+
+  defp disk_note(state, stream, note) do
+    event(state, Atom.to_string(stream), %{"truncated" => true, "note" => note})
+    put_in(state.written[stream], :full)
   end
 
   # Logs the pending lines; the trailing partial line too when `all?`.

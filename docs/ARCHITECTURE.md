@@ -241,7 +241,8 @@ flowchart LR
 .universe/
   port, token            how the CLI reaches this daemon (token mode 0600)
   log/events.jsonl       every event, append-only (redacted)
-  runs/<id>/             a worker's code, stdout, stderr, sandbox.sb, token
+  runs/<id>/             a worker's code, stdout, stderr (64 MB cap each), token
+  sandbox/<id>.sb        a worker's Seatbelt profile (outside the run dir: workers can't edit it)
   handles/<id>/          stored values: <name>.json + <name>.meta.json
   agents/<name>.json     an agent's saved session ID (+ .usage.jsonl)
   secrets/<service>.env  per-service secrets, never readable by workers

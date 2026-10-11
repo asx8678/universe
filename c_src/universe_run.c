@@ -160,13 +160,22 @@ int main(int argc, char *argv[])
 
         int rc = poll(fds, 3, 50);
         if (rc < 0 && errno != EINTR) {
+            /* Can't watch the child any more: kill the group and report the
+               real end, never a made-up exit 0. */
             perror("universe_run: poll");
+            if (alive) {
+                signal_group(SIGKILL);
+                waitpid(child, &status, 0);
+                alive = 0;
+            }
             break;
         }
 
         if (fds[0].fd >= 0 && (fds[0].revents & (POLLIN | POLLHUP))) {
             ssize_t n = read(STDIN_FILENO, inbuf + inlen, sizeof(inbuf) - inlen);
-            if (n <= 0) {
+            if (n < 0 && (errno == EINTR || errno == EAGAIN)) {
+                n = 0; /* interrupted: try again next round */
+            } else if (n <= 0) {
                 signal_group(SIGKILL);
                 waitpid(child, NULL, 0);
                 return 0;
@@ -206,11 +215,19 @@ int main(int argc, char *argv[])
         if (alive && kill_at >= 0 && now_ms() >= kill_at)
             signal_group(SIGKILL);
 
-        if (alive && waitpid(child, &status, WNOHANG) == child) {
-            alive = 0;
-            /* Reap leftovers so their pipe ends close; then drain briefly. */
-            killpg(child, SIGKILL);
-            drain_until = now_ms() + 1000;
+        if (alive) {
+            /* Peek without reaping: while the exited leader is a zombie its
+               pid (the group id) can't be reused, so killing the leftovers
+               can't hit an unrelated new group. Then reap it. */
+            siginfo_t si;
+            memset(&si, 0, sizeof si);
+            if (waitid(P_PID, (id_t) child, &si, WEXITED | WNOHANG | WNOWAIT) == 0 &&
+                si.si_pid == child) {
+                killpg(child, SIGKILL);
+                waitpid(child, &status, 0);
+                alive = 0;
+                drain_until = now_ms() + 1000;
+            }
         }
     }
 

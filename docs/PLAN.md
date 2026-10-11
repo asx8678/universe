@@ -77,7 +77,7 @@ put more of what the model needs in digest lines so it calls `inspect` less.
 ### Decision 1: isolation runs on macOS first, behind an adapter (recommended default)
 - Add the behaviour `Universe.Isolation` with `wrap(cmd, args, profile, opts) :: {cmd, args, env}` and `limits(profile)`.
 - Adapters:
-  - `Universe.Isolation.SandboxExec` (**v1 default on macOS**). It generates a Seatbelt `.sb` profile per run into `.universe/runs/<id>/sandbox.sb`:
+  - `Universe.Isolation.SandboxExec` (**v1 default on macOS**). It generates a Seatbelt `.sb` profile per run into `.universe/sandbox/<id>.sb` (moved out of the worker-writable run dir):
     - snippet: `(deny default)`, allow process-exec and file-read for the project and toolchains, allow `file-write*` only on leased subpaths, `.universe/runs/<id>/` and the SDK socket, `(deny network*)` except the Unix socket.
     - service: the same, plus `(allow network-outbound (remote ip "<host>:<port>"))` for each allowed host.
   - `Universe.Isolation.Box` (Linux, later). `box` is probably prologic/box: Linux namespaces plus cgroups.

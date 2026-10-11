@@ -137,5 +137,14 @@ size = os.path.getsize(out) if os.path.exists(out) else -1
 check("fsize: file capped at the limit", 0 <= size <= 100000, f"size={size} exit={exit_of(pk)}")
 p.wait()
 
+# 7. when the main process exits, what it left behind in its group dies
+marker = os.path.join(tmp, "leftover")
+p = start(["sh", "-c", f"sleep 30 & echo $! > {marker}; exit 5"])
+pk = packets(p)
+left = int(open(marker).read().strip()) if os.path.exists(marker) else None
+check("exit: code of the main process", exit_of(pk) == (5, 0), str(exit_of(pk)))
+check("exit: leftovers in the group are killed", left is not None and wait_gone([left]) == [], str(left))
+p.wait()
+
 print(f"\n{'PASS' if not failures else 'FAIL'}: {len(failures)} failing")
 sys.exit(1 if failures else 0)

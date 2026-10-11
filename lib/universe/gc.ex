@@ -38,6 +38,12 @@ defmodule Universe.GC do
   @impl true
   def init(_opts) do
     :ets.new(@mem_table, [:set, :public, :named_table])
+
+    # After a GC restart the table is new: live workers register again, so
+    # no memory budget is silently dropped.
+    for pid <- Registry.select(Universe.Registry, [{{:_, :"$1", :_}, [], [:"$1"]}]),
+        do: send(pid, :rewatch_memory)
+
     Process.send_after(self(), :mem, @mem_ms)
     Process.send_after(self(), :sweep, @sweep_ms)
     {:ok, %{}}
@@ -48,7 +54,7 @@ defmodule Universe.GC do
 
   @impl true
   def handle_info(:mem, state) do
-    check_memory()
+    guarded(:memory, &check_memory/0)
     Process.send_after(self(), :mem, @mem_ms)
     {:noreply, state}
   end
@@ -57,6 +63,17 @@ defmodule Universe.GC do
     sweep()
     Process.send_after(self(), :sweep, @sweep_ms)
     {:noreply, state}
+  end
+
+  # One failing step (a file a worker made undeletable, a ps hiccup) must not
+  # take GC down: a restart would also cost every memory watch until re-sent.
+  defp guarded(step, fun) do
+    fun.()
+  rescue
+    e ->
+      require Logger
+      Logger.warning("gc #{step} failed: #{Exception.message(e)}")
+      []
   end
 
   defp check_memory do
@@ -85,7 +102,10 @@ defmodule Universe.GC do
   end
 
   defp sweep do
-    %{idle: reap_idle_services(), run_dirs: prune_run_dirs()}
+    %{
+      idle: guarded(:idle, &reap_idle_services/0),
+      run_dirs: guarded(:run_dirs, &prune_run_dirs/0)
+    }
   end
 
   defp reap_idle_services do
@@ -116,14 +136,30 @@ defmodule Universe.GC do
             not MapSet.member?(live, id),
             dir = Path.join(Paths.runs_dir(), entry),
             {:ok, %File.Stat{mtime: mtime}} <- [File.stat(dir, time: :posix)],
-            mtime < cutoff do
-          File.rm_rf!(dir)
+            mtime < cutoff,
+            :ok <- [remove(dir)] do
           EventLog.append("gc", id: id, data: %{"action" => "prune_run_dir"})
           id
         end
 
       {:error, _} ->
         []
+    end
+  end
+
+  # A worker may have left directories without permissions (chmod 000):
+  # give them back, then delete; a failure is logged and retried next sweep.
+  defp remove(dir) do
+    System.cmd("chmod", ["-R", "u+rwx", dir], stderr_to_stdout: true)
+
+    case File.rm_rf(dir) do
+      {:ok, _} ->
+        :ok
+
+      {:error, reason, path} ->
+        require Logger
+        Logger.warning("gc could not delete #{path}: #{inspect(reason)}")
+        :error
     end
   end
 end

@@ -15,6 +15,7 @@ defmodule Universe.WorkerTest do
       code: code,
       budget: Map.merge(%{wall_s: 30, out_kb: 256}, Map.new(Keyword.get(opts, :budget, []))),
       leases: Keyword.get(opts, :leases, []),
+      max_output_bytes: Keyword.get(opts, :max_output_bytes),
       notify: self()
     }
 
@@ -78,6 +79,21 @@ defmodule Universe.WorkerTest do
   test "the worker's own HOME shows as ~/ in last lines" do
     s = await(start("echo \"$HOME/.ssh\"; exit 1"))
     assert s["last_out"] == "~/.ssh"
+  end
+
+  test "output files stop at max_output_bytes; the process is not stopped for it" do
+    id =
+      start("head -c 50000 /dev/zero | tr '\\0' 'x'; echo; echo after", max_output_bytes: 10_000)
+
+    assert %{"status" => "done", "last_out" => "after"} = await(id)
+
+    assert File.stat!(Path.join(Worker.run_dir(id), "stdout")).size == 10_000
+    :ok = EventLog.sync()
+
+    assert Enum.any?(
+             EventLog.for_id(id),
+             &(&1["type"] == "stdout" and &1["data"]["note"] =~ "not kept on disk")
+           )
   end
 
   test "non-zero exit is failed, with the code" do

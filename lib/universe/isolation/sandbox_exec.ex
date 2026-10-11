@@ -1,7 +1,8 @@
 defmodule Universe.Isolation.SandboxExec do
   @moduledoc """
   macOS Seatbelt via `/usr/bin/sandbox-exec`. Writes a profile per run to
-  `<run_dir>/sandbox.sb`.
+  `.universe/sandbox/<id>.sb`, which no worker can write (a profile in the
+  worker's own run directory could be edited before a restart reads it).
 
     * reads: everything except `$HOME`; the project and the SDK directory are
       re-allowed, but `.universe/` is denied apart from the worker's own run
@@ -25,10 +26,22 @@ defmodule Universe.Isolation.SandboxExec do
 
   @sandbox_exec "/usr/bin/sandbox-exec"
   @local_hosts ["localhost", "127.0.0.1", "::1", "[::1]"]
+  # Ways out of the sandbox through other processes: starting apps
+  # (LaunchServices) and scripting them (Apple Events). Probed on macOS 27:
+  # `open` and `launchctl submit` already fail from a worker and
+  # appleevent-send is denied by `(deny default)`; these denies keep it so
+  # even if a later macOS changes one of those.
+  @denied_services [
+    "com.apple.coreservices.launchservicesd",
+    "com.apple.coreservices.appleevents",
+    "com.apple.coreservices.quarantine-resolver"
+  ]
 
   @impl true
   def wrap(argv, spec) do
-    path = Path.join(spec.run_dir, "sandbox.sb")
+    dir = Universe.Paths.sandbox_dir(spec.root)
+    File.mkdir_p!(dir)
+    path = Path.join(dir, Map.get(spec, :profile, Path.basename(spec.run_dir)) <> ".sb")
     File.write!(path, profile(spec))
     [@sandbox_exec, "-f", path | argv]
   end
@@ -49,6 +62,7 @@ defmodule Universe.Isolation.SandboxExec do
     (version 1)
     (deny default)
     (allow process-exec process-fork sysctl-read mach-lookup ipc-posix-shm iokit-open)
+    (deny mach-lookup #{Enum.map_join(@denied_services, " ", &~s{(global-name "#{&1}")})})
     (allow signal (target same-sandbox))
 
     (allow file-read*)

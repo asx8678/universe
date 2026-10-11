@@ -24,6 +24,8 @@ defmodule Universe.Paths do
   def handles_dir(root \\ project_root()), do: Path.join(universe_dir(root), "handles")
   def tools_dir(root \\ project_root()), do: Path.join(universe_dir(root), "tools")
   def secrets_dir(root \\ project_root()), do: Path.join(universe_dir(root), "secrets")
+  # Sandbox profiles: outside every run directory, so no worker can edit one.
+  def sandbox_dir(root \\ project_root()), do: Path.join(universe_dir(root), "sandbox")
 
   @doc "Reads the persisted port, or nil when `mix universe.init` has not run."
   def read_port(root \\ project_root()) do

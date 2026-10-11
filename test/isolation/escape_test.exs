@@ -33,6 +33,49 @@ defmodule Universe.Isolation.EscapeTest do
     %{root: root, lease: lease}
   end
 
+  test "a lease through a symlink that leaves the project is refused", %{root: root, lease: lease} do
+    outside =
+      Path.join(System.tmp_dir!(), "universe-outside-#{System.unique_integer([:positive])}")
+
+    File.mkdir_p!(outside)
+    on_exit(fn -> File.rm_rf(outside) end)
+
+    # A worker with a lease on `lease` plants a symlink inside it...
+    {status, _, _} = attempt("ln -s #{outside} #{lease}/x", %{"leases" => [lease]})
+    assert status == "done"
+
+    # ...and a later lease on that path must not open the target for writing.
+    {status, _, text} = attempt("echo pwned > #{lease}/x/owned", %{"leases" => ["#{lease}/x"]})
+    assert status == "failed"
+    assert text =~ "resolves outside the project"
+    refute File.exists?(Path.join(outside, "owned"))
+    assert File.exists?(Path.join(root, lease))
+  end
+
+  test "secrets and the environment never appear on a command line" do
+    name = uniq("envsvc")
+    File.mkdir_p!(Paths.secrets_dir())
+    secret = "sk-ps-#{System.unique_integer([:positive])}"
+    File.write!(Path.join(Paths.secrets_dir(), "#{name}.env"), "API_KEY=#{secret}\n")
+
+    code = "import time\nU.serve(#{inspect(name)}, {'ping': lambda: 'pong'}, '')"
+    d = %{"op" => "serve", "label" => name, "lang" => "python", "code" => code}
+    API.tick(%{"directives" => [d], "wait" => %{"ids" => [name], "timeout_s" => 15}})
+
+    {ps, 0} = System.cmd("ps", ["-axww", "-o", "command"])
+    refute ps =~ secret
+
+    # This project's worker processes carry no environment on their command line.
+    ours = ps |> String.split("\n") |> Enum.filter(&String.contains?(&1, Paths.project_root()))
+    assert ours != []
+    refute Enum.any?(ours, &(&1 =~ "UNIVERSE_TOKEN_FILE="))
+
+    API.tick(%{
+      "directives" => [%{"op" => "kill", "target" => name}],
+      "wait" => %{"ids" => [name], "timeout_s" => 10}
+    })
+  end
+
   test "writing outside the lease fails", %{root: root, lease: lease} do
     {status, _, _} = attempt("echo pwned > src/victim.txt", %{"leases" => [lease]})
     assert status == "failed"

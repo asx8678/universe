@@ -45,6 +45,31 @@ defmodule Universe.Isolation do
   end
 
   @doc """
+  Checks that every writable path, with symlinks resolved, is inside the
+  project and outside `.universe/`. Lease names are checked as text when
+  they are accepted, but a symlink a worker made since (`ln -s ~/.ssh out/x`,
+  then a lease on `out/x`) could point anywhere.
+  """
+  def check_writable(spec) do
+    root = realpath(spec.root)
+    universe = Path.join(root, ".universe")
+
+    case Enum.find(spec.writable, &(not inside?(realpath(&1), root, universe))) do
+      nil ->
+        :ok
+
+      path ->
+        {:error,
+         "lease #{Path.relative_to(path, spec.root)} resolves outside the project (#{realpath(path)})"}
+    end
+  end
+
+  defp inside?(path, root, universe) do
+    (path == root or String.starts_with?(path, root <> "/")) and
+      not (path == universe or String.starts_with?(path, universe <> "/"))
+  end
+
+  @doc """
   Resolves symlinks in every existing component of `path`, so sandbox rules
   match what the kernel sees (`/tmp` is `/private/tmp` on macOS). Components
   that don't exist yet are appended as given.
