@@ -42,7 +42,7 @@ defmodule Universe.Worker do
   @grace_ms 2_000
   @line_max 300
   # Output events: a partial line waits this long, or up to this size.
-  @flush_ms 300
+  @flush_ms 200
   @pending_max 4096
   @default_fsize 1_073_741_824
 
@@ -276,7 +276,7 @@ defmodule Universe.Worker do
   end
 
   def handle_info({:flush, stream}, %{done: false} = state),
-    do: {:noreply, state |> put_in([:flush_timer, stream], nil) |> flush(stream)}
+    do: {:noreply, state |> put_in([:flush_timer, stream], nil) |> flush_round(stream)}
 
   def handle_info(_msg, state), do: {:noreply, state}
 
@@ -347,41 +347,54 @@ defmodule Universe.Worker do
 
   ## Output
 
-  # Output events carry whole lines: a chunk is logged up to its last
-  # newline and the rest waits for more, at most @flush_ms (a prompt with no
-  # newline still shows) or @pending_max bytes, and is flushed before exit.
+  # Output is logged in batches of whole lines: at most one event per stream
+  # every @flush_ms (a process that flushes every print would otherwise log
+  # one event per line), sooner when @pending_max bytes are waiting. A
+  # partial line is held one round and then logged anyway, so a prompt with
+  # no newline still shows. Everything left is flushed before exit.
   defp output(state, stream, chunk) do
     :ok = :file.write(state.files[stream], chunk)
     state = track_lines(state, stream, chunk)
-    buffered = state.pending[stream] <> chunk
+    state = update_in(state.pending[stream], &(&1 <> chunk))
+
+    state =
+      if byte_size(state.pending[stream]) >= @pending_max,
+        do: emit_lines(state, stream, false),
+        else: state
+
+    if state.pending[stream] == "" or state.flush_timer[stream],
+      do: state,
+      else:
+        put_in(state.flush_timer[stream], Process.send_after(self(), {:flush, stream}, @flush_ms))
+  end
+
+  # Logs the pending lines; the trailing partial line too when `all?`.
+  defp emit_lines(state, stream, all?) do
+    pending = state.pending[stream]
 
     {ready, rest} =
-      case :binary.matches(buffered, "\n") do
-        [] -> {"", buffered}
-        matches -> buffered |> :erlang.split_binary(elem(List.last(matches), 0) + 1)
+      case :binary.matches(pending, "\n") do
+        _ when all? -> {pending, ""}
+        [] -> {pending, ""}
+        matches -> :erlang.split_binary(pending, elem(List.last(matches), 0) + 1)
       end
 
-    {ready, rest} =
-      if byte_size(rest) > @pending_max, do: {ready <> rest, ""}, else: {ready, rest}
-
     state = put_in(state.pending[stream], rest)
-    state = if ready == "", do: state, else: emit(state, stream, ready)
+    if ready == "", do: state, else: emit(state, stream, ready)
+  end
 
-    cond do
-      rest == "" or state.flush_timer[stream] ->
-        state
+  # Timer: whole lines go out; a partial line alone (no newline since the
+  # last round) goes out too.
+  defp flush_round(state, stream) do
+    state = emit_lines(state, stream, false)
 
-      true ->
+    if state.pending[stream] == "",
+      do: state,
+      else:
         put_in(state.flush_timer[stream], Process.send_after(self(), {:flush, stream}, @flush_ms))
-    end
   end
 
-  defp flush(state, stream) do
-    case state.pending[stream] do
-      "" -> state
-      rest -> state |> put_in([:pending, stream], "") |> emit(stream, rest)
-    end
-  end
+  defp flush(state, stream), do: emit_lines(state, stream, true)
 
   defp emit(state, stream, chunk) do
     emitted = state.emitted[stream]

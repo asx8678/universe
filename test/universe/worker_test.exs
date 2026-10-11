@@ -48,7 +48,31 @@ defmodule Universe.WorkerTest do
 
     texts = for e <- EventLog.for_id(id), e["type"] == "stdout", do: e["data"]["text"]
     assert Enum.join(texts) == "half and half\nno newline"
-    assert "half and half\n" in texts
+    refute "half " in texts
+  end
+
+  test "a process printing line by line is logged in a few batches" do
+    id =
+      start("import sys\nfor i in range(2000):\n    print('line', i, flush=True)", lang: "python")
+
+    await(id)
+    :ok = EventLog.sync()
+
+    texts = for e <- EventLog.for_id(id), e["type"] == "stdout", do: e["data"]["text"]
+    assert length(texts) < 25
+    assert Enum.join(texts) == File.read!(Path.join(Worker.run_dir(id), "stdout"))
+    assert Enum.all?(texts, &String.ends_with?(&1, "\n"))
+  end
+
+  test "a prompt without a newline still shows while the process waits" do
+    id = start("printf 'Continue? '; sleep 1.5")
+    Process.sleep(900)
+    :ok = EventLog.sync()
+
+    assert [%{"data" => %{"text" => "Continue? "}}] =
+             Enum.filter(EventLog.for_id(id), &(&1["type"] == "stdout"))
+
+    await(id)
   end
 
   test "the worker's own HOME shows as ~/ in last lines" do
