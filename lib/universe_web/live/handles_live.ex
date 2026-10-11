@@ -109,7 +109,7 @@ defmodule UniverseWeb.HandlesLive do
                 {length(g.handles)} · {Handles.human_bytes(g.bytes)}
               </span>
             </summary>
-            <table class="w-full table-fixed border-t border-base-300 text-sm">
+            <table class="w-full border-t border-base-300 text-sm">
               <tbody>
                 <tr
                   :for={h <- g.handles}
@@ -122,7 +122,7 @@ defmodule UniverseWeb.HandlesLive do
                   phx-click="preview"
                   phx-value-handle={h["handle"]}
                 >
-                  <td class={[td_class(), "w-56 max-w-56 truncate font-mono text-xs"]}>
+                  <td class={[td_class(), "w-56 font-mono text-xs break-all"]}>
                     {name(h["handle"])}
                   </td>
                   <td class={[td_class(), "w-20 whitespace-nowrap text-xs text-muted"]}>

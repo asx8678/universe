@@ -47,6 +47,12 @@ defmodule UniverseWeb.ObserverPagesTest do
     assert html =~ label
     {:ok, _view, html} = live(conn, ~p"/replay/nope.jsonl")
     assert html =~ "no log named"
+
+    # Picking a file from the list patches to it.
+    {:ok, view, _html} = live(conn, ~p"/replay")
+    view |> element("#replay-files a", "events.jsonl") |> render_click()
+    assert_patch(view, ~p"/replay/events.jsonl")
+    assert render(view) =~ label
   end
 
   test "stop all kills live workers and reports it", %{conn: conn} do

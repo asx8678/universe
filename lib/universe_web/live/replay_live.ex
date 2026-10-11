@@ -11,23 +11,26 @@ defmodule UniverseWeb.ReplayLive do
   alias Universe.Paths
 
   @impl true
-  def mount(params, _session, socket) do
-    files = log_files()
+  def mount(_params, _session, socket),
+    do: {:ok, assign(socket, page_title: "Replay", files: log_files())}
 
+  # Picking a file patches the URL, so the file is read here, not in mount.
+  @impl true
+  def handle_params(params, _uri, socket) do
     socket =
       case params["file"] do
         nil ->
           assign(socket, file: nil, ticks: [], error: nil)
 
         file ->
-          if file in files do
+          if file in socket.assigns.files do
             assign(socket, file: file, ticks: ticks_from_events(read(file)), error: nil)
           else
             assign(socket, file: file, ticks: [], error: "no log named #{file}")
           end
       end
 
-    {:ok, assign(socket, page_title: "Replay", files: files)}
+    {:noreply, socket}
   end
 
   defp log_files do
