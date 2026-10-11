@@ -133,3 +133,110 @@ Ran Oct 11, 2026: **NO-GO** (agents won 1 of 2 tasks; go needed both). See
 Per the rule: keep agent workers as an option; subagents stay the default
 way to delegate. The cheapest lever on the losing task is orchestrator
 turns, not helper tokens.
+
+# M7 acceptance: does the orchestrator build, wire and steer helpers?
+
+Fixed Oct 11, 2026, **before** any run. Not a benchmark: one setup is scored,
+a reference arm is only reported.
+
+## Task (`triage`, fixture `fixtures/triage/`, made by `gen_triage.py`)
+
+Triage 600 open support tickets in a SQLite database of 3,000 customers,
+~13.5 k orders and ~7 k tickets, and write `triage.md`
+(`id. category | priority | next action`). The prompt says nothing about
+helpers, agents or services.
+
+- **Category** is judgment over free text. Each open ticket was written once
+  by sonnet (`write_tickets.py`) from a seeded spec: one real problem, other
+  categories' vocabulary in passing (resolved past problems, asides), ten
+  personas, 500-1,200 chars, ~10 % stating the problem only at the end.
+- **Priority** needs per-customer lookups (other unresolved tickets, 90-day
+  spend, refunds, sign-up date).
+- **Volume** is what makes helpers the right call: ~600 × ~850 chars is
+  ~130 k tokens of text, too much to page into the orchestrator's own context
+  sensibly (at 240 it was ~55 k, which an orchestrator can just read).
+
+Gates the fixture passed before any run (`audit_triage.py`, Oct 11, 2026):
+
+- clarity: haiku, reading each ticket with the definitions and the
+  chargeback rule, agrees with all 600 labels (gate ≥ 99 %);
+- regex: sonnet, given 50 labelled open tickets, wrote a keyword/regex
+  classifier with aside and negation filtering
+  (`graders/triage_regex_gate_{1,2}.py`): 93.0 % and 85.2 % of categories on
+  two samples (gate ≤ 93 %), 17 and 13 chargeback errors on 52 positives
+  (gate ≥ 5), so a regex-only route fails the 100 % priority bar;
+- history: naive Bayes trained on the 6,000 closed tickets with categories
+  (which the model can read) gets 60.3 % (gate ≤ 93 %).
+
+The first regex sample cleared the original 90 % category bar, so the bar
+was raised to 95 % before any run: haiku reading the tickets gets 100 %,
+leaving room for agents working through long slices; a regex has to beat
+what one tuned on labelled open tickets managed.
+
+**Pilot, Oct 11, 2026 (why the task changed).** The first fixture (240
+tickets from template sentences) was solved by a sonnet orchestrator in
+48 s and 11 turns with no helpers: it read one dump of all tickets, spotted
+the templates and wrote an exact-phrase regex (240/240), then applied the
+chargeback rule with a `chargeback|disput` regex (26/26). Under the skill's
+"don't build for one-off work" that was the right call, so the task, not the
+teaching, was changed.
+
+Mid-run, the harness sends a second user message (stream-json stdin): any
+ticket that mentions a chargeback (filed or threatened, by name or as asking
+the bank or card issuer to reverse the payment) is `urgent`, for every
+ticket including ones already triaged. About half of those tickets never
+use the words "chargeback" or "dispute", so re-checking done tickets takes
+reading, not a regex. It goes 8 s after the first agent task starts (the
+model reads it when its current tick returns, while tasks still run), else
+at 4 min, else right after the first answer. Whether an agent task was in
+flight when it went in is recorded per run.
+
+Grader (`graders/triage.py`, answers outside the fixture): every open ticket
+exactly once, every priority right (chargeback rule included), ≥ 95 % of
+categories right.
+
+## Setups
+
+- **accept** (scored): plugin + daemon, `Agent`/`Task` disallowed, Opus 5.5
+  orchestrator (claude's default), helper model left to the orchestrator.
+  3 runs; 5 if they split 2–1 or 1–2. `--max-budget-usd 25` per run, 30 min.
+- **plain** (reference, unscored, after the accept runs): Claude Code with
+  its own tools including `Agent`, no plugin, same prompt and mid-run
+  message, 3 runs.
+- `Skill` is allowed, so the plugin's skill can load. It was not in the
+  M4-M6 allow-lists: those runs tried to load it and were denied (one
+  `permission_denied` each), so they ran on the tick description and
+  SessionStart hook alone.
+- Pilot first: one accept run with a sonnet orchestrator to check the
+  harness; not counted.
+
+## Criteria (`accept.py`, from the event log and transcript)
+
+- **Built:** an agent served with `services` naming a code service that
+  served in the run.
+- **Wired:** at least one `call` with `via: sdk` under an agent's ID.
+- **Steered:** at least one delivered `steer` event (attempts and rejection
+  reasons reported too). If no agent task was in flight when the mid-run
+  message went in, steering is n/a for that run, not a fail.
+- **Correct:** the grader passes.
+- **Turns:** reported, not gated; M6 took 7–13. Over 15 is flagged, over 25
+  counts as a failure of the run.
+- **Helper tokens:** reported and flagged, not gated. `--max-budget-usd`
+  caps only the orchestrator; agents are separate `claude` processes with
+  no budget flag, bounded by the 30-min kill. Agent sessions grow across
+  tickets and tasks, which is a finding to measure.
+- Also reported: serve and task in one tick, run output `Read` into the
+  main context, helper model, end-of-run main context.
+
+A run **passes** if it is built, wired, correct and within 25 turns.
+**Accepted** if at least 2 of 3 runs pass and at least one run with a steer
+window steered. A run that solves the task without helpers is reported as
+its own finding (compare its cost with the plain arm), not as a pass.
+
+```
+python3 bench/gen_triage.py && python3 bench/write_tickets.py && python3 bench/audit_triage.py
+python3 bench/gen_triage.py
+UNIVERSE_BENCH_OUT=bench/out7 python3 bench/run.py --tasks triage --setups accept --runs 3 --budget 25 --go
+UNIVERSE_BENCH_OUT=bench/out7 python3 bench/run.py --tasks triage --setups plain --runs 3 --budget 25 --go
+python3 bench/accept.py bench/out7/triage.*.jsonl
+```

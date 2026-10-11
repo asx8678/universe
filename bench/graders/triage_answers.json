@@ -1,0 +1,3002 @@
+{
+ "11111": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "high"
+ },
+ "11112": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11113": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11114": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11115": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11116": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11117": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11118": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11119": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11120": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11121": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11122": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11123": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11124": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11125": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11126": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11127": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11128": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11129": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11130": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11131": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11132": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11133": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11134": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11135": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11136": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11137": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11138": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11139": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11140": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11141": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11142": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11143": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11144": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11145": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11146": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11147": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11148": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11149": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11150": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11151": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11152": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11153": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11154": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11155": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11156": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11157": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11158": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11159": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11160": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11161": {
+  "category": "billing",
+  "chargeback": true,
+  "priority": "medium"
+ },
+ "11162": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11163": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11164": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11165": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11166": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11167": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11168": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11169": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "high"
+ },
+ "11170": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11171": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11172": {
+  "category": "billing",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11173": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11174": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11175": {
+  "category": "billing",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11176": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11177": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11178": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11179": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11180": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11181": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11182": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11183": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11184": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11185": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11186": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11187": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "high"
+ },
+ "11188": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11189": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11190": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11191": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11192": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11193": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11194": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11195": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11196": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11197": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11198": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11199": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11200": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11201": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11202": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11203": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11204": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11205": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11206": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11207": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11208": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11209": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11210": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11211": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11212": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11213": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11214": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11215": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11216": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11217": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11218": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11219": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11220": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11221": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11222": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11223": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11224": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11225": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11226": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11227": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "high"
+ },
+ "11228": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11229": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11230": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11231": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11232": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11233": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11234": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11235": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11236": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11237": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "medium"
+ },
+ "11238": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11239": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11240": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11241": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11242": {
+  "category": "billing",
+  "chargeback": true,
+  "priority": "medium"
+ },
+ "11243": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11244": {
+  "category": "billing",
+  "chargeback": true,
+  "priority": "high"
+ },
+ "11245": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11246": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11247": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11248": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11249": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11250": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11251": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11252": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11253": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "medium"
+ },
+ "11254": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11255": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11256": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11257": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11258": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11259": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11260": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11261": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11262": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11263": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11264": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11265": {
+  "category": "billing",
+  "chargeback": true,
+  "priority": "high"
+ },
+ "11266": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11267": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11268": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11269": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11270": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11271": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11272": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11273": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11274": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11275": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11276": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11277": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11278": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11279": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11280": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11281": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "high"
+ },
+ "11282": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11283": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11284": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11285": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11286": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11287": {
+  "category": "billing",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11288": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11289": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11290": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11291": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11292": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11293": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11294": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11295": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11296": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11297": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11298": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11299": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11300": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11301": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11302": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11303": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11304": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11305": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11306": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11307": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11308": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11309": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11310": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11311": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11312": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11313": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11314": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11315": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11316": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11317": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11318": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11319": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11320": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11321": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11322": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11323": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11324": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11325": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11326": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11327": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11328": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11329": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11330": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11331": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11332": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11333": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11334": {
+  "category": "billing",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11335": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11336": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11337": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11338": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11339": {
+  "category": "billing",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11340": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11341": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11342": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "high"
+ },
+ "11343": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11344": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11345": {
+  "category": "billing",
+  "chargeback": true,
+  "priority": "medium"
+ },
+ "11346": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11347": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11348": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11349": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11350": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11351": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11352": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11353": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11354": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11355": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11356": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11357": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11358": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "high"
+ },
+ "11359": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11360": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11361": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "medium"
+ },
+ "11362": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11363": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11364": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11365": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11366": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11367": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11368": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "medium"
+ },
+ "11369": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11370": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11371": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11372": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11373": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11374": {
+  "category": "billing",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11375": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11376": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11377": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11378": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11379": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11380": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11381": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11382": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11383": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11384": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11385": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11386": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11387": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11388": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11389": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11390": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11391": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11392": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11393": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "high"
+ },
+ "11394": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11395": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11396": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11397": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11398": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11399": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11400": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11401": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11402": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11403": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11404": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11405": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11406": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11407": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11408": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11409": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11410": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11411": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11412": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11413": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11414": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11415": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11416": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11417": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11418": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11419": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11420": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11421": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11422": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11423": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11424": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11425": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11426": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11427": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11428": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11429": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11430": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11431": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11432": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11433": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11434": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11435": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11436": {
+  "category": "billing",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11437": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11438": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11439": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11440": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11441": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11442": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11443": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11444": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11445": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11446": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11447": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11448": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11449": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11450": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11451": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11452": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11453": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11454": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11455": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11456": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11457": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11458": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11459": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11460": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11461": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11462": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11463": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11464": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11465": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11466": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11467": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11468": {
+  "category": "billing",
+  "chargeback": true,
+  "priority": "high"
+ },
+ "11469": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11470": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11471": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11472": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11473": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11474": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "high"
+ },
+ "11475": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11476": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11477": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11478": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11479": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11480": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11481": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11482": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11483": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11484": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11485": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11486": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11487": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11488": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11489": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11490": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11491": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11492": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11493": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11494": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11495": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11496": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11497": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11498": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11499": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11500": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11501": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11502": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11503": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11504": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11505": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11506": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11507": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11508": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11509": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11510": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11511": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11512": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11513": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11514": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11515": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11516": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11517": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11518": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11519": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11520": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11521": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "high"
+ },
+ "11522": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11523": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11524": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11525": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11526": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11527": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11528": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11529": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11530": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11531": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11532": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11533": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11534": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11535": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11536": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11537": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11538": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11539": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11540": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11541": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11542": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11543": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11544": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11545": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "high"
+ },
+ "11546": {
+  "category": "billing",
+  "chargeback": true,
+  "priority": "medium"
+ },
+ "11547": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11548": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11549": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11550": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11551": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11552": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11553": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11554": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11555": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11556": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11557": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11558": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11559": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11560": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11561": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11562": {
+  "category": "billing",
+  "chargeback": true,
+  "priority": "medium"
+ },
+ "11563": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11564": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11565": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11566": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11567": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11568": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11569": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11570": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11571": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11572": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11573": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11574": {
+  "category": "billing",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11575": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11576": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11577": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11578": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11579": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11580": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11581": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11582": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11583": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11584": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11585": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11586": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11587": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11588": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11589": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11590": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11591": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11592": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11593": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11594": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11595": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11596": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11597": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11598": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11599": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11600": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11601": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11602": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11603": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11604": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11605": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11606": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11607": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11608": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11609": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11610": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11611": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11612": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11613": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11614": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11615": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11616": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11617": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11618": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11619": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11620": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11621": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11622": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11623": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11624": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11625": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11626": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11627": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11628": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11629": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11630": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11631": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11632": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11633": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11634": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11635": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11636": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11637": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11638": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11639": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11640": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11641": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11642": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11643": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11644": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11645": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11646": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11647": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11648": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11649": {
+  "category": "billing",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11650": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11651": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11652": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11653": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11654": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11655": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11656": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11657": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11658": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11659": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11660": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11661": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11662": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11663": {
+  "category": "shipping",
+  "chargeback": true,
+  "priority": "low"
+ },
+ "11664": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11665": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11666": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11667": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11668": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11669": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11670": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11671": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11672": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11673": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11674": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11675": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11676": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11677": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11678": {
+  "category": "billing",
+  "chargeback": true,
+  "priority": "high"
+ },
+ "11679": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11680": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11681": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11682": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11683": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11684": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11685": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11686": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11687": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11688": {
+  "category": "billing",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11689": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11690": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11691": {
+  "category": "billing",
+  "chargeback": true,
+  "priority": "high"
+ },
+ "11692": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11693": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11694": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11695": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11696": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11697": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11698": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11699": {
+  "category": "account",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11700": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11701": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "medium"
+ },
+ "11702": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11703": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11704": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11705": {
+  "category": "feature_request",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11706": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11707": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "low"
+ },
+ "11708": {
+  "category": "shipping",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11709": {
+  "category": "bug",
+  "chargeback": false,
+  "priority": "high"
+ },
+ "11710": {
+  "category": "returns",
+  "chargeback": false,
+  "priority": "medium"
+ }
+}

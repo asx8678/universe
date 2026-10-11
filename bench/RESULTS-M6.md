@@ -32,3 +32,9 @@ Model: claude-opus-5-5. Medians per cell; token counts from the API usage in eac
 | qa.subagents.1 | PASS | 45,990 | 1,237,364 | 832,387 | 211 | 16 | 4 | no |
 | qa.subagents.2 | PASS | 41,997 | 1,344,439 | 1,026,411 | 197.9 | 12 | 3 | no |
 | qa.subagents.3 | PASS | 45,288 | 1,767,146 | 1,358,718 | 196.1 | 15 | 4 | no |
+
+**Validity note (added Oct 11, 2026):** the universe/agents setups never
+loaded the plugin's skill. `Skill` was missing from `--allowedTools`, so each
+run's attempt to load it was denied (one `permission_denied` per transcript)
+and the model worked from the tick description and SessionStart hook alone.
+Fixed in `run.py` for later runs; these results were not rerun.

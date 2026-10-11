@@ -1,0 +1,8811 @@
+{
+ "11111": {
+  "category": "shipping",
+  "chargeback": "indirect",
+  "asides": [
+   "account"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Sven",
+  "order": "#103738",
+  "item": "rain jacket",
+  "date": "20 September"
+ },
+ "11112": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "feature_request"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#108143",
+  "item": "backpack",
+  "date": "23 August"
+ },
+ "11113": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#107969",
+  "item": "coffee grinder",
+  "date": "2 September"
+ },
+ "11114": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#100088",
+  "item": "desk lamp",
+  "date": "28 September"
+ },
+ "11115": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 650,
+  "issue_last": true,
+  "first_name": "Eitan",
+  "order": "#109458",
+  "item": "linen shirt",
+  "date": "7 September"
+ },
+ "11116": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "bug"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#113240",
+  "item": "trail shoes",
+  "date": "17 September"
+ },
+ "11117": {
+  "category": "shipping",
+  "chargeback": "direct",
+  "asides": [
+   "feature_request",
+   "account"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#113033",
+  "item": "trail shoes",
+  "date": "24 August"
+ },
+ "11118": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "shipping"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Omar",
+  "order": "#109025",
+  "item": "trail shoes",
+  "date": "4 September"
+ },
+ "11119": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "feature_request"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Tara",
+  "order": "#106570",
+  "item": "desk lamp",
+  "date": "30 August"
+ },
+ "11120": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "billing"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Ben",
+  "order": "#112872",
+  "item": "desk lamp",
+  "date": "26 September"
+ },
+ "11121": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#107251",
+  "item": "rain jacket",
+  "date": "20 September"
+ },
+ "11122": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "returns"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#111330",
+  "item": "linen shirt",
+  "date": "20 September"
+ },
+ "11123": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#107787",
+  "item": "desk lamp",
+  "date": "19 September"
+ },
+ "11124": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#102485",
+  "item": "wool scarf",
+  "date": "10 September"
+ },
+ "11125": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "account"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#112729",
+  "item": "backpack",
+  "date": "25 August"
+ },
+ "11126": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "billing"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Jonas",
+  "order": "#102085",
+  "item": "coffee grinder",
+  "date": "19 September"
+ },
+ "11127": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "returns"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#105583",
+  "item": "yoga mat",
+  "date": "16 September"
+ },
+ "11128": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "returns"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#109276",
+  "item": "linen shirt",
+  "date": "26 August"
+ },
+ "11129": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "billing"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Omar",
+  "order": "#108082",
+  "item": "linen shirt",
+  "date": "7 September"
+ },
+ "11130": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "shipping"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#113422",
+  "item": "trail shoes",
+  "date": "14 September"
+ },
+ "11131": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "returns"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#107793",
+  "item": "rain jacket",
+  "date": "23 September"
+ },
+ "11132": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "feature_request"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#113454",
+  "item": "trail shoes",
+  "date": "2 September"
+ },
+ "11133": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Wei",
+  "order": "#104346",
+  "item": "coffee grinder",
+  "date": "19 September"
+ },
+ "11134": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#104457",
+  "item": "yoga mat",
+  "date": "8 September"
+ },
+ "11135": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "returns"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#108922",
+  "item": "linen shirt",
+  "date": "20 September"
+ },
+ "11136": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "feature_request"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Dev",
+  "order": "#109274",
+  "item": "yoga mat",
+  "date": "27 September"
+ },
+ "11137": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Dev",
+  "order": "#104384",
+  "item": "linen shirt",
+  "date": "9 September"
+ },
+ "11138": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "returns"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#111948",
+  "item": "rain jacket",
+  "date": "22 August"
+ },
+ "11139": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#103842",
+  "item": "desk lamp",
+  "date": "9 September"
+ },
+ "11140": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "shipping"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Wei",
+  "order": "#108452",
+  "item": "yoga mat",
+  "date": "30 August"
+ },
+ "11141": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#106662",
+  "item": "wool scarf",
+  "date": "27 September"
+ },
+ "11142": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#100023",
+  "item": "linen shirt",
+  "date": "13 September"
+ },
+ "11143": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#112753",
+  "item": "rain jacket",
+  "date": "11 September"
+ },
+ "11144": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Ben",
+  "order": "#100840",
+  "item": "linen shirt",
+  "date": "18 September"
+ },
+ "11145": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "account"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Ana",
+  "order": "#107627",
+  "item": "rain jacket",
+  "date": "31 August"
+ },
+ "11146": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "bug"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#104775",
+  "item": "rain jacket",
+  "date": "17 September"
+ },
+ "11147": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Ben",
+  "order": "#109152",
+  "item": "yoga mat",
+  "date": "6 September"
+ },
+ "11148": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Rosa",
+  "order": "#110073",
+  "item": "rain jacket",
+  "date": "22 September"
+ },
+ "11149": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "shipping"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Yara",
+  "order": "#100892",
+  "item": "yoga mat",
+  "date": "9 September"
+ },
+ "11150": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "billing"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Sven",
+  "order": "#105322",
+  "item": "desk lamp",
+  "date": "14 September"
+ },
+ "11151": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "returns"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#107986",
+  "item": "backpack",
+  "date": "15 September"
+ },
+ "11152": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#107115",
+  "item": "yoga mat",
+  "date": "25 September"
+ },
+ "11153": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Sven",
+  "order": "#104796",
+  "item": "wool scarf",
+  "date": "8 September"
+ },
+ "11154": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "account"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#102886",
+  "item": "trail shoes",
+  "date": "4 September"
+ },
+ "11155": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#107360",
+  "item": "linen shirt",
+  "date": "24 September"
+ },
+ "11156": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "account"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 1200,
+  "issue_last": true,
+  "first_name": "Rosa",
+  "order": "#110768",
+  "item": "yoga mat",
+  "date": "15 September"
+ },
+ "11157": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "account"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Jonas",
+  "order": "#102701",
+  "item": "wool scarf",
+  "date": "6 September"
+ },
+ "11158": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "billing"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#107579",
+  "item": "linen shirt",
+  "date": "18 September"
+ },
+ "11159": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "billing"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Dev",
+  "order": "#110943",
+  "item": "rain jacket",
+  "date": "2 September"
+ },
+ "11160": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "account"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Rosa",
+  "order": "#112506",
+  "item": "trail shoes",
+  "date": "6 September"
+ },
+ "11161": {
+  "category": "billing",
+  "chargeback": "direct",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#110154",
+  "item": "rain jacket",
+  "date": "16 September"
+ },
+ "11162": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "feature_request"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Ana",
+  "order": "#100226",
+  "item": "desk lamp",
+  "date": "28 August"
+ },
+ "11163": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "billing"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#100159",
+  "item": "backpack",
+  "date": "16 September"
+ },
+ "11164": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "feature_request"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#106699",
+  "item": "rain jacket",
+  "date": "26 August"
+ },
+ "11165": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "account"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#108054",
+  "item": "rain jacket",
+  "date": "5 September"
+ },
+ "11166": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "bug"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Omar",
+  "order": "#100269",
+  "item": "yoga mat",
+  "date": "12 September"
+ },
+ "11167": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "feature_request"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Jonas",
+  "order": "#105252",
+  "item": "desk lamp",
+  "date": "29 August"
+ },
+ "11168": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "shipping"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Wei",
+  "order": "#106734",
+  "item": "coffee grinder",
+  "date": "22 September"
+ },
+ "11169": {
+  "category": "shipping",
+  "chargeback": "direct",
+  "asides": [
+   "bug",
+   "account"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#111777",
+  "item": "linen shirt",
+  "date": "9 September"
+ },
+ "11170": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "billing"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#105359",
+  "item": "backpack",
+  "date": "22 August"
+ },
+ "11171": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Wei",
+  "order": "#107311",
+  "item": "linen shirt",
+  "date": "16 September"
+ },
+ "11172": {
+  "category": "billing",
+  "chargeback": "indirect",
+  "asides": [
+   "bug",
+   "shipping"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#112105",
+  "item": "wool scarf",
+  "date": "16 September"
+ },
+ "11173": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "account"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#110491",
+  "item": "linen shirt",
+  "date": "25 August"
+ },
+ "11174": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "bug"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#101615",
+  "item": "yoga mat",
+  "date": "29 August"
+ },
+ "11175": {
+  "category": "billing",
+  "chargeback": "direct",
+  "asides": [
+   "account",
+   "bug"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#112225",
+  "item": "desk lamp",
+  "date": "30 August"
+ },
+ "11176": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "billing"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#105639",
+  "item": "desk lamp",
+  "date": "29 September"
+ },
+ "11177": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "shipping"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Sven",
+  "order": "#103093",
+  "item": "trail shoes",
+  "date": "22 August"
+ },
+ "11178": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Ana",
+  "order": "#104751",
+  "item": "trail shoes",
+  "date": "26 August"
+ },
+ "11179": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "shipping"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 500,
+  "issue_last": true,
+  "first_name": "Zoe",
+  "order": "#100956",
+  "item": "yoga mat",
+  "date": "23 September"
+ },
+ "11180": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#110029",
+  "item": "coffee grinder",
+  "date": "29 September"
+ },
+ "11181": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "bug"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#113137",
+  "item": "desk lamp",
+  "date": "29 September"
+ },
+ "11182": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 800,
+  "issue_last": true,
+  "first_name": "Hiro",
+  "order": "#102277",
+  "item": "backpack",
+  "date": "29 September"
+ },
+ "11183": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "billing"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Omar",
+  "order": "#101786",
+  "item": "desk lamp",
+  "date": "10 September"
+ },
+ "11184": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#112221",
+  "item": "rain jacket",
+  "date": "13 September"
+ },
+ "11185": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "returns"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Dev",
+  "order": "#101891",
+  "item": "rain jacket",
+  "date": "7 September"
+ },
+ "11186": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#110566",
+  "item": "coffee grinder",
+  "date": "24 September"
+ },
+ "11187": {
+  "category": "shipping",
+  "chargeback": "indirect",
+  "asides": [
+   "bug",
+   "returns"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#105778",
+  "item": "rain jacket",
+  "date": "5 September"
+ },
+ "11188": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 1100,
+  "issue_last": true,
+  "first_name": "Grace",
+  "order": "#100127",
+  "item": "yoga mat",
+  "date": "23 August"
+ },
+ "11189": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "billing"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Sven",
+  "order": "#101887",
+  "item": "desk lamp",
+  "date": "27 August"
+ },
+ "11190": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "returns"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#106678",
+  "item": "desk lamp",
+  "date": "12 September"
+ },
+ "11191": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "account"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Ben",
+  "order": "#104889",
+  "item": "coffee grinder",
+  "date": "7 September"
+ },
+ "11192": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "shipping"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Ben",
+  "order": "#108581",
+  "item": "wool scarf",
+  "date": "16 September"
+ },
+ "11193": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "billing"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#108985",
+  "item": "wool scarf",
+  "date": "16 September"
+ },
+ "11194": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#107522",
+  "item": "rain jacket",
+  "date": "22 September"
+ },
+ "11195": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 500,
+  "issue_last": true,
+  "first_name": "Fatima",
+  "order": "#108285",
+  "item": "rain jacket",
+  "date": "23 August"
+ },
+ "11196": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "account"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Ben",
+  "order": "#106386",
+  "item": "desk lamp",
+  "date": "28 September"
+ },
+ "11197": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 800,
+  "issue_last": true,
+  "first_name": "Dev",
+  "order": "#112982",
+  "item": "yoga mat",
+  "date": "3 September"
+ },
+ "11198": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "returns"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Dev",
+  "order": "#101785",
+  "item": "yoga mat",
+  "date": "8 September"
+ },
+ "11199": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "returns"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Grace",
+  "order": "#106971",
+  "item": "yoga mat",
+  "date": "30 August"
+ },
+ "11200": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Sven",
+  "order": "#103734",
+  "item": "backpack",
+  "date": "22 August"
+ },
+ "11201": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "shipping"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 650,
+  "issue_last": true,
+  "first_name": "Marta",
+  "order": "#101183",
+  "item": "trail shoes",
+  "date": "21 September"
+ },
+ "11202": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "billing"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Grace",
+  "order": "#109583",
+  "item": "rain jacket",
+  "date": "27 August"
+ },
+ "11203": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "billing"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Omar",
+  "order": "#112793",
+  "item": "linen shirt",
+  "date": "29 August"
+ },
+ "11204": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#102471",
+  "item": "desk lamp",
+  "date": "5 September"
+ },
+ "11205": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "shipping"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#113365",
+  "item": "rain jacket",
+  "date": "29 September"
+ },
+ "11206": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "bug"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#103440",
+  "item": "rain jacket",
+  "date": "18 September"
+ },
+ "11207": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 1100,
+  "issue_last": true,
+  "first_name": "Jonas",
+  "order": "#102280",
+  "item": "coffee grinder",
+  "date": "22 September"
+ },
+ "11208": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "shipping"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 650,
+  "issue_last": true,
+  "first_name": "Hiro",
+  "order": "#111327",
+  "item": "trail shoes",
+  "date": "4 September"
+ },
+ "11209": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "returns"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Wei",
+  "order": "#107018",
+  "item": "desk lamp",
+  "date": "2 September"
+ },
+ "11210": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "bug"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#101767",
+  "item": "desk lamp",
+  "date": "10 September"
+ },
+ "11211": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "shipping"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#102819",
+  "item": "wool scarf",
+  "date": "25 September"
+ },
+ "11212": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "shipping"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Rosa",
+  "order": "#101042",
+  "item": "linen shirt",
+  "date": "29 September"
+ },
+ "11213": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "returns"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#104829",
+  "item": "wool scarf",
+  "date": "31 August"
+ },
+ "11214": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "shipping"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 950,
+  "issue_last": true,
+  "first_name": "Chlo\u00e9",
+  "order": "#102236",
+  "item": "linen shirt",
+  "date": "13 September"
+ },
+ "11215": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "account"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Wei",
+  "order": "#100518",
+  "item": "backpack",
+  "date": "21 September"
+ },
+ "11216": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "shipping"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Omar",
+  "order": "#105869",
+  "item": "trail shoes",
+  "date": "17 September"
+ },
+ "11217": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#107017",
+  "item": "wool scarf",
+  "date": "18 September"
+ },
+ "11218": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "account"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#100198",
+  "item": "coffee grinder",
+  "date": "15 September"
+ },
+ "11219": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "shipping"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Yara",
+  "order": "#113392",
+  "item": "desk lamp",
+  "date": "2 September"
+ },
+ "11220": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#100449",
+  "item": "trail shoes",
+  "date": "20 September"
+ },
+ "11221": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#109023",
+  "item": "wool scarf",
+  "date": "19 September"
+ },
+ "11222": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "shipping"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 1100,
+  "issue_last": true,
+  "first_name": "Fatima",
+  "order": "#107440",
+  "item": "coffee grinder",
+  "date": "9 September"
+ },
+ "11223": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "returns"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#100198",
+  "item": "desk lamp",
+  "date": "13 September"
+ },
+ "11224": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#112436",
+  "item": "desk lamp",
+  "date": "2 September"
+ },
+ "11225": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Ana",
+  "order": "#112431",
+  "item": "backpack",
+  "date": "20 September"
+ },
+ "11226": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "feature_request"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Ana",
+  "order": "#107945",
+  "item": "yoga mat",
+  "date": "21 September"
+ },
+ "11227": {
+  "category": "shipping",
+  "chargeback": "direct",
+  "asides": [
+   "bug",
+   "billing"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#100953",
+  "item": "linen shirt",
+  "date": "1 September"
+ },
+ "11228": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "returns"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#111054",
+  "item": "linen shirt",
+  "date": "20 September"
+ },
+ "11229": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "returns"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Rosa",
+  "order": "#112506",
+  "item": "backpack",
+  "date": "17 September"
+ },
+ "11230": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#106092",
+  "item": "trail shoes",
+  "date": "22 August"
+ },
+ "11231": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "returns"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Omar",
+  "order": "#111050",
+  "item": "desk lamp",
+  "date": "29 August"
+ },
+ "11232": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "returns"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#108213",
+  "item": "linen shirt",
+  "date": "17 September"
+ },
+ "11233": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "returns"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Grace",
+  "order": "#111998",
+  "item": "coffee grinder",
+  "date": "3 September"
+ },
+ "11234": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Wei",
+  "order": "#113252",
+  "item": "wool scarf",
+  "date": "7 September"
+ },
+ "11235": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "feature_request"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 500,
+  "issue_last": true,
+  "first_name": "Wei",
+  "order": "#102152",
+  "item": "trail shoes",
+  "date": "26 September"
+ },
+ "11236": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#106399",
+  "item": "coffee grinder",
+  "date": "13 September"
+ },
+ "11237": {
+  "category": "shipping",
+  "chargeback": "indirect",
+  "asides": [
+   "account",
+   "returns"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#106273",
+  "item": "linen shirt",
+  "date": "20 September"
+ },
+ "11238": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#104622",
+  "item": "rain jacket",
+  "date": "5 September"
+ },
+ "11239": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "returns"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Sven",
+  "order": "#107794",
+  "item": "rain jacket",
+  "date": "27 August"
+ },
+ "11240": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "returns"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#102749",
+  "item": "coffee grinder",
+  "date": "25 September"
+ },
+ "11241": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "returns"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#102474",
+  "item": "trail shoes",
+  "date": "4 September"
+ },
+ "11242": {
+  "category": "billing",
+  "chargeback": "direct",
+  "asides": [
+   "returns",
+   "shipping"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#109373",
+  "item": "yoga mat",
+  "date": "30 August"
+ },
+ "11243": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "feature_request"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#100598",
+  "item": "yoga mat",
+  "date": "26 September"
+ },
+ "11244": {
+  "category": "billing",
+  "chargeback": "direct",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#103799",
+  "item": "rain jacket",
+  "date": "24 August"
+ },
+ "11245": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 500,
+  "issue_last": true,
+  "first_name": "Lena",
+  "order": "#106456",
+  "item": "wool scarf",
+  "date": "24 August"
+ },
+ "11246": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "account"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#106439",
+  "item": "trail shoes",
+  "date": "10 September"
+ },
+ "11247": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "shipping"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#100556",
+  "item": "coffee grinder",
+  "date": "24 August"
+ },
+ "11248": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "returns"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 950,
+  "issue_last": true,
+  "first_name": "Chlo\u00e9",
+  "order": "#110029",
+  "item": "linen shirt",
+  "date": "6 September"
+ },
+ "11249": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "shipping"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Tara",
+  "order": "#106571",
+  "item": "desk lamp",
+  "date": "23 September"
+ },
+ "11250": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "returns"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 1200,
+  "issue_last": true,
+  "first_name": "Zoe",
+  "order": "#104731",
+  "item": "coffee grinder",
+  "date": "6 September"
+ },
+ "11251": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#102708",
+  "item": "coffee grinder",
+  "date": "28 August"
+ },
+ "11252": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Yara",
+  "order": "#106946",
+  "item": "yoga mat",
+  "date": "3 September"
+ },
+ "11253": {
+  "category": "shipping",
+  "chargeback": "indirect",
+  "asides": [
+   "bug",
+   "returns"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Rosa",
+  "order": "#100433",
+  "item": "linen shirt",
+  "date": "27 September"
+ },
+ "11254": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "account"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Jonas",
+  "order": "#105916",
+  "item": "trail shoes",
+  "date": "2 September"
+ },
+ "11255": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#100669",
+  "item": "desk lamp",
+  "date": "22 August"
+ },
+ "11256": {
+  "category": "shipping",
+  "chargeback": "direct",
+  "asides": [
+   "bug",
+   "feature_request"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 800,
+  "issue_last": true,
+  "first_name": "Priya",
+  "order": "#105438",
+  "item": "wool scarf",
+  "date": "20 September"
+ },
+ "11257": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "feature_request"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#103459",
+  "item": "wool scarf",
+  "date": "1 September"
+ },
+ "11258": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "shipping"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#107249",
+  "item": "yoga mat",
+  "date": "1 September"
+ },
+ "11259": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "bug"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#111524",
+  "item": "coffee grinder",
+  "date": "24 September"
+ },
+ "11260": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "returns"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Wei",
+  "order": "#108615",
+  "item": "linen shirt",
+  "date": "23 September"
+ },
+ "11261": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "shipping"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#105843",
+  "item": "trail shoes",
+  "date": "31 August"
+ },
+ "11262": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "billing"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#109927",
+  "item": "yoga mat",
+  "date": "5 September"
+ },
+ "11263": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "returns"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#104645",
+  "item": "trail shoes",
+  "date": "14 September"
+ },
+ "11264": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "returns"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#111805",
+  "item": "coffee grinder",
+  "date": "13 September"
+ },
+ "11265": {
+  "category": "billing",
+  "chargeback": "direct",
+  "asides": [
+   "returns",
+   "bug"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#103156",
+  "item": "linen shirt",
+  "date": "29 August"
+ },
+ "11266": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "billing"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Tara",
+  "order": "#106571",
+  "item": "yoga mat",
+  "date": "4 September"
+ },
+ "11267": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "shipping"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#104620",
+  "item": "linen shirt",
+  "date": "4 September"
+ },
+ "11268": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "account"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#101591",
+  "item": "backpack",
+  "date": "24 September"
+ },
+ "11269": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#107863",
+  "item": "linen shirt",
+  "date": "29 September"
+ },
+ "11270": {
+  "category": "shipping",
+  "chargeback": "indirect",
+  "asides": [
+   "billing",
+   "bug"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#105582",
+  "item": "yoga mat",
+  "date": "17 September"
+ },
+ "11271": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#102471",
+  "item": "trail shoes",
+  "date": "19 September"
+ },
+ "11272": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Grace",
+  "order": "#102762",
+  "item": "backpack",
+  "date": "23 September"
+ },
+ "11273": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "returns"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#107365",
+  "item": "backpack",
+  "date": "17 September"
+ },
+ "11274": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#102567",
+  "item": "trail shoes",
+  "date": "28 August"
+ },
+ "11275": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "billing"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Dev",
+  "order": "#110359",
+  "item": "linen shirt",
+  "date": "9 September"
+ },
+ "11276": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "feature_request"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Jonas",
+  "order": "#103221",
+  "item": "rain jacket",
+  "date": "27 August"
+ },
+ "11277": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "billing"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#113360",
+  "item": "trail shoes",
+  "date": "19 September"
+ },
+ "11278": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Tara",
+  "order": "#104178",
+  "item": "rain jacket",
+  "date": "11 September"
+ },
+ "11279": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Yara",
+  "order": "#102895",
+  "item": "coffee grinder",
+  "date": "28 August"
+ },
+ "11280": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#104542",
+  "item": "desk lamp",
+  "date": "9 September"
+ },
+ "11281": {
+  "category": "shipping",
+  "chargeback": "indirect",
+  "asides": [
+   "billing",
+   "account"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#101617",
+  "item": "yoga mat",
+  "date": "31 August"
+ },
+ "11282": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "returns"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#100159",
+  "item": "desk lamp",
+  "date": "7 September"
+ },
+ "11283": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#107437",
+  "item": "yoga mat",
+  "date": "13 September"
+ },
+ "11284": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "billing"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1200,
+  "issue_last": true,
+  "first_name": "Tara",
+  "order": "#112501",
+  "item": "wool scarf",
+  "date": "5 September"
+ },
+ "11285": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "shipping"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Ana",
+  "order": "#112429",
+  "item": "coffee grinder",
+  "date": "13 September"
+ },
+ "11286": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "shipping"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Yara",
+  "order": "#113394",
+  "item": "trail shoes",
+  "date": "28 August"
+ },
+ "11287": {
+  "category": "billing",
+  "chargeback": "indirect",
+  "asides": [
+   "bug",
+   "shipping"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#108256",
+  "item": "coffee grinder",
+  "date": "29 August"
+ },
+ "11288": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "returns"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Ana",
+  "order": "#109057",
+  "item": "trail shoes",
+  "date": "22 August"
+ },
+ "11289": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "shipping"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Jonas",
+  "order": "#113060",
+  "item": "yoga mat",
+  "date": "2 September"
+ },
+ "11290": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "billing"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Jonas",
+  "order": "#109062",
+  "item": "coffee grinder",
+  "date": "4 September"
+ },
+ "11291": {
+  "category": "shipping",
+  "chargeback": "direct",
+  "asides": [
+   "returns"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Tara",
+  "order": "#111744",
+  "item": "linen shirt",
+  "date": "5 September"
+ },
+ "11292": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "returns"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#108864",
+  "item": "desk lamp",
+  "date": "28 September"
+ },
+ "11293": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#103948",
+  "item": "yoga mat",
+  "date": "16 September"
+ },
+ "11294": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "bug"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 500,
+  "issue_last": true,
+  "first_name": "Omar",
+  "order": "#113494",
+  "item": "yoga mat",
+  "date": "27 August"
+ },
+ "11295": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#109313",
+  "item": "backpack",
+  "date": "7 September"
+ },
+ "11296": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "billing"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Ben",
+  "order": "#110401",
+  "item": "wool scarf",
+  "date": "24 August"
+ },
+ "11297": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#109135",
+  "item": "wool scarf",
+  "date": "4 September"
+ },
+ "11298": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "billing"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#107867",
+  "item": "linen shirt",
+  "date": "29 September"
+ },
+ "11299": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Omar",
+  "order": "#110672",
+  "item": "yoga mat",
+  "date": "29 August"
+ },
+ "11300": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "account"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#111806",
+  "item": "backpack",
+  "date": "13 September"
+ },
+ "11301": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "account"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#102886",
+  "item": "desk lamp",
+  "date": "22 September"
+ },
+ "11302": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "shipping"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 1100,
+  "issue_last": true,
+  "first_name": "Chlo\u00e9",
+  "order": "#110029",
+  "item": "desk lamp",
+  "date": "18 September"
+ },
+ "11303": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "billing"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#107135",
+  "item": "backpack",
+  "date": "15 September"
+ },
+ "11304": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "returns"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Omar",
+  "order": "#107703",
+  "item": "rain jacket",
+  "date": "15 September"
+ },
+ "11305": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "account"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#104625",
+  "item": "trail shoes",
+  "date": "24 September"
+ },
+ "11306": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "bug"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#107566",
+  "item": "wool scarf",
+  "date": "10 September"
+ },
+ "11307": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#105379",
+  "item": "linen shirt",
+  "date": "25 August"
+ },
+ "11308": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "shipping"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#108079",
+  "item": "trail shoes",
+  "date": "31 August"
+ },
+ "11309": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "billing"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Tara",
+  "order": "#111671",
+  "item": "trail shoes",
+  "date": "27 September"
+ },
+ "11310": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "billing"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Ana",
+  "order": "#109056",
+  "item": "backpack",
+  "date": "14 September"
+ },
+ "11311": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "account"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#113368",
+  "item": "trail shoes",
+  "date": "4 September"
+ },
+ "11312": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "feature_request"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Dev",
+  "order": "#111205",
+  "item": "desk lamp",
+  "date": "25 September"
+ },
+ "11313": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#111610",
+  "item": "coffee grinder",
+  "date": "20 September"
+ },
+ "11314": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "bug"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#100452",
+  "item": "backpack",
+  "date": "1 September"
+ },
+ "11315": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "feature_request"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#104448",
+  "item": "coffee grinder",
+  "date": "12 September"
+ },
+ "11316": {
+  "category": "shipping",
+  "chargeback": "indirect",
+  "asides": [
+   "feature_request",
+   "returns"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#102965",
+  "item": "desk lamp",
+  "date": "12 September"
+ },
+ "11317": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#107877",
+  "item": "desk lamp",
+  "date": "18 September"
+ },
+ "11318": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "returns"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Tara",
+  "order": "#107606",
+  "item": "trail shoes",
+  "date": "4 September"
+ },
+ "11319": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "account"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 800,
+  "issue_last": true,
+  "first_name": "Chlo\u00e9",
+  "order": "#110742",
+  "item": "coffee grinder",
+  "date": "16 September"
+ },
+ "11320": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Tara",
+  "order": "#103343",
+  "item": "desk lamp",
+  "date": "21 September"
+ },
+ "11321": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#112573",
+  "item": "linen shirt",
+  "date": "22 August"
+ },
+ "11322": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "bug"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#111039",
+  "item": "coffee grinder",
+  "date": "28 September"
+ },
+ "11323": {
+  "category": "shipping",
+  "chargeback": "direct",
+  "asides": [
+   "billing",
+   "bug"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 500,
+  "issue_last": true,
+  "first_name": "Omar",
+  "order": "#110439",
+  "item": "backpack",
+  "date": "24 August"
+ },
+ "11324": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "billing"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#100088",
+  "item": "rain jacket",
+  "date": "19 September"
+ },
+ "11325": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "returns"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#102521",
+  "item": "coffee grinder",
+  "date": "23 September"
+ },
+ "11326": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "returns"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Jonas",
+  "order": "#112526",
+  "item": "coffee grinder",
+  "date": "16 September"
+ },
+ "11327": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#107188",
+  "item": "coffee grinder",
+  "date": "16 September"
+ },
+ "11328": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "bug"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#103106",
+  "item": "yoga mat",
+  "date": "24 August"
+ },
+ "11329": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#110769",
+  "item": "coffee grinder",
+  "date": "25 August"
+ },
+ "11330": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "account"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#104712",
+  "item": "trail shoes",
+  "date": "25 August"
+ },
+ "11331": {
+  "category": "shipping",
+  "chargeback": "indirect",
+  "asides": [
+   "bug"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Dev",
+  "order": "#102159",
+  "item": "coffee grinder",
+  "date": "23 September"
+ },
+ "11332": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#101232",
+  "item": "desk lamp",
+  "date": "20 September"
+ },
+ "11333": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "account"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Dev",
+  "order": "#109678",
+  "item": "coffee grinder",
+  "date": "28 September"
+ },
+ "11334": {
+  "category": "billing",
+  "chargeback": "direct",
+  "asides": [
+   "bug",
+   "feature_request"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#109016",
+  "item": "rain jacket",
+  "date": "26 September"
+ },
+ "11335": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "shipping"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#112979",
+  "item": "wool scarf",
+  "date": "7 September"
+ },
+ "11336": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "billing"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#107511",
+  "item": "trail shoes",
+  "date": "1 September"
+ },
+ "11337": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "shipping"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#110767",
+  "item": "yoga mat",
+  "date": "21 September"
+ },
+ "11338": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "feature_request"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#100974",
+  "item": "linen shirt",
+  "date": "26 September"
+ },
+ "11339": {
+  "category": "billing",
+  "chargeback": "indirect",
+  "asides": [
+   "account"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#108047",
+  "item": "rain jacket",
+  "date": "25 September"
+ },
+ "11340": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Tara",
+  "order": "#106330",
+  "item": "trail shoes",
+  "date": "5 September"
+ },
+ "11341": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "returns"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#103798",
+  "item": "coffee grinder",
+  "date": "19 September"
+ },
+ "11342": {
+  "category": "shipping",
+  "chargeback": "indirect",
+  "asides": [
+   "feature_request",
+   "account"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Tara",
+  "order": "#107605",
+  "item": "wool scarf",
+  "date": "26 September"
+ },
+ "11343": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "feature_request"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Tara",
+  "order": "#107606",
+  "item": "trail shoes",
+  "date": "3 September"
+ },
+ "11344": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 800,
+  "issue_last": true,
+  "first_name": "Nils",
+  "order": "#110067",
+  "item": "desk lamp",
+  "date": "28 September"
+ },
+ "11345": {
+  "category": "billing",
+  "chargeback": "direct",
+  "asides": [
+   "feature_request",
+   "account"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 500,
+  "issue_last": true,
+  "first_name": "Nils",
+  "order": "#110465",
+  "item": "desk lamp",
+  "date": "1 September"
+ },
+ "11346": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "billing"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#105269",
+  "item": "yoga mat",
+  "date": "10 September"
+ },
+ "11347": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Omar",
+  "order": "#105865",
+  "item": "linen shirt",
+  "date": "31 August"
+ },
+ "11348": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "bug"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#103107",
+  "item": "wool scarf",
+  "date": "26 August"
+ },
+ "11349": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "bug"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 500,
+  "issue_last": true,
+  "first_name": "Nils",
+  "order": "#101372",
+  "item": "backpack",
+  "date": "28 September"
+ },
+ "11350": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "returns"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#103917",
+  "item": "trail shoes",
+  "date": "13 September"
+ },
+ "11351": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "billing"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#106912",
+  "item": "rain jacket",
+  "date": "26 September"
+ },
+ "11352": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "shipping"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Omar",
+  "order": "#110693",
+  "item": "rain jacket",
+  "date": "9 September"
+ },
+ "11353": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "returns"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#106261",
+  "item": "wool scarf",
+  "date": "13 September"
+ },
+ "11354": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "account"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 650,
+  "issue_last": true,
+  "first_name": "Grace",
+  "order": "#103538",
+  "item": "coffee grinder",
+  "date": "29 August"
+ },
+ "11355": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#112193",
+  "item": "backpack",
+  "date": "7 September"
+ },
+ "11356": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "billing"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#103798",
+  "item": "desk lamp",
+  "date": "29 August"
+ },
+ "11357": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#107864",
+  "item": "trail shoes",
+  "date": "27 September"
+ },
+ "11358": {
+  "category": "shipping",
+  "chargeback": "indirect",
+  "asides": [
+   "bug"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#111777",
+  "item": "wool scarf",
+  "date": "29 September"
+ },
+ "11359": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#110527",
+  "item": "linen shirt",
+  "date": "13 September"
+ },
+ "11360": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Omar",
+  "order": "#113024",
+  "item": "wool scarf",
+  "date": "31 August"
+ },
+ "11361": {
+  "category": "shipping",
+  "chargeback": "direct",
+  "asides": [
+   "feature_request",
+   "returns"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Rosa",
+  "order": "#101857",
+  "item": "trail shoes",
+  "date": "16 September"
+ },
+ "11362": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Grace",
+  "order": "#108582",
+  "item": "rain jacket",
+  "date": "26 September"
+ },
+ "11363": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Ben",
+  "order": "#105850",
+  "item": "rain jacket",
+  "date": "27 September"
+ },
+ "11364": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#113359",
+  "item": "rain jacket",
+  "date": "19 September"
+ },
+ "11365": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#109836",
+  "item": "coffee grinder",
+  "date": "11 September"
+ },
+ "11366": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "bug"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#104638",
+  "item": "desk lamp",
+  "date": "27 September"
+ },
+ "11367": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#106398",
+  "item": "coffee grinder",
+  "date": "17 September"
+ },
+ "11368": {
+  "category": "shipping",
+  "chargeback": "direct",
+  "asides": [
+   "returns",
+   "feature_request"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#101844",
+  "item": "trail shoes",
+  "date": "26 September"
+ },
+ "11369": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "shipping"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#108732",
+  "item": "coffee grinder",
+  "date": "25 September"
+ },
+ "11370": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "shipping"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#108653",
+  "item": "backpack",
+  "date": "1 September"
+ },
+ "11371": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 500,
+  "issue_last": true,
+  "first_name": "Nils",
+  "order": "#107885",
+  "item": "wool scarf",
+  "date": "3 September"
+ },
+ "11372": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#112992",
+  "item": "backpack",
+  "date": "16 September"
+ },
+ "11373": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "feature_request"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#102271",
+  "item": "trail shoes",
+  "date": "19 September"
+ },
+ "11374": {
+  "category": "billing",
+  "chargeback": "indirect",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Grace",
+  "order": "#103631",
+  "item": "coffee grinder",
+  "date": "19 September"
+ },
+ "11375": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "account"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#102447",
+  "item": "rain jacket",
+  "date": "18 September"
+ },
+ "11376": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "bug"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#105778",
+  "item": "yoga mat",
+  "date": "15 September"
+ },
+ "11377": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "shipping"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#104853",
+  "item": "yoga mat",
+  "date": "10 September"
+ },
+ "11378": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "bug"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#111889",
+  "item": "backpack",
+  "date": "21 September"
+ },
+ "11379": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#103320",
+  "item": "coffee grinder",
+  "date": "29 August"
+ },
+ "11380": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Omar",
+  "order": "#103183",
+  "item": "yoga mat",
+  "date": "8 September"
+ },
+ "11381": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#108431",
+  "item": "trail shoes",
+  "date": "21 September"
+ },
+ "11382": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 800,
+  "issue_last": true,
+  "first_name": "Jonas",
+  "order": "#106890",
+  "item": "backpack",
+  "date": "5 September"
+ },
+ "11383": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "account"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Ben",
+  "order": "#109269",
+  "item": "rain jacket",
+  "date": "17 September"
+ },
+ "11384": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "returns"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#100159",
+  "item": "backpack",
+  "date": "27 September"
+ },
+ "11385": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "billing"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 500,
+  "issue_last": true,
+  "first_name": "Ines",
+  "order": "#103212",
+  "item": "yoga mat",
+  "date": "28 September"
+ },
+ "11386": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Ana",
+  "order": "#111462",
+  "item": "yoga mat",
+  "date": "1 September"
+ },
+ "11387": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "returns"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#100086",
+  "item": "yoga mat",
+  "date": "18 September"
+ },
+ "11388": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "bug"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#112974",
+  "item": "coffee grinder",
+  "date": "22 September"
+ },
+ "11389": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#104518",
+  "item": "coffee grinder",
+  "date": "27 September"
+ },
+ "11390": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "feature_request"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#109487",
+  "item": "coffee grinder",
+  "date": "30 August"
+ },
+ "11391": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 1200,
+  "issue_last": true,
+  "first_name": "Lena",
+  "order": "#103157",
+  "item": "rain jacket",
+  "date": "29 September"
+ },
+ "11392": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Ana",
+  "order": "#109056",
+  "item": "coffee grinder",
+  "date": "20 September"
+ },
+ "11393": {
+  "category": "shipping",
+  "chargeback": "indirect",
+  "asides": [
+   "returns",
+   "bug"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#103584",
+  "item": "linen shirt",
+  "date": "26 September"
+ },
+ "11394": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "billing"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#102554",
+  "item": "desk lamp",
+  "date": "12 September"
+ },
+ "11395": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "bug"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#112434",
+  "item": "desk lamp",
+  "date": "31 August"
+ },
+ "11396": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#109861",
+  "item": "rain jacket",
+  "date": "13 September"
+ },
+ "11397": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "shipping"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#104247",
+  "item": "trail shoes",
+  "date": "10 September"
+ },
+ "11398": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "account"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Wei",
+  "order": "#100094",
+  "item": "linen shirt",
+  "date": "27 September"
+ },
+ "11399": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#105783",
+  "item": "yoga mat",
+  "date": "4 September"
+ },
+ "11400": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "shipping"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#103157",
+  "item": "coffee grinder",
+  "date": "3 September"
+ },
+ "11401": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "account"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#102819",
+  "item": "rain jacket",
+  "date": "11 September"
+ },
+ "11402": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "feature_request"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#108121",
+  "item": "backpack",
+  "date": "1 September"
+ },
+ "11403": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "returns"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#110169",
+  "item": "backpack",
+  "date": "27 September"
+ },
+ "11404": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Tara",
+  "order": "#106326",
+  "item": "yoga mat",
+  "date": "7 September"
+ },
+ "11405": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "billing"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Tara",
+  "order": "#106046",
+  "item": "rain jacket",
+  "date": "21 September"
+ },
+ "11406": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "billing"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Sven",
+  "order": "#111450",
+  "item": "coffee grinder",
+  "date": "22 September"
+ },
+ "11407": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "billing"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#108101",
+  "item": "backpack",
+  "date": "11 September"
+ },
+ "11408": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "feature_request"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#111236",
+  "item": "trail shoes",
+  "date": "29 August"
+ },
+ "11409": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "account"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#100257",
+  "item": "coffee grinder",
+  "date": "29 August"
+ },
+ "11410": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "returns"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#104881",
+  "item": "linen shirt",
+  "date": "25 September"
+ },
+ "11411": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#102713",
+  "item": "coffee grinder",
+  "date": "19 September"
+ },
+ "11412": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "bug"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#112690",
+  "item": "rain jacket",
+  "date": "20 September"
+ },
+ "11413": {
+  "category": "shipping",
+  "chargeback": "indirect",
+  "asides": [
+   "feature_request",
+   "account"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 800,
+  "issue_last": true,
+  "first_name": "Nils",
+  "order": "#109906",
+  "item": "yoga mat",
+  "date": "30 August"
+ },
+ "11414": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#113419",
+  "item": "backpack",
+  "date": "25 August"
+ },
+ "11415": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "feature_request"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Jonas",
+  "order": "#101117",
+  "item": "yoga mat",
+  "date": "23 September"
+ },
+ "11416": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Grace",
+  "order": "#113200",
+  "item": "yoga mat",
+  "date": "23 September"
+ },
+ "11417": {
+  "category": "shipping",
+  "chargeback": "indirect",
+  "asides": [
+   "feature_request",
+   "account"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Rosa",
+  "order": "#109366",
+  "item": "trail shoes",
+  "date": "22 September"
+ },
+ "11418": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#111330",
+  "item": "rain jacket",
+  "date": "23 August"
+ },
+ "11419": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#102886",
+  "item": "wool scarf",
+  "date": "27 August"
+ },
+ "11420": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "shipping"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#105564",
+  "item": "linen shirt",
+  "date": "4 September"
+ },
+ "11421": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "bug"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Yara",
+  "order": "#106945",
+  "item": "coffee grinder",
+  "date": "20 September"
+ },
+ "11422": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#104443",
+  "item": "backpack",
+  "date": "23 September"
+ },
+ "11423": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "billing"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#109142",
+  "item": "wool scarf",
+  "date": "22 September"
+ },
+ "11424": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "account"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#101010",
+  "item": "wool scarf",
+  "date": "22 September"
+ },
+ "11425": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Rosa",
+  "order": "#111184",
+  "item": "desk lamp",
+  "date": "3 September"
+ },
+ "11426": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "returns"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Sven",
+  "order": "#107165",
+  "item": "linen shirt",
+  "date": "12 September"
+ },
+ "11427": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#111655",
+  "item": "desk lamp",
+  "date": "6 September"
+ },
+ "11428": {
+  "category": "shipping",
+  "chargeback": "indirect",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Dev",
+  "order": "#104256",
+  "item": "wool scarf",
+  "date": "29 September"
+ },
+ "11429": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "returns"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 650,
+  "issue_last": true,
+  "first_name": "Nils",
+  "order": "#110796",
+  "item": "desk lamp",
+  "date": "30 August"
+ },
+ "11430": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "billing"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 950,
+  "issue_last": true,
+  "first_name": "Ben",
+  "order": "#113326",
+  "item": "desk lamp",
+  "date": "12 September"
+ },
+ "11431": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "shipping"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#102992",
+  "item": "linen shirt",
+  "date": "27 August"
+ },
+ "11432": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "bug"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1100,
+  "issue_last": true,
+  "first_name": "Eitan",
+  "order": "#100253",
+  "item": "trail shoes",
+  "date": "12 September"
+ },
+ "11433": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "returns"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#104863",
+  "item": "trail shoes",
+  "date": "14 September"
+ },
+ "11434": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "shipping"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#107012",
+  "item": "coffee grinder",
+  "date": "5 September"
+ },
+ "11435": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "bug"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Omar",
+  "order": "#109890",
+  "item": "yoga mat",
+  "date": "3 September"
+ },
+ "11436": {
+  "category": "billing",
+  "chargeback": "direct",
+  "asides": [
+   "account"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#106276",
+  "item": "trail shoes",
+  "date": "27 August"
+ },
+ "11437": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "billing"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 1100,
+  "issue_last": true,
+  "first_name": "Fatima",
+  "order": "#102127",
+  "item": "rain jacket",
+  "date": "24 September"
+ },
+ "11438": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "returns"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#104128",
+  "item": "rain jacket",
+  "date": "12 September"
+ },
+ "11439": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "returns"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#102272",
+  "item": "backpack",
+  "date": "11 September"
+ },
+ "11440": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "billing"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Ana",
+  "order": "#110248",
+  "item": "linen shirt",
+  "date": "8 September"
+ },
+ "11441": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "shipping"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#103685",
+  "item": "coffee grinder",
+  "date": "25 August"
+ },
+ "11442": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "bug"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#101558",
+  "item": "desk lamp",
+  "date": "2 September"
+ },
+ "11443": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#111885",
+  "item": "rain jacket",
+  "date": "25 September"
+ },
+ "11444": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "billing"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Sven",
+  "order": "#101069",
+  "item": "rain jacket",
+  "date": "20 September"
+ },
+ "11445": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "bug"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#108751",
+  "item": "linen shirt",
+  "date": "29 September"
+ },
+ "11446": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "billing"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#110943",
+  "item": "trail shoes",
+  "date": "19 September"
+ },
+ "11447": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Tara",
+  "order": "#109461",
+  "item": "coffee grinder",
+  "date": "22 September"
+ },
+ "11448": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "billing"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#111521",
+  "item": "backpack",
+  "date": "4 September"
+ },
+ "11449": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Dev",
+  "order": "#111209",
+  "item": "coffee grinder",
+  "date": "2 September"
+ },
+ "11450": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "shipping"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Dev",
+  "order": "#108289",
+  "item": "linen shirt",
+  "date": "28 September"
+ },
+ "11451": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "account"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#100953",
+  "item": "desk lamp",
+  "date": "23 August"
+ },
+ "11452": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#104862",
+  "item": "wool scarf",
+  "date": "13 September"
+ },
+ "11453": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#109563",
+  "item": "wool scarf",
+  "date": "28 August"
+ },
+ "11454": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#104456",
+  "item": "trail shoes",
+  "date": "22 August"
+ },
+ "11455": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "bug"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#104111",
+  "item": "coffee grinder",
+  "date": "2 September"
+ },
+ "11456": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "billing"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#111888",
+  "item": "trail shoes",
+  "date": "5 September"
+ },
+ "11457": {
+  "category": "shipping",
+  "chargeback": "indirect",
+  "asides": [
+   "account",
+   "bug"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#106741",
+  "item": "backpack",
+  "date": "10 September"
+ },
+ "11458": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "shipping"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#103512",
+  "item": "backpack",
+  "date": "6 September"
+ },
+ "11459": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "shipping"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#104585",
+  "item": "yoga mat",
+  "date": "1 September"
+ },
+ "11460": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "shipping"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#103106",
+  "item": "backpack",
+  "date": "16 September"
+ },
+ "11461": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "shipping"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Sven",
+  "order": "#110034",
+  "item": "desk lamp",
+  "date": "31 August"
+ },
+ "11462": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "returns"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#107041",
+  "item": "yoga mat",
+  "date": "26 September"
+ },
+ "11463": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "shipping"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#100794",
+  "item": "yoga mat",
+  "date": "10 September"
+ },
+ "11464": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "account"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#109557",
+  "item": "trail shoes",
+  "date": "3 September"
+ },
+ "11465": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "shipping"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Tara",
+  "order": "#106325",
+  "item": "desk lamp",
+  "date": "26 August"
+ },
+ "11466": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "returns"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 1200,
+  "issue_last": true,
+  "first_name": "Ben",
+  "order": "#108409",
+  "item": "backpack",
+  "date": "24 August"
+ },
+ "11467": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "billing"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#112691",
+  "item": "trail shoes",
+  "date": "5 September"
+ },
+ "11468": {
+  "category": "billing",
+  "chargeback": "indirect",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#102447",
+  "item": "wool scarf",
+  "date": "26 September"
+ },
+ "11469": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Tara",
+  "order": "#108689",
+  "item": "trail shoes",
+  "date": "22 September"
+ },
+ "11470": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "shipping"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#107358",
+  "item": "trail shoes",
+  "date": "22 September"
+ },
+ "11471": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#109817",
+  "item": "wool scarf",
+  "date": "5 September"
+ },
+ "11472": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "billing"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 650,
+  "issue_last": true,
+  "first_name": "Chlo\u00e9",
+  "order": "#109557",
+  "item": "trail shoes",
+  "date": "25 September"
+ },
+ "11473": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "returns"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#112133",
+  "item": "backpack",
+  "date": "26 August"
+ },
+ "11474": {
+  "category": "shipping",
+  "chargeback": "indirect",
+  "asides": [
+   "billing",
+   "bug"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 1200,
+  "issue_last": true,
+  "first_name": "Tara",
+  "order": "#112502",
+  "item": "desk lamp",
+  "date": "13 September"
+ },
+ "11475": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "billing"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#106912",
+  "item": "coffee grinder",
+  "date": "10 September"
+ },
+ "11476": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "billing"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Dev",
+  "order": "#111394",
+  "item": "rain jacket",
+  "date": "19 September"
+ },
+ "11477": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Grace",
+  "order": "#108583",
+  "item": "backpack",
+  "date": "19 September"
+ },
+ "11478": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "shipping"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#103212",
+  "item": "desk lamp",
+  "date": "17 September"
+ },
+ "11479": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "returns"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#111769",
+  "item": "coffee grinder",
+  "date": "24 September"
+ },
+ "11480": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#103566",
+  "item": "yoga mat",
+  "date": "8 September"
+ },
+ "11481": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Jonas",
+  "order": "#102561",
+  "item": "rain jacket",
+  "date": "31 August"
+ },
+ "11482": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "shipping"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#105386",
+  "item": "coffee grinder",
+  "date": "28 September"
+ },
+ "11483": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#111884",
+  "item": "rain jacket",
+  "date": "11 September"
+ },
+ "11484": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "bug"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 1100,
+  "issue_last": true,
+  "first_name": "Chlo\u00e9",
+  "order": "#108898",
+  "item": "rain jacket",
+  "date": "8 September"
+ },
+ "11485": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "returns"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#104457",
+  "item": "wool scarf",
+  "date": "14 September"
+ },
+ "11486": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Tara",
+  "order": "#112501",
+  "item": "yoga mat",
+  "date": "7 September"
+ },
+ "11487": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "returns"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#111039",
+  "item": "yoga mat",
+  "date": "22 September"
+ },
+ "11488": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "feature_request"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#101232",
+  "item": "yoga mat",
+  "date": "20 September"
+ },
+ "11489": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#101279",
+  "item": "desk lamp",
+  "date": "30 August"
+ },
+ "11490": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "shipping"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#106393",
+  "item": "wool scarf",
+  "date": "24 September"
+ },
+ "11491": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "account"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#100556",
+  "item": "wool scarf",
+  "date": "23 September"
+ },
+ "11492": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "returns"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#110770",
+  "item": "trail shoes",
+  "date": "15 September"
+ },
+ "11493": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "account"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#105973",
+  "item": "linen shirt",
+  "date": "11 September"
+ },
+ "11494": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#100256",
+  "item": "desk lamp",
+  "date": "1 September"
+ },
+ "11495": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "billing"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#100669",
+  "item": "rain jacket",
+  "date": "21 September"
+ },
+ "11496": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "returns"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 950,
+  "issue_last": true,
+  "first_name": "Lena",
+  "order": "#104640",
+  "item": "rain jacket",
+  "date": "28 August"
+ },
+ "11497": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Ben",
+  "order": "#106386",
+  "item": "backpack",
+  "date": "31 August"
+ },
+ "11498": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "feature_request"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Tara",
+  "order": "#113492",
+  "item": "backpack",
+  "date": "29 August"
+ },
+ "11499": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "bug"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 950,
+  "issue_last": true,
+  "first_name": "Chlo\u00e9",
+  "order": "#102446",
+  "item": "trail shoes",
+  "date": "25 September"
+ },
+ "11500": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "shipping"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#112517",
+  "item": "yoga mat",
+  "date": "18 September"
+ },
+ "11501": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "shipping"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Wei",
+  "order": "#108828",
+  "item": "wool scarf",
+  "date": "31 August"
+ },
+ "11502": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#111641",
+  "item": "yoga mat",
+  "date": "16 September"
+ },
+ "11503": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "billing"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Wei",
+  "order": "#105298",
+  "item": "yoga mat",
+  "date": "21 September"
+ },
+ "11504": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "billing"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Wei",
+  "order": "#101167",
+  "item": "backpack",
+  "date": "19 September"
+ },
+ "11505": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#103891",
+  "item": "rain jacket",
+  "date": "27 September"
+ },
+ "11506": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "account"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Yara",
+  "order": "#110643",
+  "item": "yoga mat",
+  "date": "4 September"
+ },
+ "11507": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "feature_request"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Omar",
+  "order": "#111298",
+  "item": "yoga mat",
+  "date": "6 September"
+ },
+ "11508": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "account"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 1100,
+  "issue_last": true,
+  "first_name": "Ben",
+  "order": "#102442",
+  "item": "coffee grinder",
+  "date": "7 September"
+ },
+ "11509": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "billing"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#108652",
+  "item": "yoga mat",
+  "date": "25 August"
+ },
+ "11510": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#107434",
+  "item": "coffee grinder",
+  "date": "10 September"
+ },
+ "11511": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "billing"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#103432",
+  "item": "trail shoes",
+  "date": "28 August"
+ },
+ "11512": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "returns"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Jonas",
+  "order": "#106302",
+  "item": "rain jacket",
+  "date": "8 September"
+ },
+ "11513": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "account"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#110789",
+  "item": "wool scarf",
+  "date": "5 September"
+ },
+ "11514": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "billing"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#107778",
+  "item": "wool scarf",
+  "date": "6 September"
+ },
+ "11515": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#109536",
+  "item": "linen shirt",
+  "date": "21 September"
+ },
+ "11516": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#111972",
+  "item": "rain jacket",
+  "date": "11 September"
+ },
+ "11517": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#106409",
+  "item": "wool scarf",
+  "date": "25 August"
+ },
+ "11518": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "account"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#111421",
+  "item": "yoga mat",
+  "date": "10 September"
+ },
+ "11519": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#111521",
+  "item": "yoga mat",
+  "date": "6 September"
+ },
+ "11520": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "feature_request"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Jonas",
+  "order": "#102084",
+  "item": "wool scarf",
+  "date": "12 September"
+ },
+ "11521": {
+  "category": "shipping",
+  "chargeback": "indirect",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#100560",
+  "item": "rain jacket",
+  "date": "9 September"
+ },
+ "11522": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Sven",
+  "order": "#104176",
+  "item": "backpack",
+  "date": "17 September"
+ },
+ "11523": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#104829",
+  "item": "rain jacket",
+  "date": "4 September"
+ },
+ "11524": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "billing"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#112691",
+  "item": "trail shoes",
+  "date": "25 August"
+ },
+ "11525": {
+  "category": "shipping",
+  "chargeback": "indirect",
+  "asides": [
+   "account",
+   "billing"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Grace",
+  "order": "#103990",
+  "item": "trail shoes",
+  "date": "2 September"
+ },
+ "11526": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#107855",
+  "item": "linen shirt",
+  "date": "7 September"
+ },
+ "11527": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#108752",
+  "item": "desk lamp",
+  "date": "2 September"
+ },
+ "11528": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "bug"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#112303",
+  "item": "trail shoes",
+  "date": "29 August"
+ },
+ "11529": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "feature_request"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#108610",
+  "item": "backpack",
+  "date": "16 September"
+ },
+ "11530": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Wei",
+  "order": "#108444",
+  "item": "coffee grinder",
+  "date": "25 September"
+ },
+ "11531": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "shipping"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#100445",
+  "item": "backpack",
+  "date": "29 August"
+ },
+ "11532": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "returns"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#107186",
+  "item": "rain jacket",
+  "date": "26 September"
+ },
+ "11533": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "bug"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 800,
+  "issue_last": true,
+  "first_name": "Zoe",
+  "order": "#109849",
+  "item": "yoga mat",
+  "date": "28 September"
+ },
+ "11534": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "shipping"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Grace",
+  "order": "#108841",
+  "item": "wool scarf",
+  "date": "27 August"
+ },
+ "11535": {
+  "category": "shipping",
+  "chargeback": "direct",
+  "asides": [
+   "feature_request",
+   "bug"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#111240",
+  "item": "yoga mat",
+  "date": "28 September"
+ },
+ "11536": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#111039",
+  "item": "linen shirt",
+  "date": "22 August"
+ },
+ "11537": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "returns"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Rosa",
+  "order": "#107361",
+  "item": "trail shoes",
+  "date": "18 September"
+ },
+ "11538": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#102496",
+  "item": "rain jacket",
+  "date": "23 August"
+ },
+ "11539": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#113364",
+  "item": "trail shoes",
+  "date": "12 September"
+ },
+ "11540": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "shipping"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#104513",
+  "item": "desk lamp",
+  "date": "19 September"
+ },
+ "11541": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#105345",
+  "item": "backpack",
+  "date": "15 September"
+ },
+ "11542": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Yara",
+  "order": "#111014",
+  "item": "coffee grinder",
+  "date": "5 September"
+ },
+ "11543": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "shipping"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 800,
+  "issue_last": true,
+  "first_name": "Fatima",
+  "order": "#103180",
+  "item": "wool scarf",
+  "date": "28 August"
+ },
+ "11544": {
+  "category": "shipping",
+  "chargeback": "indirect",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Omar",
+  "order": "#109077",
+  "item": "trail shoes",
+  "date": "30 August"
+ },
+ "11545": {
+  "category": "shipping",
+  "chargeback": "indirect",
+  "asides": [
+   "account",
+   "billing"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#111890",
+  "item": "trail shoes",
+  "date": "15 September"
+ },
+ "11546": {
+  "category": "billing",
+  "chargeback": "direct",
+  "asides": [
+   "bug",
+   "shipping"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#113267",
+  "item": "wool scarf",
+  "date": "7 September"
+ },
+ "11547": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Ben",
+  "order": "#111493",
+  "item": "desk lamp",
+  "date": "10 September"
+ },
+ "11548": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#113230",
+  "item": "wool scarf",
+  "date": "23 September"
+ },
+ "11549": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#102894",
+  "item": "wool scarf",
+  "date": "22 September"
+ },
+ "11550": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Omar",
+  "order": "#113141",
+  "item": "yoga mat",
+  "date": "22 August"
+ },
+ "11551": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "bug"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#100256",
+  "item": "coffee grinder",
+  "date": "22 September"
+ },
+ "11552": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "billing"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Tara",
+  "order": "#109561",
+  "item": "trail shoes",
+  "date": "28 September"
+ },
+ "11553": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "bug"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#112195",
+  "item": "wool scarf",
+  "date": "30 August"
+ },
+ "11554": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "feature_request"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#104917",
+  "item": "yoga mat",
+  "date": "13 September"
+ },
+ "11555": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Grace",
+  "order": "#109132",
+  "item": "rain jacket",
+  "date": "17 September"
+ },
+ "11556": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#104553",
+  "item": "linen shirt",
+  "date": "9 September"
+ },
+ "11557": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "shipping"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 950,
+  "issue_last": true,
+  "first_name": "Lena",
+  "order": "#109757",
+  "item": "wool scarf",
+  "date": "13 September"
+ },
+ "11558": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#103871",
+  "item": "trail shoes",
+  "date": "28 August"
+ },
+ "11559": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "account"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#106321",
+  "item": "backpack",
+  "date": "16 September"
+ },
+ "11560": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "billing"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#100580",
+  "item": "desk lamp",
+  "date": "2 September"
+ },
+ "11561": {
+  "category": "shipping",
+  "chargeback": "direct",
+  "asides": [
+   "returns"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Ana",
+  "order": "#100969",
+  "item": "wool scarf",
+  "date": "5 September"
+ },
+ "11562": {
+  "category": "billing",
+  "chargeback": "direct",
+  "asides": [
+   "bug",
+   "returns"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Ana",
+  "order": "#111943",
+  "item": "yoga mat",
+  "date": "5 September"
+ },
+ "11563": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "shipping"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#113355",
+  "item": "linen shirt",
+  "date": "21 September"
+ },
+ "11564": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "returns"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#104553",
+  "item": "coffee grinder",
+  "date": "18 September"
+ },
+ "11565": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "returns"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#106304",
+  "item": "desk lamp",
+  "date": "23 September"
+ },
+ "11566": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "feature_request"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Jonas",
+  "order": "#111929",
+  "item": "trail shoes",
+  "date": "4 September"
+ },
+ "11567": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "returns"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#104860",
+  "item": "linen shirt",
+  "date": "17 September"
+ },
+ "11568": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 650,
+  "issue_last": true,
+  "first_name": "Ana",
+  "order": "#107623",
+  "item": "rain jacket",
+  "date": "27 August"
+ },
+ "11569": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#107591",
+  "item": "coffee grinder",
+  "date": "25 September"
+ },
+ "11570": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "returns"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Jonas",
+  "order": "#103630",
+  "item": "yoga mat",
+  "date": "30 August"
+ },
+ "11571": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#106033",
+  "item": "trail shoes",
+  "date": "23 August"
+ },
+ "11572": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "shipping"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Grace",
+  "order": "#106971",
+  "item": "wool scarf",
+  "date": "29 August"
+ },
+ "11573": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "bug"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Ben",
+  "order": "#101729",
+  "item": "yoga mat",
+  "date": "31 August"
+ },
+ "11574": {
+  "category": "billing",
+  "chargeback": "indirect",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Omar",
+  "order": "#111052",
+  "item": "rain jacket",
+  "date": "27 August"
+ },
+ "11575": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#101630",
+  "item": "wool scarf",
+  "date": "1 September"
+ },
+ "11576": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "returns"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Dev",
+  "order": "#104235",
+  "item": "trail shoes",
+  "date": "6 September"
+ },
+ "11577": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "returns"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Wei",
+  "order": "#106781",
+  "item": "trail shoes",
+  "date": "24 August"
+ },
+ "11578": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "returns"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#108652",
+  "item": "trail shoes",
+  "date": "7 September"
+ },
+ "11579": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#100468",
+  "item": "coffee grinder",
+  "date": "3 September"
+ },
+ "11580": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#106400",
+  "item": "desk lamp",
+  "date": "18 September"
+ },
+ "11581": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "bug"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Dev",
+  "order": "#103686",
+  "item": "rain jacket",
+  "date": "21 September"
+ },
+ "11582": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "billing"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#107046",
+  "item": "coffee grinder",
+  "date": "5 September"
+ },
+ "11583": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "account"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#107797",
+  "item": "backpack",
+  "date": "27 September"
+ },
+ "11584": {
+  "category": "shipping",
+  "chargeback": "indirect",
+  "asides": [
+   "returns",
+   "feature_request"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#106851",
+  "item": "rain jacket",
+  "date": "24 August"
+ },
+ "11585": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "bug"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#111962",
+  "item": "wool scarf",
+  "date": "25 August"
+ },
+ "11586": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "shipping"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 650,
+  "issue_last": true,
+  "first_name": "Kofi",
+  "order": "#108522",
+  "item": "trail shoes",
+  "date": "23 September"
+ },
+ "11587": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "returns"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#107188",
+  "item": "trail shoes",
+  "date": "18 September"
+ },
+ "11588": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Grace",
+  "order": "#101347",
+  "item": "desk lamp",
+  "date": "12 September"
+ },
+ "11589": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "feature_request"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Ben",
+  "order": "#103483",
+  "item": "rain jacket",
+  "date": "23 August"
+ },
+ "11590": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "bug"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#103578",
+  "item": "linen shirt",
+  "date": "25 September"
+ },
+ "11591": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "shipping"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Tara",
+  "order": "#111344",
+  "item": "linen shirt",
+  "date": "15 September"
+ },
+ "11592": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "feature_request"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 1200,
+  "issue_last": true,
+  "first_name": "Sven",
+  "order": "#103092",
+  "item": "yoga mat",
+  "date": "14 September"
+ },
+ "11593": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "bug"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1200,
+  "issue_last": true,
+  "first_name": "Yara",
+  "order": "#107686",
+  "item": "linen shirt",
+  "date": "12 September"
+ },
+ "11594": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#105781",
+  "item": "wool scarf",
+  "date": "8 September"
+ },
+ "11595": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "shipping"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Grace",
+  "order": "#106971",
+  "item": "linen shirt",
+  "date": "15 September"
+ },
+ "11596": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#112264",
+  "item": "trail shoes",
+  "date": "24 September"
+ },
+ "11597": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "returns"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#104645",
+  "item": "trail shoes",
+  "date": "5 September"
+ },
+ "11598": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#101759",
+  "item": "linen shirt",
+  "date": "27 August"
+ },
+ "11599": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#104208",
+  "item": "coffee grinder",
+  "date": "13 September"
+ },
+ "11600": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#106607",
+  "item": "trail shoes",
+  "date": "25 September"
+ },
+ "11601": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "account"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Wei",
+  "order": "#109825",
+  "item": "coffee grinder",
+  "date": "28 August"
+ },
+ "11602": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "feature_request"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Wei",
+  "order": "#104243",
+  "item": "linen shirt",
+  "date": "26 August"
+ },
+ "11603": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "returns"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#100465",
+  "item": "trail shoes",
+  "date": "23 August"
+ },
+ "11604": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "billing"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Sven",
+  "order": "#102879",
+  "item": "trail shoes",
+  "date": "8 September"
+ },
+ "11605": {
+  "category": "shipping",
+  "chargeback": "direct",
+  "asides": [
+   "account",
+   "bug"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Rosa",
+  "order": "#108893",
+  "item": "yoga mat",
+  "date": "10 September"
+ },
+ "11606": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#109853",
+  "item": "rain jacket",
+  "date": "18 September"
+ },
+ "11607": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#105802",
+  "item": "coffee grinder",
+  "date": "5 September"
+ },
+ "11608": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "bug"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Rosa",
+  "order": "#112506",
+  "item": "desk lamp",
+  "date": "31 August"
+ },
+ "11609": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "feature_request"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#111424",
+  "item": "coffee grinder",
+  "date": "25 August"
+ },
+ "11610": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "returns"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 1100,
+  "issue_last": true,
+  "first_name": "Ana",
+  "order": "#111943",
+  "item": "trail shoes",
+  "date": "11 September"
+ },
+ "11611": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "shipping"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#105358",
+  "item": "trail shoes",
+  "date": "29 September"
+ },
+ "11612": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Grace",
+  "order": "#103091",
+  "item": "trail shoes",
+  "date": "23 August"
+ },
+ "11613": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Jonas",
+  "order": "#109715",
+  "item": "yoga mat",
+  "date": "27 August"
+ },
+ "11614": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "billing"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#105270",
+  "item": "linen shirt",
+  "date": "19 September"
+ },
+ "11615": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "bug"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#109538",
+  "item": "trail shoes",
+  "date": "22 August"
+ },
+ "11616": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "shipping"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Wei",
+  "order": "#113203",
+  "item": "yoga mat",
+  "date": "12 September"
+ },
+ "11617": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "returns"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Omar",
+  "order": "#110792",
+  "item": "trail shoes",
+  "date": "22 September"
+ },
+ "11618": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "feature_request"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 950,
+  "issue_last": true,
+  "first_name": "Chlo\u00e9",
+  "order": "#104553",
+  "item": "coffee grinder",
+  "date": "31 August"
+ },
+ "11619": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "billing"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#112373",
+  "item": "rain jacket",
+  "date": "15 September"
+ },
+ "11620": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#106529",
+  "item": "coffee grinder",
+  "date": "13 September"
+ },
+ "11621": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#100867",
+  "item": "linen shirt",
+  "date": "31 August"
+ },
+ "11622": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "bug"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#104534",
+  "item": "wool scarf",
+  "date": "25 September"
+ },
+ "11623": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "returns"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Rosa",
+  "order": "#105191",
+  "item": "desk lamp",
+  "date": "14 September"
+ },
+ "11624": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#110632",
+  "item": "wool scarf",
+  "date": "18 September"
+ },
+ "11625": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#112333",
+  "item": "trail shoes",
+  "date": "2 September"
+ },
+ "11626": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#101755",
+  "item": "desk lamp",
+  "date": "22 August"
+ },
+ "11627": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#108073",
+  "item": "coffee grinder",
+  "date": "2 September"
+ },
+ "11628": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#103873",
+  "item": "wool scarf",
+  "date": "9 September"
+ },
+ "11629": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "returns"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Ana",
+  "order": "#102445",
+  "item": "trail shoes",
+  "date": "19 September"
+ },
+ "11630": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "account"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#109557",
+  "item": "coffee grinder",
+  "date": "13 September"
+ },
+ "11631": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "billing"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Ana",
+  "order": "#108508",
+  "item": "backpack",
+  "date": "28 August"
+ },
+ "11632": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "bug"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#109017",
+  "item": "backpack",
+  "date": "8 September"
+ },
+ "11633": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "shipping"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Ana",
+  "order": "#109823",
+  "item": "backpack",
+  "date": "31 August"
+ },
+ "11634": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#100087",
+  "item": "desk lamp",
+  "date": "4 September"
+ },
+ "11635": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#107251",
+  "item": "desk lamp",
+  "date": "5 September"
+ },
+ "11636": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "account"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#101626",
+  "item": "rain jacket",
+  "date": "2 September"
+ },
+ "11637": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "billing"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#109619",
+  "item": "wool scarf",
+  "date": "7 September"
+ },
+ "11638": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "feature_request"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#100997",
+  "item": "trail shoes",
+  "date": "17 September"
+ },
+ "11639": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "billing"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#104937",
+  "item": "wool scarf",
+  "date": "29 August"
+ },
+ "11640": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "account"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#100375",
+  "item": "trail shoes",
+  "date": "29 September"
+ },
+ "11641": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#101817",
+  "item": "coffee grinder",
+  "date": "26 September"
+ },
+ "11642": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "bug"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#106605",
+  "item": "yoga mat",
+  "date": "8 September"
+ },
+ "11643": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#102908",
+  "item": "desk lamp",
+  "date": "14 September"
+ },
+ "11644": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "shipping"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Nils",
+  "order": "#104458",
+  "item": "desk lamp",
+  "date": "12 September"
+ },
+ "11645": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Dev",
+  "order": "#100724",
+  "item": "linen shirt",
+  "date": "29 August"
+ },
+ "11646": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "shipping"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#109111",
+  "item": "desk lamp",
+  "date": "29 September"
+ },
+ "11647": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#100844",
+  "item": "desk lamp",
+  "date": "13 September"
+ },
+ "11648": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "feature_request"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#105691",
+  "item": "yoga mat",
+  "date": "27 August"
+ },
+ "11649": {
+  "category": "billing",
+  "chargeback": "direct",
+  "asides": [
+   "shipping",
+   "account"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Grace",
+  "order": "#113066",
+  "item": "linen shirt",
+  "date": "27 August"
+ },
+ "11650": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "returns"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#104240",
+  "item": "desk lamp",
+  "date": "21 September"
+ },
+ "11651": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "billing"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#103212",
+  "item": "yoga mat",
+  "date": "20 September"
+ },
+ "11652": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "bug"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#102320",
+  "item": "backpack",
+  "date": "5 September"
+ },
+ "11653": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "shipping"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Grace",
+  "order": "#112079",
+  "item": "linen shirt",
+  "date": "30 August"
+ },
+ "11654": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#101757",
+  "item": "wool scarf",
+  "date": "16 September"
+ },
+ "11655": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "returns"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#111884",
+  "item": "wool scarf",
+  "date": "24 September"
+ },
+ "11656": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "bug"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#107215",
+  "item": "coffee grinder",
+  "date": "25 August"
+ },
+ "11657": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "returns"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#100310",
+  "item": "linen shirt",
+  "date": "26 August"
+ },
+ "11658": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "feature_request"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Yara",
+  "order": "#113393",
+  "item": "desk lamp",
+  "date": "29 August"
+ },
+ "11659": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "feature_request"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Ana",
+  "order": "#110559",
+  "item": "coffee grinder",
+  "date": "27 September"
+ },
+ "11660": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "billing"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Dev",
+  "order": "#101889",
+  "item": "linen shirt",
+  "date": "24 August"
+ },
+ "11661": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "bug"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#108890",
+  "item": "backpack",
+  "date": "21 September"
+ },
+ "11662": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "account"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#110771",
+  "item": "trail shoes",
+  "date": "26 August"
+ },
+ "11663": {
+  "category": "shipping",
+  "chargeback": "direct",
+  "asides": [
+   "bug",
+   "billing"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#103417",
+  "item": "coffee grinder",
+  "date": "20 September"
+ },
+ "11664": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "bug"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 950,
+  "issue_last": true,
+  "first_name": "Vera",
+  "order": "#106305",
+  "item": "yoga mat",
+  "date": "12 September"
+ },
+ "11665": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Sven",
+  "order": "#106974",
+  "item": "trail shoes",
+  "date": "24 September"
+ },
+ "11666": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "returns"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Chlo\u00e9",
+  "order": "#111543",
+  "item": "trail shoes",
+  "date": "5 September"
+ },
+ "11667": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "bug"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Grace",
+  "order": "#107800",
+  "item": "trail shoes",
+  "date": "26 August"
+ },
+ "11668": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "shipping"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Fatima",
+  "order": "#102666",
+  "item": "wool scarf",
+  "date": "23 August"
+ },
+ "11669": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "returns"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#103961",
+  "item": "coffee grinder",
+  "date": "21 September"
+ },
+ "11670": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "bug"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Wei",
+  "order": "#108707",
+  "item": "backpack",
+  "date": "3 September"
+ },
+ "11671": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "account"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Hiro",
+  "order": "#105822",
+  "item": "yoga mat",
+  "date": "18 September"
+ },
+ "11672": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "feature_request"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Ines",
+  "order": "#110771",
+  "item": "rain jacket",
+  "date": "23 September"
+ },
+ "11673": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "returns"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#109312",
+  "item": "rain jacket",
+  "date": "27 September"
+ },
+ "11674": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "account"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Wei",
+  "order": "#105207",
+  "item": "wool scarf",
+  "date": "13 September"
+ },
+ "11675": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "returns"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Ben",
+  "order": "#111791",
+  "item": "wool scarf",
+  "date": "24 September"
+ },
+ "11676": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "returns"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 800,
+  "issue_last": true,
+  "first_name": "Zoe",
+  "order": "#100928",
+  "item": "desk lamp",
+  "date": "3 September"
+ },
+ "11677": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "bug"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Dev",
+  "order": "#102196",
+  "item": "desk lamp",
+  "date": "21 September"
+ },
+ "11678": {
+  "category": "billing",
+  "chargeback": "indirect",
+  "asides": [
+   "feature_request",
+   "shipping"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Sven",
+  "order": "#103092",
+  "item": "rain jacket",
+  "date": "2 September"
+ },
+ "11679": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "billing"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#102866",
+  "item": "coffee grinder",
+  "date": "24 August"
+ },
+ "11680": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "shipping"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#109312",
+  "item": "backpack",
+  "date": "7 September"
+ },
+ "11681": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "billing"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Vera",
+  "order": "#104513",
+  "item": "coffee grinder",
+  "date": "29 August"
+ },
+ "11682": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "account"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#104627",
+  "item": "backpack",
+  "date": "10 September"
+ },
+ "11683": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Wei",
+  "order": "#110407",
+  "item": "rain jacket",
+  "date": "25 September"
+ },
+ "11684": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Sven",
+  "order": "#103738",
+  "item": "coffee grinder",
+  "date": "26 September"
+ },
+ "11685": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "returns",
+   "billing"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Sven",
+  "order": "#110507",
+  "item": "linen shirt",
+  "date": "14 September"
+ },
+ "11686": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "returns"
+  ],
+  "persona": "a terse customer who writes in fragments",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Sven",
+  "order": "#107794",
+  "item": "desk lamp",
+  "date": "26 August"
+ },
+ "11687": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "billing",
+   "shipping"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Lena",
+  "order": "#111806",
+  "item": "coffee grinder",
+  "date": "29 August"
+ },
+ "11688": {
+  "category": "billing",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "feature_request"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Jonas",
+  "order": "#103221",
+  "item": "coffee grinder",
+  "date": "26 September"
+ },
+ "11689": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#107178",
+  "item": "rain jacket",
+  "date": "7 September"
+ },
+ "11690": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#110902",
+  "item": "linen shirt",
+  "date": "4 September"
+ },
+ "11691": {
+  "category": "billing",
+  "chargeback": "direct",
+  "asides": [
+   "shipping",
+   "bug"
+  ],
+  "persona": "a small-business owner, brisk and practical",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Marta",
+  "order": "#112434",
+  "item": "coffee grinder",
+  "date": "25 August"
+ },
+ "11692": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "returns"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 1100,
+  "issue_last": true,
+  "first_name": "Rosa",
+  "order": "#100669",
+  "item": "yoga mat",
+  "date": "9 September"
+ },
+ "11693": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "billing"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 500,
+  "issue_last": true,
+  "first_name": "Eitan",
+  "order": "#112709",
+  "item": "desk lamp",
+  "date": "5 September"
+ },
+ "11694": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "account"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#104829",
+  "item": "backpack",
+  "date": "27 August"
+ },
+ "11695": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "billing"
+  ],
+  "persona": "a very polite first-time customer, apologetic",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Sven",
+  "order": "#107375",
+  "item": "yoga mat",
+  "date": "20 September"
+ },
+ "11696": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "account"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1100,
+  "issue_last": true,
+  "first_name": "Umar",
+  "order": "#109111",
+  "item": "trail shoes",
+  "date": "2 September"
+ },
+ "11697": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "someone forwarding the problem on behalf of a relative",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#111777",
+  "item": "trail shoes",
+  "date": "31 August"
+ },
+ "11698": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "shipping"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#106912",
+  "item": "coffee grinder",
+  "date": "9 September"
+ },
+ "11699": {
+  "category": "account",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "shipping"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Priya",
+  "order": "#102822",
+  "item": "yoga mat",
+  "date": "29 August"
+ },
+ "11700": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "feature_request"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 800,
+  "issue_last": false,
+  "first_name": "Umar",
+  "order": "#106315",
+  "item": "linen shirt",
+  "date": "28 September"
+ },
+ "11701": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "shipping"
+  ],
+  "persona": "an IT professional, precise and detailed",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Rosa",
+  "order": "#112566",
+  "item": "linen shirt",
+  "date": "27 August"
+ },
+ "11702": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "account"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#111233",
+  "item": "wool scarf",
+  "date": "8 September"
+ },
+ "11703": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "bug",
+   "feature_request"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 1100,
+  "issue_last": true,
+  "first_name": "Ben",
+  "order": "#106386",
+  "item": "trail shoes",
+  "date": "8 September"
+ },
+ "11704": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "account"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 500,
+  "issue_last": false,
+  "first_name": "Grace",
+  "order": "#102915",
+  "item": "wool scarf",
+  "date": "12 September"
+ },
+ "11705": {
+  "category": "feature_request",
+  "chargeback": "none",
+  "asides": [
+   "account"
+  ],
+  "persona": "a retiree, polite and chatty, tells some backstory",
+  "length": 1100,
+  "issue_last": false,
+  "first_name": "Rosa",
+  "order": "#108786",
+  "item": "linen shirt",
+  "date": "2 September"
+ },
+ "11706": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "billing"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 650,
+  "issue_last": true,
+  "first_name": "Omar",
+  "order": "#100627",
+  "item": "trail shoes",
+  "date": "11 September"
+ },
+ "11707": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "account",
+   "bug"
+  ],
+  "persona": "a non-native English speaker, simple but slightly unusual phrasing",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Zoe",
+  "order": "#100950",
+  "item": "backpack",
+  "date": "30 August"
+ },
+ "11708": {
+  "category": "shipping",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "billing"
+  ],
+  "persona": "a busy parent writing on a phone, short sentences, a typo or two",
+  "length": 950,
+  "issue_last": false,
+  "first_name": "Kofi",
+  "order": "#111234",
+  "item": "desk lamp",
+  "date": "21 September"
+ },
+ "11709": {
+  "category": "bug",
+  "chargeback": "none",
+  "asides": [
+   "shipping",
+   "account"
+  ],
+  "persona": "a student, casual, lowercase-heavy",
+  "length": 1200,
+  "issue_last": false,
+  "first_name": "Eitan",
+  "order": "#101615",
+  "item": "yoga mat",
+  "date": "27 September"
+ },
+ "11710": {
+  "category": "returns",
+  "chargeback": "none",
+  "asides": [
+   "feature_request",
+   "shipping"
+  ],
+  "persona": "an angry long-time customer, sarcastic",
+  "length": 650,
+  "issue_last": false,
+  "first_name": "Quinn",
+  "order": "#102308",
+  "item": "linen shirt",
+  "date": "24 August"
+ }
+}
